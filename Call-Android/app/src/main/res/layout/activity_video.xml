@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:background="#2C3033"
+         android:paddingTop="@dimen/dp_24"
+        android:layout_height="match_parent">
+
+        <org.ar.call.DragViewLayout
+            android:id="@+id/rl_video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <RelativeLayout
+                android:id="@+id/rl_remote_video"
+                android:onClick="RemoteViewOnclick"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:background="#2C3033"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="center"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/img_logo_dark_big"></ImageView>
+            </RelativeLayout>
+
+
+
+            <RelativeLayout
+                android:id="@+id/rl_local_video"
+                android:layout_width="@dimen/dp_90"
+                android:onClick="SwitchVideo"
+                android:layout_height="@dimen/dp_160">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#1C1C1C"
+                    android:scaleType="center"
+                    android:src="@drawable/img_logo_dark_small"></ImageView>
+
+            </RelativeLayout>
+
+
+        </org.ar.call.DragViewLayout>
+
+
+
+
+
+
+
+        <RelativeLayout
+            android:id="@+id/rl_btn_group"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/ibtn_hang_Up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/dp_20"
+            android:background="@null"
+            android:text="挂断"
+            android:textSize="@dimen/sp_11"
+            android:textColor="@color/white"
+            android:onClick="Leave"
+            android:drawablePadding="@dimen/dp_13"
+            android:drawableTop="@drawable/img_hang_up"></Button>
+
+        <LinearLayout
+            android:layout_above="@+id/ibtn_hang_Up"
+            android:layout_width="match_parent"
+            android:layout_marginBottom="@dimen/dp_22"
+            android:layout_marginLeft="@dimen/dp_20"
+            android:layout_marginRight="@dimen/dp_20"
+            android:gravity="center_horizontal"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/ibtn_audio"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:onClick="MuteLocalAudio"
+                android:drawableTop="@drawable/selector_audio_manager"
+                android:layout_height="wrap_content">
+            </Button>
+
+            <Button
+                android:id="@+id/ibtn_speak"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:onClick="SwitchSpeak"
+                android:drawableTop="@drawable/selector_voice"
+                android:layout_height="wrap_content">
+
+            </Button>
+
+            <Button
+                android:id="@+id/ibtn_video"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:onClick="MuteLocalVideo"
+                android:drawableTop="@drawable/selector_video_manager"
+                android:layout_height="wrap_content">
+            </Button>
+
+
+            <Button
+                android:id="@+id/btn_switch"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:onClick="SwitchCamera"
+                android:background="@null"
+                android:drawableTop="@drawable/selector_switch"
+                ></Button>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btn_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="Small"
+            android:padding="@dimen/dp_20"
+            android:background="@null"
+            android:src="@drawable/img_small"
+            ></ImageButton>
+        </RelativeLayout>
+
+
+    </FrameLayout>
+

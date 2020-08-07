@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/img_bg"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/iv_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/img_logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/dp_180"></ImageView>
+
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/iv_logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/dp_37"
+        android:textColor="@color/white"
+        android:textSize="@dimen/sp_14"
+        android:text="AR呼叫邀请场景展示"></TextView>
+
+    <Button
+        android:id="@+id/btn_login"
+        android:layout_width="@dimen/dp_301"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_name"
+        android:layout_marginTop="@dimen/dp_112"
+        android:background="@drawable/shape_login_btn"
+        android:onClick="Login"
+        android:layout_centerHorizontal="true"
+        android:textSize="@dimen/sp_14"
+        android:text="登录"
+        android:textColor="@color/colorAccent" />
+
+    <TextView
+        android:id="@+id/tv_user"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_below="@+id/btn_login"
+        android:layout_marginTop="@dimen/dp_45"
+        android:textSize="@dimen/sp_14"
+        android:textColor="@color/white"
+        android:text="您的呼叫ID:0000"></TextView>
+
+</RelativeLayout>

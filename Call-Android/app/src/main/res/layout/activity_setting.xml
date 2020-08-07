@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5"
+    >
+    <RelativeLayout
+        android:layout_marginTop="@dimen/dp_25"
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44">
+
+        <ImageView
+            android:onClick="Back"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/img_back"
+            android:paddingRight="@dimen/dp_18"
+            android:paddingLeft="@dimen/dp_18"></ImageView>
+
+        <TextView
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#333333"
+            android:textSize="@dimen/sp_18"
+            android:text="设置"></TextView>
+    </RelativeLayout>
+
+
+
+    <TextView
+        android:layout_marginTop="@dimen/dp_11"
+        android:layout_width="match_parent"
+        android:background="#ffffff"
+        android:text="分辨率"
+        android:paddingLeft="@dimen/dp_18"
+        android:textColor="#999999"
+        android:textSize="@dimen/sp_15"
+        android:gravity="center_vertical"
+        android:layout_height="@dimen/dp_47">
+    </TextView>
+
+    <TextView
+        android:id="@+id/tv_xy"
+        android:onClick="FenBianLv"
+        android:layout_width="match_parent"
+        android:text="480*640"
+        android:paddingLeft="@dimen/dp_18"
+        android:textColor="#333333"
+        android:background="@color/white"
+        android:paddingRight="@dimen/dp_18"
+        android:drawableRight="@drawable/img_more"
+        android:textSize="@dimen/sp_15"
+        android:gravity="center_vertical"
+        android:layout_height="@dimen/dp_47">
+    </TextView>
+
+
+    <TextView
+        android:layout_marginTop="@dimen/dp_11"
+        android:layout_width="match_parent"
+        android:background="@color/white"
+        android:text="帧率"
+        android:paddingLeft="@dimen/dp_18"
+        android:textColor="#999999"
+        android:textSize="@dimen/sp_15"
+        android:gravity="center_vertical"
+        android:layout_height="@dimen/dp_47">
+    </TextView>
+
+    <TextView
+        android:id="@+id/tv_frame"
+        android:onClick="Frame"
+        android:layout_width="match_parent"
+        android:text="15"
+        android:background="@color/white"
+        android:paddingLeft="@dimen/dp_18"
+        android:textColor="#333333"
+        android:paddingRight="@dimen/dp_18"
+        android:drawableRight="@drawable/img_more"
+        android:textSize="@dimen/sp_15"
+        android:gravity="center_vertical"
+        android:layout_height="@dimen/dp_47">
+    </TextView>
+
+
+
+
+
+
+
+</LinearLayout>
