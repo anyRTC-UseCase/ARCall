@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="google" content="notranslate" />
+		<title>anyrtc呼叫 - anyRTC</title>
+
+		<!-- CSS only -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+		 crossorigin="anonymous">
+		<!-- JS, Popper.js, and jQuery -->
+		<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+		 crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+		 crossorigin="anonymous"></script>
+
+		<!-- 覆盖bootstrap样式 -->
+		<link rel="stylesheet" href="./assets/css/index.css">
+
+	</head>
+	<body class="notranslate">
+
+		<!-- 首页 style="display: none !important;" -->
+		<div class="page d-flex flex-col justify-content-center align-items-center" id="homePage">
+
+			<!--  -->
+			<div class="login d-flex flex-row">
+				<!-- 警告框 -->
+				<div class="warning_box" id="warningBox"></div>
+				<!--  -->
+				<div class="flex-fill flex-basis-0 login-left">
+					<div class="extend-height d-flex flex-column align-items-center"></div>
+				</div>
+				<!--  -->
+				<div class="flex-fill flex-basis-0 login-right">
+					<!--  -->
+					<div class="d-flex flex-column login-form" id="loginForm">
+						<div class="login-form_hd align-self-end">
+							<span class="icon-btn" id="openSettingBtn">
+								<svg width="2em" style="color: #40a3fc;" height="2em" viewBox="0 0 16 16" class="bi bi-gear" fill="currentColor"
+								 xmlns="http://www.w3.org/2000/svg">
+									<path fill-rule="evenodd" d="M8.837 1.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 0 1 4.377 3.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 0 1-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 0 1 1.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 0 1 2.692 1.116l.094.318c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 0 1 2.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 0 1 1.116-2.693l.318-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 0 1-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159A1.873 1.873 0 0 1 8.93 1.945l-.094-.319zm-2.633-.283c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 0 0 1.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 0 0 .52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 0 0-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 0 0-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 0 0-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 0 0-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 0 0 .52-1.255l-.16-.292c-.892-1.64.902-3.433 2.541-2.54l.292.159a.873.873 0 0 0 1.255-.52l.094-.319z" />
+									<path fill-rule="evenodd" d="M8 5.754a2.246 2.246 0 1 0 0 4.492 2.246 2.246 0 0 0 0-4.492zM4.754 8a3.246 3.246 0 1 1 6.492 0 3.246 3.246 0 0 1-6.492 0z" />
+								</svg>
+							</span>
+						</div>
+						<div class="login-form_bd">
+							<div class="f-flex justify-content-between input-group userid-inputs" id="userInputs">
+								<input type="tel" maxlength="1" name="code" pattern="[0-9]*" />
+								<input type="tel" maxlength="1" name="code" pattern="[0-9]*" />
+								<input type="tel" maxlength="1" name="code" pattern="[0-9]*" />
+								<input type="tel" maxlength="1" name="code" pattern="[0-9]*" />
+							</div>
+						</div>
+						<div class="login-form_bt">
+							<div class="login-form_desc">输入您朋友的用户ID</div>
+							<div class="login-form_submit">
+								<button type="button" class="container-fluid btn btn-primary" disabled id="makeCallBtn">call</button>
+							</div>
+							<div class="login-form_ownid">您的用户ID：<span id="ownUserIdView">未登录</span></div>
+						</div>
+					</div>
+					<!-- 设置 -->
+					<div class="d-flex flex-column login-form login-setting" id="loginSetting">
+						<div class="extend-height d-flex flex-column">
+							<div class="setting-hd d-flex">
+								<div>
+									<span class="icon-btn" id="closeSettingBtn">
+										<svg width="2em" style="color: #ddd;" height="2em" viewBox="0 0 16 16" class="bi bi-chevron-left" fill="currentColor"
+										 xmlns="http://www.w3.org/2000/svg">
+											<path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+										</svg>
+									</span>
+								</div>
+								<div style="text-align: center;width: 100%;">
+									<span>设置</span>
+								</div>
+
+							</div>
+							<div class="setting-bd">
+								<div class="setting-option_title">分辨率</div>
+								<select name="" id="settingVideoResolution">
+									<option value="640*360">360P</option>
+									<option value="640*480">480P</option>
+									<option value="1280*720">720P</option>
+								</select>
+								<!--  -->
+								<div class="setting-option_title">音频设备</div>
+								<select name="" id="audioInputSelect"></select>
+								<!--  -->
+								<div class="setting-option_title">视频设备</div>
+								<select name="" id="videoInputSelect"></select>
+								<!--  -->
+								<div class="d-flex justify-content-center setting-video_preview" id="settingVideoPreview">
+									<img draggable="false" class="img-responsive setting-video_preview_bg" src="assets/images/chart.png">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- 背景图 -->
+				<div class="login_bg">
+					<img draggable="false" class="img-responsive" src="assets/images/BG.png">
+				</div>
+			</div>
+		</div>
+
+		<!-- 邀请页 -->
+		<div class="page d-flex justify-content-center align-items-center allheight d-none" id="makeCallPage">
+			<div class="invitation bd-highlight">
+				<div class="d-flex justify-content-center">
+					<div class="head_portrait">
+						<img draggable="false" src="assets/images/head.png">
+					</div>
+				</div>
+				<div class="d-flex justify-content-center text-white mt-2 mb-2" id="calleeIdView" style="font-size: 2em;letter-spacing: 12px;">----</div>
+				<div class="d-flex justify-content-center text-white">呼叫中...</div>
+
+				<div class="page d-flex flex-col justify-content-center align-items-centermar" style="margin:130px auto 30px">
+					<img draggable="false" class="img-responsive" style="cursor: pointer;" src="assets/images/hangup.png" id="cancelCallBtn">
+					<!-- <button type="button" class="btn btn-danger" >取消</button> -->
+				</div>
+			</div>
+		</div>
+
+		<!-- 被呼页 -->
+		<div class="page d-flex justify-content-center align-items-center allheight d-none" id="reciveCallPage">
+			<div class="invitation bd-highlight">
+				<div class="d-flex justify-content-center">
+					<div class="head_portrait">
+						<img draggable="false" src="assets/images/head.png">
+					</div>
+				</div>
+				<div class="d-flex justify-content-center text-white mt-2 mb-2" id="callerIdView" style="font-size: 2em;letter-spacing: 12px;">----</div>
+				<div class="d-flex justify-content-center text-white">待接听...</div>
+
+				<div class="page d-flex flex-col justify-content-around align-items-centermar" style="margin:130px auto 30px">
+					<img draggable="false" class="img-responsive" style="cursor: pointer;" src="assets/images/answer.png" id="acceptCallBtn">
+					<img draggable="false" class="img-responsive" style="cursor: pointer;" src="assets/images/hangup.png" id="refuseCallBtn">
+				</div>
+			</div>
+		</div>
+
+		<!-- 视频通讯页 -->
+		<div class="page d-none d-flex flex-col justify-content-center align-items-center" id="meetPage">
+			<div class="container" style="position: relative;">
+				<!-- 小屏 -->
+				<div class="video-preview_title d-flex justify-content-center align-items-center" id="mineVideoPreview">
+					<img id="mineVideoPreview_bg" draggable="false" style="position: absolute;" class="img-responsive" src="assets/images/logo_title.png">
+				</div>
+				<!-- 大屏 -->
+				<div class="video-preview_big d-flex justify-content-center align-items-center" id="peerVideoPreview">
+					<img draggable="false" style="position: absolute;" class="img-responsive" src="assets/images/logo_big.png">
+				</div>
+				<!--  -->
+				<div class="video-operate d-flex justify-content-center">
+					<div class="d-flex">
+						<!-- 语音开关 -->
+						<div id="audioSwitchBtn">
+							<img draggable="false" class="derail derail_voice" src="assets/images/voice.png">
+							<img draggable="false" class="derail derail_voice_close" src="assets/images/voice_close.png">
+						</div>
+						<!-- 挂断 -->
+						<div style="margin: 0 30px;" id="hangupBtn">
+							<img draggable="false" class="derail" src="assets/images/video_hangup.png" />
+						</div>
+						<!-- 视频开关 -->
+						<div id="videoSwitchBtn">
+							<img draggable="false" class="derail derail_video" src="assets/images/video.png">
+							<img draggable="false" class="derail derail_video_close" src="assets/images/video_close.png">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- <script src="https://ardw.anyrtc.io/sdk/web/ArRTC@latest.js"></script> -->
+		<script src="./assets/js/ArRTC@latest.js"></script>
+		<!-- <script src="https://ardw.anyrtc.io/sdk/web/ArRTM@latest.js"></script> -->
+		<script src="./assets/js/ArRTM@latestcopy.js"></script>
+		<script src="./assets/js/index.js"></script>
+	</body>
+</html>
