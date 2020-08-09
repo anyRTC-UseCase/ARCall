@@ -1,0 +1,67 @@
+//
+//  ARtmManager.m
+//  ARtmKitDemo
+//
+//  Created by 余生丶 on 2020/6/19.
+//  Copyright © 2020 AR. All rights reserved.
+//
+
+#import "ARtmManager.h"
+#import "ARtmUserManager.h"
+
+static ARtmKit *rtmKit_ = nil;
+static ARtcEngineKit *rtcKit_ = nil;
+static NSString *localUid = nil;
+static NSMutableDictionary *offlineDic = nil;
+
+@implementation ARtmManager
+
++ (void)load {
+    rtmKit_ = [[ARtmKit alloc] initWithAppId:appID delegate:nil];
+    rtcKit_ = [ARtcEngineKit sharedEngineWithAppId:appID delegate:nil];
+    offlineDic = [NSMutableDictionary dictionary];
+}
+
++ (ARtmKit * _Nullable)rtmKit {
+    return rtmKit_;
+}
+
++ (ARtcEngineKit * _Nullable)rtcKit {
+    return rtcKit_;
+}
+
++ (void)setLocalUid:(NSString *)uid {
+    localUid = uid;
+    if (uid.length != 0) {
+        ARtmUserInfo *userInfo = [[ARtmUserInfo alloc] init];
+        userInfo.uid = uid;
+        userInfo.frameRate = 15;
+        userInfo.dimensions = @"480P";
+        [ARtmUserManager saveAccountInformation:userInfo];
+    } else {
+        [ARtmUserManager deleteAccountInformation];
+    }
+}
+
++ (NSString *)getLocalUid {
+    return ARtmUserManager.fetchUserInfo.uid;
+}
+
++ (void)addOfflineMessage:(ARtmMessage * _Nonnull)message fromUser:(NSString * _Nonnull)uid {
+    if (message.isOfflineMessage) {
+        NSMutableArray *infoArr = nil;
+        if (offlineDic[uid]) {
+            infoArr = offlineDic[uid];
+        } else {
+            infoArr = [NSMutableArray array];
+        }
+        
+        [infoArr addObject:message];
+        
+        if (!offlineDic[uid]) {
+            offlineDic[uid] = infoArr;
+        }
+    }
+}
+
+@end

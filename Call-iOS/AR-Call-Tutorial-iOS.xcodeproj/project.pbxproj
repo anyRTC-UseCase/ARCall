@@ -1,0 +1,544 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 51;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0ED0DB8A3EDC39B5F9ED5419 /* Pods_AR_Call_Tutorial_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA097CF202F6D6C055171E6 /* Pods_AR_Call_Tutorial_iOS.framework */; };
+		63511E4324C42240004D405B /* ARtmUserManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 63511E4224C42240004D405B /* ARtmUserManager.m */; };
+		636780BF24C2EEAE004D5C1D /* ARtcKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 636780BD24C2EEA6004D5C1D /* ARtcKit.framework */; };
+		636780C024C2EEAE004D5C1D /* ARtcKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 636780BD24C2EEA6004D5C1D /* ARtcKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		636780C624C2FB8B004D5C1D /* ARtmConfigController.m in Sources */ = {isa = PBXBuildFile; fileRef = 636780C524C2FB8B004D5C1D /* ARtmConfigController.m */; };
+		63871CE824DBFCF8003C220D /* ARtmKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63871CE624DBFCEC003C220D /* ARtmKit.framework */; };
+		63871CE924DBFCF8003C220D /* ARtmKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 63871CE624DBFCEC003C220D /* ARtmKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		63871CEB24DBFFD9003C220D /* rtm_call.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 63871CEA24DBFFD9003C220D /* rtm_call.mp3 */; };
+		63CA2EF324C17971003FF0AC /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 63CA2EF224C17971003FF0AC /* AppDelegate.m */; };
+		63CA2EF924C17971003FF0AC /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 63CA2EF824C17971003FF0AC /* ViewController.m */; };
+		63CA2EFC24C17971003FF0AC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 63CA2EFA24C17971003FF0AC /* Main.storyboard */; };
+		63CA2EFE24C17972003FF0AC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63CA2EFD24C17972003FF0AC /* Assets.xcassets */; };
+		63CA2F0124C17972003FF0AC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 63CA2EFF24C17972003FF0AC /* LaunchScreen.storyboard */; };
+		63CA2F0424C17972003FF0AC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 63CA2F0324C17972003FF0AC /* main.m */; };
+		63CA2F1624C18B05003FF0AC /* ARtmManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 63CA2F1424C18B05003FF0AC /* ARtmManager.m */; };
+		63CA2F1924C18BC9003FF0AC /* ARCallCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 63CA2F1824C18BC9003FF0AC /* ARCallCommon.m */; };
+		63CA2F1C24C18E6A003FF0AC /* ARtmMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 63CA2F1B24C18E6A003FF0AC /* ARtmMainViewController.m */; };
+		63CA2F2324C1BBF8003FF0AC /* ARtmCallView.m in Sources */ = {isa = PBXBuildFile; fileRef = 63CA2F2224C1BBF8003FF0AC /* ARtmCallView.m */; };
+		63CA2F2524C1BC0B003FF0AC /* ARtmCallView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 63CA2F2424C1BC0B003FF0AC /* ARtmCallView.xib */; };
+		63CA2F2F24C1EA79003FF0AC /* WMDragView.m in Sources */ = {isa = PBXBuildFile; fileRef = 63CA2F2D24C1EA79003FF0AC /* WMDragView.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		63CA2F1124C17DBE003FF0AC /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				636780C024C2EEAE004D5C1D /* ARtcKit.framework in Embed Frameworks */,
+				63871CE924DBFCF8003C220D /* ARtmKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		63511E4124C42240004D405B /* ARtmUserManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmUserManager.h; sourceTree = "<group>"; };
+		63511E4224C42240004D405B /* ARtmUserManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmUserManager.m; sourceTree = "<group>"; };
+		636780BD24C2EEA6004D5C1D /* ARtcKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ARtcKit.framework; sourceTree = "<group>"; };
+		636780C424C2FB8B004D5C1D /* ARtmConfigController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmConfigController.h; sourceTree = "<group>"; };
+		636780C524C2FB8B004D5C1D /* ARtmConfigController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmConfigController.m; sourceTree = "<group>"; };
+		63871CE624DBFCEC003C220D /* ARtmKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ARtmKit.framework; sourceTree = "<group>"; };
+		63871CEA24DBFFD9003C220D /* rtm_call.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = rtm_call.mp3; sourceTree = "<group>"; };
+		63CA2EEE24C17971003FF0AC /* 视频通话.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "视频通话.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		63CA2EF124C17971003FF0AC /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		63CA2EF224C17971003FF0AC /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		63CA2EF724C17971003FF0AC /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		63CA2EF824C17971003FF0AC /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		63CA2EFB24C17971003FF0AC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		63CA2EFD24C17972003FF0AC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		63CA2F0024C17972003FF0AC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		63CA2F0224C17972003FF0AC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		63CA2F0324C17972003FF0AC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		63CA2F0E24C17CC9003FF0AC /* PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
+		63CA2F1424C18B05003FF0AC /* ARtmManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ARtmManager.m; sourceTree = "<group>"; };
+		63CA2F1524C18B05003FF0AC /* ARtmManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARtmManager.h; sourceTree = "<group>"; };
+		63CA2F1724C18BC9003FF0AC /* ARCallCommon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARCallCommon.h; sourceTree = "<group>"; };
+		63CA2F1824C18BC9003FF0AC /* ARCallCommon.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARCallCommon.m; sourceTree = "<group>"; };
+		63CA2F1A24C18E6A003FF0AC /* ARtmMainViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmMainViewController.h; sourceTree = "<group>"; };
+		63CA2F1B24C18E6A003FF0AC /* ARtmMainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmMainViewController.m; sourceTree = "<group>"; };
+		63CA2F2124C1BBF8003FF0AC /* ARtmCallView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmCallView.h; sourceTree = "<group>"; };
+		63CA2F2224C1BBF8003FF0AC /* ARtmCallView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmCallView.m; sourceTree = "<group>"; };
+		63CA2F2424C1BC0B003FF0AC /* ARtmCallView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ARtmCallView.xib; sourceTree = "<group>"; };
+		63CA2F2D24C1EA79003FF0AC /* WMDragView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WMDragView.m; sourceTree = "<group>"; };
+		63CA2F2E24C1EA79003FF0AC /* WMDragView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WMDragView.h; sourceTree = "<group>"; };
+		8AFC5CD5596F128B5F08D513 /* Pods-AR-Call-Tutorial-iOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AR-Call-Tutorial-iOS.debug.xcconfig"; path = "Target Support Files/Pods-AR-Call-Tutorial-iOS/Pods-AR-Call-Tutorial-iOS.debug.xcconfig"; sourceTree = "<group>"; };
+		8CA097CF202F6D6C055171E6 /* Pods_AR_Call_Tutorial_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AR_Call_Tutorial_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A3F539A03502FDAC2D396134 /* Pods-AR-Call-Tutorial-iOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AR-Call-Tutorial-iOS.release.xcconfig"; path = "Target Support Files/Pods-AR-Call-Tutorial-iOS/Pods-AR-Call-Tutorial-iOS.release.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		63CA2EEB24C17971003FF0AC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				63871CE824DBFCF8003C220D /* ARtmKit.framework in Frameworks */,
+				636780BF24C2EEAE004D5C1D /* ARtcKit.framework in Frameworks */,
+				0ED0DB8A3EDC39B5F9ED5419 /* Pods_AR_Call_Tutorial_iOS.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		52FADC3B8696C6FC34212343 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				8AFC5CD5596F128B5F08D513 /* Pods-AR-Call-Tutorial-iOS.debug.xcconfig */,
+				A3F539A03502FDAC2D396134 /* Pods-AR-Call-Tutorial-iOS.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		63CA2EE524C17971003FF0AC = {
+			isa = PBXGroup;
+			children = (
+				63CA2EF024C17971003FF0AC /* AR-Call-Tutorial-iOS */,
+				63CA2EEF24C17971003FF0AC /* Products */,
+				52FADC3B8696C6FC34212343 /* Pods */,
+				AA66DAFA2D5D9A0AD9B3E2DD /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		63CA2EEF24C17971003FF0AC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				63CA2EEE24C17971003FF0AC /* 视频通话.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		63CA2EF024C17971003FF0AC /* AR-Call-Tutorial-iOS */ = {
+			isa = PBXGroup;
+			children = (
+				63871CE624DBFCEC003C220D /* ARtmKit.framework */,
+				636780BD24C2EEA6004D5C1D /* ARtcKit.framework */,
+				63EDCF3924C5C843003AE948 /* Call */,
+				63EDCF3824C5C821003AE948 /* Tool */,
+				63EDCF3724C5C7F7003AE948 /* Base */,
+				63EDCF3A24C5C860003AE948 /* Config */,
+				63CA2EFA24C17971003FF0AC /* Main.storyboard */,
+				63CA2EFD24C17972003FF0AC /* Assets.xcassets */,
+				63CA2F0224C17972003FF0AC /* Info.plist */,
+				63871CEA24DBFFD9003C220D /* rtm_call.mp3 */,
+				63CA2EFF24C17972003FF0AC /* LaunchScreen.storyboard */,
+				63CA2F0324C17972003FF0AC /* main.m */,
+				63CA2F0E24C17CC9003FF0AC /* PrefixHeader.pch */,
+			);
+			path = "AR-Call-Tutorial-iOS";
+			sourceTree = "<group>";
+		};
+		63EDCF3724C5C7F7003AE948 /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				63CA2EF124C17971003FF0AC /* AppDelegate.h */,
+				63CA2EF224C17971003FF0AC /* AppDelegate.m */,
+			);
+			path = Base;
+			sourceTree = "<group>";
+		};
+		63EDCF3824C5C821003AE948 /* Tool */ = {
+			isa = PBXGroup;
+			children = (
+				63CA2F1524C18B05003FF0AC /* ARtmManager.h */,
+				63CA2F1424C18B05003FF0AC /* ARtmManager.m */,
+				63511E4124C42240004D405B /* ARtmUserManager.h */,
+				63511E4224C42240004D405B /* ARtmUserManager.m */,
+				63CA2F1724C18BC9003FF0AC /* ARCallCommon.h */,
+				63CA2F1824C18BC9003FF0AC /* ARCallCommon.m */,
+				63CA2F2E24C1EA79003FF0AC /* WMDragView.h */,
+				63CA2F2D24C1EA79003FF0AC /* WMDragView.m */,
+			);
+			path = Tool;
+			sourceTree = "<group>";
+		};
+		63EDCF3924C5C843003AE948 /* Call */ = {
+			isa = PBXGroup;
+			children = (
+				63CA2F1A24C18E6A003FF0AC /* ARtmMainViewController.h */,
+				63CA2F1B24C18E6A003FF0AC /* ARtmMainViewController.m */,
+				63CA2EF724C17971003FF0AC /* ViewController.h */,
+				63CA2EF824C17971003FF0AC /* ViewController.m */,
+				63EDCF3B24C5C892003AE948 /* View */,
+			);
+			path = Call;
+			sourceTree = "<group>";
+		};
+		63EDCF3A24C5C860003AE948 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				636780C424C2FB8B004D5C1D /* ARtmConfigController.h */,
+				636780C524C2FB8B004D5C1D /* ARtmConfigController.m */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		63EDCF3B24C5C892003AE948 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				63CA2F2124C1BBF8003FF0AC /* ARtmCallView.h */,
+				63CA2F2224C1BBF8003FF0AC /* ARtmCallView.m */,
+				63CA2F2424C1BC0B003FF0AC /* ARtmCallView.xib */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		AA66DAFA2D5D9A0AD9B3E2DD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8CA097CF202F6D6C055171E6 /* Pods_AR_Call_Tutorial_iOS.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		63CA2EED24C17971003FF0AC /* AR-Call-Tutorial-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 63CA2F0724C17972003FF0AC /* Build configuration list for PBXNativeTarget "AR-Call-Tutorial-iOS" */;
+			buildPhases = (
+				C7CE701EA82A74D9AFAE9838 /* [CP] Check Pods Manifest.lock */,
+				63CA2EEA24C17971003FF0AC /* Sources */,
+				63CA2EEB24C17971003FF0AC /* Frameworks */,
+				63CA2EEC24C17971003FF0AC /* Resources */,
+				63CA2F1124C17DBE003FF0AC /* Embed Frameworks */,
+				53A668AB02CE17643B9A8559 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "AR-Call-Tutorial-iOS";
+			productName = "AR-Call-Tutorial-iOS";
+			productReference = 63CA2EEE24C17971003FF0AC /* 视频通话.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		63CA2EE624C17971003FF0AC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1130;
+				ORGANIZATIONNAME = AR;
+				TargetAttributes = {
+					63CA2EED24C17971003FF0AC = {
+						CreatedOnToolsVersion = 11.3;
+					};
+				};
+			};
+			buildConfigurationList = 63CA2EE924C17971003FF0AC /* Build configuration list for PBXProject "AR-Call-Tutorial-iOS" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 63CA2EE524C17971003FF0AC;
+			productRefGroup = 63CA2EEF24C17971003FF0AC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				63CA2EED24C17971003FF0AC /* AR-Call-Tutorial-iOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		63CA2EEC24C17971003FF0AC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				63CA2F2524C1BC0B003FF0AC /* ARtmCallView.xib in Resources */,
+				63871CEB24DBFFD9003C220D /* rtm_call.mp3 in Resources */,
+				63CA2F0124C17972003FF0AC /* LaunchScreen.storyboard in Resources */,
+				63CA2EFE24C17972003FF0AC /* Assets.xcassets in Resources */,
+				63CA2EFC24C17971003FF0AC /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		53A668AB02CE17643B9A8559 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AR-Call-Tutorial-iOS/Pods-AR-Call-Tutorial-iOS-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AR-Call-Tutorial-iOS/Pods-AR-Call-Tutorial-iOS-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AR-Call-Tutorial-iOS/Pods-AR-Call-Tutorial-iOS-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C7CE701EA82A74D9AFAE9838 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-AR-Call-Tutorial-iOS-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		63CA2EEA24C17971003FF0AC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				63CA2EF924C17971003FF0AC /* ViewController.m in Sources */,
+				636780C624C2FB8B004D5C1D /* ARtmConfigController.m in Sources */,
+				63511E4324C42240004D405B /* ARtmUserManager.m in Sources */,
+				63CA2F2F24C1EA79003FF0AC /* WMDragView.m in Sources */,
+				63CA2F1924C18BC9003FF0AC /* ARCallCommon.m in Sources */,
+				63CA2F2324C1BBF8003FF0AC /* ARtmCallView.m in Sources */,
+				63CA2EF324C17971003FF0AC /* AppDelegate.m in Sources */,
+				63CA2F1C24C18E6A003FF0AC /* ARtmMainViewController.m in Sources */,
+				63CA2F0424C17972003FF0AC /* main.m in Sources */,
+				63CA2F1624C18B05003FF0AC /* ARtmManager.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		63CA2EFA24C17971003FF0AC /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				63CA2EFB24C17971003FF0AC /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		63CA2EFF24C17972003FF0AC /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				63CA2F0024C17972003FF0AC /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		63CA2F0524C17972003FF0AC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		63CA2F0624C17972003FF0AC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		63CA2F0824C17972003FF0AC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8AFC5CD5596F128B5F08D513 /* Pods-AR-Call-Tutorial-iOS.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = MW4NEMKYLF;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/AR-Call-Tutorial-iOS",
+				);
+				GCC_PREFIX_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/PrefixHeader.pch";
+				INFOPLIST_FILE = "AR-Call-Tutorial-iOS/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.linhwa.LHOA;
+				PRODUCT_NAME = "视频通话";
+				PROVISIONING_PROFILE_SPECIFIER = com.linhwa.LHOA;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		63CA2F0924C17972003FF0AC /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A3F539A03502FDAC2D396134 /* Pods-AR-Call-Tutorial-iOS.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = MW4NEMKYLF;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/AR-Call-Tutorial-iOS",
+				);
+				GCC_PREFIX_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/PrefixHeader.pch";
+				INFOPLIST_FILE = "AR-Call-Tutorial-iOS/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.linhwa.LHOA;
+				PRODUCT_NAME = "视频通话";
+				PROVISIONING_PROFILE_SPECIFIER = com.linhwa.LHOA;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		63CA2EE924C17971003FF0AC /* Build configuration list for PBXProject "AR-Call-Tutorial-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				63CA2F0524C17972003FF0AC /* Debug */,
+				63CA2F0624C17972003FF0AC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		63CA2F0724C17972003FF0AC /* Build configuration list for PBXNativeTarget "AR-Call-Tutorial-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				63CA2F0824C17972003FF0AC /* Debug */,
+				63CA2F0924C17972003FF0AC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 63CA2EE624C17971003FF0AC /* Project object */;
+}
