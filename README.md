@@ -1,5 +1,7 @@
 ## 效果
+
 ![image](https://github.com/anyRTC-UseCase/ARCall/blob/master/resource/demo.gif)
+
 ## 项目概述
 
 ARCall 是anyRTC专为2人通话的示例项目，演示了如何通过 anyRTC云服务，并配合 anyRTC RTC SDK、anyRTC RTM SDK，快速实现呼叫邀请通话的场景。
@@ -95,5 +97,6 @@ QQ咨询群：580477436
 获取更多帮助前往：[www.anyrtc.io](http://www.anyrtc.io)
 
 项目交流微信群,请扫描下方二维码进群
+
 ![image](https://github.com/anyRTC-UseCase/ARCall/blob/master/resource/qrcode.png)
 
