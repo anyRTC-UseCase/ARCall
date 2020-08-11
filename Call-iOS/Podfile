@@ -1,0 +1,10 @@
+platform :ios,'9.0'
+target 'AR-Call-Tutorial-iOS' do
+    
+use_frameworks!
+
+pod 'Bugly', '~> 2.5.2'
+pod 'SVProgressHUD', '~> 2.2.5'
+pod 'Masonry'
+
+end
