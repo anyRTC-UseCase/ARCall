@@ -13,7 +13,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ARtmManager : NSObject
 
 + (ARtmKit * _Nullable)rtmKit;
-+ (ARtcEngineKit * _Nullable)rtcKit;
 + (void)setLocalUid:(NSString *)uid;
 + (NSString *)getLocalUid;
 + (void)addOfflineMessage:(ARtmMessage * _Nonnull)message fromUser:(NSString * _Nonnull)uid;

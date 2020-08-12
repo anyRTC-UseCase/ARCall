@@ -8,6 +8,7 @@
 
 #import "ARtmConfigController.h"
 #import "ARtmUserManager.h"
+#import "ARtmCallView.h"
 
 @interface ARtmConfigController ()
 

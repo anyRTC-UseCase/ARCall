@@ -1027,6 +1027,14 @@ __attribute__((visibility("default"))) @interface ARtcEngineKit : NSObject
 
 //MARK: - 音频自采集 (仅适用于 push 模式)
 
+- (void)enableExternalAudioSourceWithSampleRate:(NSUInteger)sampleRate channelsPerFrame:(NSUInteger)channelsPerFrame;
+
+- (void)disableExternalAudioSource;
+
+- (BOOL)pushExternalAudioFrameRawData:(void *_Nonnull)data samples:(NSUInteger)samples timestamp:(NSTimeInterval)timestamp;
+
+- (BOOL)pushExternalAudioFrameSampleBuffer:(CMSampleBufferRef _Nonnull)sampleBuffer;
+
 //MARK: - 视频自采集 (仅适用于 push 模式)
 
 /**-----------------------------------------------------------------------------
