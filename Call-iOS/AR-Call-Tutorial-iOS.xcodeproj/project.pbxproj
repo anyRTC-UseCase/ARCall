@@ -9,12 +9,12 @@
 /* Begin PBXBuildFile section */
 		0ED0DB8A3EDC39B5F9ED5419 /* Pods_AR_Call_Tutorial_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA097CF202F6D6C055171E6 /* Pods_AR_Call_Tutorial_iOS.framework */; };
 		63511E4324C42240004D405B /* ARtmUserManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 63511E4224C42240004D405B /* ARtmUserManager.m */; };
-		636780BF24C2EEAE004D5C1D /* ARtcKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 636780BD24C2EEA6004D5C1D /* ARtcKit.framework */; };
-		636780C024C2EEAE004D5C1D /* ARtcKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 636780BD24C2EEA6004D5C1D /* ARtcKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		636780C624C2FB8B004D5C1D /* ARtmConfigController.m in Sources */ = {isa = PBXBuildFile; fileRef = 636780C524C2FB8B004D5C1D /* ARtmConfigController.m */; };
-		63871CE824DBFCF8003C220D /* ARtmKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63871CE624DBFCEC003C220D /* ARtmKit.framework */; };
-		63871CE924DBFCF8003C220D /* ARtmKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 63871CE624DBFCEC003C220D /* ARtmKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		63871CEB24DBFFD9003C220D /* rtm_call.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 63871CEA24DBFFD9003C220D /* rtm_call.mp3 */; };
+		63906EBA24E3D1C2000DA7B1 /* ARtcKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63906EB624E3D17F000DA7B1 /* ARtcKit.framework */; };
+		63906EBB24E3D1C2000DA7B1 /* ARtcKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 63906EB624E3D17F000DA7B1 /* ARtcKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		63906EBC24E3D1C3000DA7B1 /* ARtmKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63906EB824E3D1B6000DA7B1 /* ARtmKit.framework */; };
+		63906EBD24E3D1C3000DA7B1 /* ARtmKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 63906EB824E3D1B6000DA7B1 /* ARtmKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		63CA2EF324C17971003FF0AC /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 63CA2EF224C17971003FF0AC /* AppDelegate.m */; };
 		63CA2EF924C17971003FF0AC /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 63CA2EF824C17971003FF0AC /* ViewController.m */; };
 		63CA2EFC24C17971003FF0AC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 63CA2EFA24C17971003FF0AC /* Main.storyboard */; };
@@ -36,8 +36,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				636780C024C2EEAE004D5C1D /* ARtcKit.framework in Embed Frameworks */,
-				63871CE924DBFCF8003C220D /* ARtmKit.framework in Embed Frameworks */,
+				63906EBB24E3D1C2000DA7B1 /* ARtcKit.framework in Embed Frameworks */,
+				63906EBD24E3D1C3000DA7B1 /* ARtmKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -47,11 +47,11 @@
 /* Begin PBXFileReference section */
 		63511E4124C42240004D405B /* ARtmUserManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmUserManager.h; sourceTree = "<group>"; };
 		63511E4224C42240004D405B /* ARtmUserManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmUserManager.m; sourceTree = "<group>"; };
-		636780BD24C2EEA6004D5C1D /* ARtcKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ARtcKit.framework; sourceTree = "<group>"; };
 		636780C424C2FB8B004D5C1D /* ARtmConfigController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmConfigController.h; sourceTree = "<group>"; };
 		636780C524C2FB8B004D5C1D /* ARtmConfigController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmConfigController.m; sourceTree = "<group>"; };
-		63871CE624DBFCEC003C220D /* ARtmKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ARtmKit.framework; sourceTree = "<group>"; };
 		63871CEA24DBFFD9003C220D /* rtm_call.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = rtm_call.mp3; sourceTree = "<group>"; };
+		63906EB624E3D17F000DA7B1 /* ARtcKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ARtcKit.framework; sourceTree = "<group>"; };
+		63906EB824E3D1B6000DA7B1 /* ARtmKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ARtmKit.framework; sourceTree = "<group>"; };
 		63CA2EEE24C17971003FF0AC /* 视频通话.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "视频通话.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		63CA2EF124C17971003FF0AC /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		63CA2EF224C17971003FF0AC /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -84,8 +84,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				63871CE824DBFCF8003C220D /* ARtmKit.framework in Frameworks */,
-				636780BF24C2EEAE004D5C1D /* ARtcKit.framework in Frameworks */,
+				63906EBC24E3D1C3000DA7B1 /* ARtmKit.framework in Frameworks */,
+				63906EBA24E3D1C2000DA7B1 /* ARtcKit.framework in Frameworks */,
 				0ED0DB8A3EDC39B5F9ED5419 /* Pods_AR_Call_Tutorial_iOS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -123,8 +123,8 @@
 		63CA2EF024C17971003FF0AC /* AR-Call-Tutorial-iOS */ = {
 			isa = PBXGroup;
 			children = (
-				63871CE624DBFCEC003C220D /* ARtmKit.framework */,
-				636780BD24C2EEA6004D5C1D /* ARtcKit.framework */,
+				63906EB824E3D1B6000DA7B1 /* ARtmKit.framework */,
+				63906EB624E3D17F000DA7B1 /* ARtcKit.framework */,
 				63EDCF3924C5C843003AE948 /* Call */,
 				63EDCF3824C5C821003AE948 /* Tool */,
 				63EDCF3724C5C7F7003AE948 /* Base */,

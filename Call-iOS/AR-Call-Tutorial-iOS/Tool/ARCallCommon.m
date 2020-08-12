@@ -10,7 +10,6 @@
 
 NSString *const ARtmUserOffline = @"当前用户不在线";
 NSString *const ARtmCallerIdInvalid = @"自己不能呼叫自己";
-NSString *const ARtmCallerIdUnKnow = @"请输入4位呼叫ID";
 NSString *const ARtmCallProgress = @"当前会话正在进行中...";
 NSString *const ARtmReceivedInvitationByPeer = @"被叫已收到呼叫邀请";
 NSString *const ARtmAcceptedInvitation = @"被叫已接受呼叫邀请";
@@ -19,7 +18,7 @@ NSString *const ARtmCanceledInvitation = @"呼叫邀请已被取消";
 NSString *const ARtmFailureInvitation = @"呼叫邀请发送失败";
 NSString *const ARtmRepeatReceivedInvitation = @"收到一个新的呼叫请求，已拒绝";
 NSString *const ARtmRefusedInvitation = @"拒绝呼叫邀请成功";
-NSString *const ARtmRemoteCanceledInvitation = @"主叫已取消呼叫邀请";
+NSString *const ARtmRemoteCanceledInvitation = @"对方已取消呼叫";
 NSString *const ARtmRemoteCallBusy = @"对方正在通话中...";
 NSString *const ARtmReconnection = @"正在重连...";
 
@@ -85,6 +84,12 @@ NSString *const ARtmReconnection = @"正在重连...";
         }
     }
     return NO;
+}
+
++ (void)showInfoWithStatus:(NSString *)info {
+    [SVProgressHUD setFont:[UIFont fontWithName:@"PingFang SC" size:16]];
+    [SVProgressHUD showImage:[UIImage imageNamed:@"icon_tip"] status:info];
+    [SVProgressHUD dismissWithDelay:1.0];
 }
 
 @end

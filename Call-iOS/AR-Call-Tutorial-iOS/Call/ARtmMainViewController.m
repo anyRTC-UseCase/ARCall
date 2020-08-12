@@ -13,6 +13,7 @@
 
 @property (weak, nonatomic) IBOutlet UILabel *calleeIdLabel;
 @property (weak, nonatomic) IBOutlet UIStackView *stackView;
+@property (weak, nonatomic) IBOutlet UIButton *callButton;
 
 @property (nonatomic, strong) UITextField *calleeIdTextField;
 /* 呼叫弹框 **/
@@ -20,6 +21,7 @@
 @property (nonatomic, strong) WMDragView *localView;
 @property (nonatomic, strong) WMDragView *remoteView;
 @property (nonatomic, strong) ARtmCallKit *callKit;
+@property (nonatomic, strong) ARtcEngineKit *rtcKit;
 
 @property (nonatomic, copy) NSString *localUid;
 @property (nonatomic, copy) NSString *remoteUid;
@@ -71,6 +73,9 @@
     } else {
         config.dimensions = CGSizeMake(1280, 720);
     }
+    
+    //实例化ARtcEngineKit对象
+    self.rtcKit = [ARtcEngineKit sharedEngineWithAppId:appID delegate:self];
     //分辨率
     config.frameRate = userInfo.frameRate;
     //码率
@@ -78,20 +83,19 @@
     //编码方向
     config.orientationMode = ARVideoOutputOrientationModeAdaptative;
     //设置视频编码配置
-    [ARtmManager.rtcKit setVideoEncoderConfiguration:config];
+    [self.rtcKit setVideoEncoderConfiguration:config];
     
-    ARtmManager.rtcKit.delegate = self;
     //开启视频模块
-    [ARtmManager.rtcKit enableVideo];
+    [self.rtcKit enableVideo];
     //初始化本地视图
     ARtcVideoCanvas *videoCanvas = [[ARtcVideoCanvas alloc] init];
     videoCanvas.uid = [ARtmManager getLocalUid];
     self.localView.frame = CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     [self.rtmCallView insertSubview:self.localView atIndex:0];
     videoCanvas.view = self.localView;
-    [ARtmManager.rtcKit setupLocalVideo:videoCanvas];
+    [self.rtcKit setupLocalVideo:videoCanvas];
     //开启视频预览
-    [ARtmManager.rtcKit startPreview];
+    [self.rtcKit startPreview];
 }
 
 - (void)makeCall:(NSString *)calleeId {
@@ -134,18 +138,16 @@
                         if (onlineStatus.state == ARtmPeerOnlineStateOnline) {
                             [self makeCall:calleeId];
                         } else {
-                            [self showInfoWithStatus:ARtmUserOffline];
+                            [ARCallCommon showInfoWithStatus:ARtmUserOffline];
                         }
                     }
                 }];
-            } else {
-                [self showInfoWithStatus:ARtmCallerIdUnKnow];
             }
         } else {
-            [self showInfoWithStatus:ARtmCallProgress];
+            [ARCallCommon showInfoWithStatus:ARtmCallProgress];
         }
     } else {
-        [self showInfoWithStatus:ARtmCallerIdInvalid];
+        [ARCallCommon showInfoWithStatus:ARtmCallerIdInvalid];
     }
 }
 
@@ -154,7 +156,7 @@
 - (void)rtmKit:(ARtmKit * _Nonnull)kit connectionStateChanged:(ARtmConnectionState)state reason:(ARtmConnectionChangeReason)reason {
     //连接状态改变回调
     if (state == ARtmConnectionStateReconnecting && reason == ARtmConnectionChangeReasonInterrupted) {
-        [self showInfoWithStatus:ARtmReconnection];
+        [ARCallCommon showInfoWithStatus:ARtmReconnection];
     }
     NSLog(@"state == %ld reason == %ld",(long)state,(long)reason);
 }
@@ -169,7 +171,7 @@
             }];
             [self unsubscribePeers:self.localInvitation.calleeId];
             [self endRtmCall];
-            [self showInfoWithStatus:ARtmUserOffline];
+            [ARCallCommon showInfoWithStatus:ARtmUserOffline];
         }
     }
 }
@@ -189,7 +191,7 @@
     
     self.rtmCallView.callView.hidden = YES;
     self.rtmCallView.toolView.hidden = NO;
-    [ARtmManager.rtcKit joinChannelByToken:nil channelId:self.localInvitation.content uid:self.localUid joinSuccess:^(NSString * _Nonnull channel, NSString * _Nonnull uid, NSInteger elapsed) {
+    [self.rtcKit joinChannelByToken:nil channelId:self.localInvitation.content uid:self.localUid joinSuccess:^(NSString * _Nonnull channel, NSString * _Nonnull uid, NSInteger elapsed) {
         NSLog(@"joinChannelByToken");
     }];
     self.localInvitation = nil;
@@ -199,9 +201,9 @@
     //被叫已拒绝呼叫邀请
     if ([response isEqualToString:@"calling"]) {
         //对方正在通话中...
-        [self showInfoWithStatus:ARtmRemoteCallBusy];
+        [ARCallCommon showInfoWithStatus:ARtmRemoteCallBusy];
     } else {
-        [self showInfoWithStatus:ARtmRemoteRefusedInvitation];
+        [ARCallCommon showInfoWithStatus:ARtmRemoteRefusedInvitation];
     }
     
     [self unsubscribePeers:self.localInvitation.calleeId];
@@ -217,9 +219,9 @@
     //呼叫邀请发送失败
     [self endRtmCall];
     if (errorCode == ARtmLocalInvitationErrorRemoteOffline) {
-        [self showInfoWithStatus:ARtmUserOffline];
+        [ARCallCommon showInfoWithStatus:ARtmUserOffline];
     } else {
-        [self showInfoWithStatus:ARtmFailureInvitation];
+        [ARCallCommon showInfoWithStatus:ARtmFailureInvitation];
     }
 }
 
@@ -252,7 +254,7 @@
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationAccepted:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
     //接受呼叫邀请成功
-    [ARtmManager.rtcKit joinChannelByToken:nil channelId:remoteInvitation.content uid:self.localUid joinSuccess:^(NSString * _Nonnull channel, NSString * _Nonnull uid, NSInteger elapsed) {
+    [self.rtcKit joinChannelByToken:nil channelId:remoteInvitation.content uid:self.localUid joinSuccess:^(NSString * _Nonnull channel, NSString * _Nonnull uid, NSInteger elapsed) {
         NSLog(@"joinChannelByToken");
     }];
 }
@@ -260,6 +262,7 @@
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationCanceled:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
     //主叫已取消呼叫邀请
     [self endRtmCall];
+    [ARCallCommon showInfoWithStatus:ARtmRemoteCanceledInvitation];
     NSLog(@"%@",ARtmRemoteCanceledInvitation);
 }
 
@@ -278,7 +281,7 @@
     videoCanvas.uid = uid;
     videoCanvas.view = self.remoteView;
     //初始化远端用户视图
-    [ARtmManager.rtcKit setupRemoteVideo:videoCanvas];
+    [self.rtcKit setupRemoteVideo:videoCanvas];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self switchVideoSize];
     });
@@ -339,25 +342,25 @@
             break;
         case 53:
             //离开
-            [ARtmManager.rtcKit leaveChannel:nil];
+            [self.rtcKit leaveChannel:nil];
             [self endRtmCall];
             break;
         case 100:
             //音频
-            [ARtmManager.rtcKit muteLocalAudioStream:sender.selected];
+            [self.rtcKit muteLocalAudioStream:sender.selected];
             break;
         case 101:
             //扬声器
-            [ARtmManager.rtcKit setEnableSpeakerphone:!sender.selected];
+            [self.rtcKit setEnableSpeakerphone:!sender.selected];
             break;
         case 102:
             //视频
-            [ARtmManager.rtcKit muteLocalVideoStream:sender.selected];
+            [self.rtcKit muteLocalVideoStream:sender.selected];
             self.localView.placeholderView.hidden = !sender.selected;
             break;
         case 103:
             //旋转摄像头
-            [ARtmManager.rtcKit switchCamera];
+            [self.rtcKit switchCamera];
             break;
         default:
             break;
@@ -392,12 +395,6 @@
     }
 }
 
-- (void)showInfoWithStatus:(NSString *)info {
-    [SVProgressHUD setFont:[UIFont fontWithName:@"PingFang SC" size:16]];
-    [SVProgressHUD showImage:[UIImage imageNamed:@"icon_tip"] status:info];
-    [SVProgressHUD dismissWithDelay:1.0];
-}
-
 - (void)unsubscribePeers:(NSString *)peerId {
     //退订指定单个或多个用户的在线状态
     if (peerId.length != 0) {
@@ -418,7 +415,9 @@
     self.localInvitation = nil;
     self.remoteInvitation = nil;
     [self playMusic:NO];
-    [ARtmManager.rtcKit leaveChannel:nil];
+    [self.rtcKit leaveChannel:nil];
+    self.rtcKit = nil;
+    [ARtcEngineKit destroy];
 }
 
 - (void)switchVideoSize {
@@ -446,6 +445,14 @@
     //限制纯数字输入
     if (textField.text.length > 4) {
         textField.text = [textField.text substringToIndex:4];
+    }
+    
+    if (textField.text.length == 4) {
+        self.callButton.selected = YES;
+        self.callButton.backgroundColor = [UIColor whiteColor];
+    } else {
+        self.callButton.selected = NO;
+        self.callButton.backgroundColor = RGBA(224, 224, 224, 1);
     }
     
     NSArray *arr = [ARCallCommon getSubString:textField.text];

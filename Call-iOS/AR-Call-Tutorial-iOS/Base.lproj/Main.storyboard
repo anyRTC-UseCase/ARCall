@@ -110,7 +110,7 @@
                                 </constraints>
                                 <state key="normal" image="icon_set"/>
                                 <connections>
-                                    <segue destination="Al8-Tl-eOd" kind="presentation" modalPresentationStyle="fullScreen" id="hgn-Ju-3gy"/>
+                                    <segue destination="Al8-Tl-eOd" kind="presentation" modalPresentationStyle="currentContext" id="hgn-Ju-3gy"/>
                                 </connections>
                             </button>
                             <stackView opaque="NO" contentMode="scaleToFill" spacing="15" translatesAutoresizingMaskIntoConstraints="NO" id="f8D-ZT-Q6e">
@@ -179,12 +179,15 @@
                             </stackView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZJS-jk-FPS">
                                 <rect key="frame" x="30" y="391.5" width="315" height="44"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="backgroundColor" red="0.88225668670000001" green="0.88240832089999999" blue="0.88224714989999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="44" id="xsa-lN-yd9"/>
                                 </constraints>
                                 <state key="normal" title="开始呼叫">
-                                    <color key="titleColor" red="0.0034281639379999999" green="0.65582442279999997" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="titleColor" red="0.69011962410000005" green="0.69024020429999999" blue="0.69011199469999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <state key="selected">
+                                    <color key="titleColor" red="0.2505743802" green="0.63990479710000003" blue="0.98458892109999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </state>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
@@ -223,6 +226,7 @@
                         <viewLayoutGuide key="safeArea" id="uYa-Od-ZlY"/>
                     </view>
                     <connections>
+                        <outlet property="callButton" destination="ZJS-jk-FPS" id="SvY-4y-tMe"/>
                         <outlet property="calleeIdLabel" destination="zBD-BL-S8j" id="NP4-kM-dEt"/>
                         <outlet property="stackView" destination="f8D-ZT-Q6e" id="0ie-eA-rjE"/>
                     </connections>

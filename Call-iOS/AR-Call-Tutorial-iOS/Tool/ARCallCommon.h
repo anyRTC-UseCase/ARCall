@@ -12,7 +12,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 UIKIT_EXTERN NSString *const ARtmUserOffline;
 UIKIT_EXTERN NSString *const ARtmCallerIdInvalid;
-UIKIT_EXTERN NSString *const ARtmCallerIdUnKnow;
 UIKIT_EXTERN NSString *const ARtmCallProgress;
 UIKIT_EXTERN NSString *const ARtmReceivedInvitationByPeer;
 UIKIT_EXTERN NSString *const ARtmAcceptedInvitation;
@@ -32,9 +31,10 @@ UIKIT_EXTERN NSString *const ARtmReconnection;
 + (BOOL)validateNumber:(NSString *)number;
 
 + (NSArray *)getSubString:(NSString*)str;
-
 //隐藏界面上所有键盘
 + (void)hideKeyBoard;
+//提示信息
++ (void)showInfoWithStatus:(NSString *)info;
 
 @end
 

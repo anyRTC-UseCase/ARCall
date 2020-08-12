@@ -10,7 +10,6 @@
 #import "ARtmUserManager.h"
 
 static ARtmKit *rtmKit_ = nil;
-static ARtcEngineKit *rtcKit_ = nil;
 static NSString *localUid = nil;
 static NSMutableDictionary *offlineDic = nil;
 
@@ -18,16 +17,11 @@ static NSMutableDictionary *offlineDic = nil;
 
 + (void)load {
     rtmKit_ = [[ARtmKit alloc] initWithAppId:appID delegate:nil];
-    rtcKit_ = [ARtcEngineKit sharedEngineWithAppId:appID delegate:nil];
     offlineDic = [NSMutableDictionary dictionary];
 }
 
 + (ARtmKit * _Nullable)rtmKit {
     return rtmKit_;
-}
-
-+ (ARtcEngineKit * _Nullable)rtcKit {
-    return rtcKit_;
 }
 
 + (void)setLocalUid:(NSString *)uid {

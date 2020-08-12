@@ -148,7 +148,7 @@ __attribute__((visibility("default"))) @interface ARChannelStats : NSObject
 /** 视频编码器配置的属性 */
 __attribute__((visibility("default"))) @interface ARVideoEncoderConfiguration : NSObject
 
-/** 视频编码的分辨率 (px)，用于衡量编码质量，以长x宽表示，默认值为 640 x 360。
+/** 视频编码的分辨率 (px)，用于衡量编码质量，以长x宽表示，默认值为 640 x 480。
  
  用户可以自行设置分辨率，也可以在如下列表中直接选择想要的分辨率：
  
