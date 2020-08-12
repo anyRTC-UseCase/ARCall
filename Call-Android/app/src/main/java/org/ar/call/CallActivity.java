@@ -148,12 +148,17 @@ public class CallActivity extends AppCompatActivity implements RtmCallEventListe
             }
         });
         rlCall = findViewById(R.id.rl_call_pre);
-
         rtmClient = CallApplication.the().getCallManager().getRtmClient();
-        rtmCallManager = CallApplication.the().getCallManager().getRtmClient().getRtmCallManager();
-        rtmCallManager.setEventListener(this);
+        rtmCallManager = CallApplication.the().getCallManager().getRtmCallManager();//必须登录后获取呼叫管理器实例
 
-        CallApplication.the().getCallManager().registerListener(this);
+
+        boolean isRecCall = getIntent().getBooleanExtra("RecCall",false);
+        if (isRecCall){
+            remoteInvitation = CallApplication.the().getCallManager().getRemoteInvitation();
+            tvState.setText("收到呼叫");
+            Subscribe(remoteInvitation.getCallerId());
+            showCallLayout(true,remoteInvitation.getCallerId());
+        }
     }
 
     public void Call(View view) {
@@ -163,7 +168,13 @@ public class CallActivity extends AppCompatActivity implements RtmCallEventListe
         }
 
         if (TextUtils.isEmpty(callEditText.getInputContent())) {
-            Toast.makeText(this, "请输入需要呼叫的Id", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "请输入需要呼叫的ID", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (callEditText.getInputContent().length()<4){
+            Toast.makeText(this, "请输入4位呼叫ID", Toast.LENGTH_SHORT).show();
+
             return;
         }
         if (callEditText.getInputContent().equals(userId)) {
@@ -197,7 +208,6 @@ public class CallActivity extends AppCompatActivity implements RtmCallEventListe
             } else {
                 showCallLayout(false,callEditText.getInputContent());
                 tvState.setText("呼叫中");
-
                 Call();
             }
 
@@ -606,5 +616,20 @@ public class CallActivity extends AppCompatActivity implements RtmCallEventListe
                     baseDialog.doDismiss();
                     return true;
                 });
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        CallApplication.the().getCallManager().unregisterListener(this);
+        CallApplication.the().getCallManager().unregisterCallListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        CallApplication.the().getCallManager().registerCallListener(this);
+        CallApplication.the().getCallManager().registerListener(this);
     }
 }

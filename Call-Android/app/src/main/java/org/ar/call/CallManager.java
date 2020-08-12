@@ -22,8 +22,11 @@ public class CallManager {
 
     private Context context;
     private RtmClient rtmClient;
+    private RtmCallManager rtmCallManager;
     private List<RtmClientListener> mListenerList = new ArrayList<>();
+    private List<RtmCallEventListener> rtmCallEventListenerList = new ArrayList<>();
     private boolean isCall = false;
+    private RemoteInvitation remoteInvitation;
     public CallManager(Context context) {
         this.context = context;
       }
@@ -57,16 +60,105 @@ public class CallManager {
                     }
                 }
             });
+            rtmCallManager=rtmClient.getRtmCallManager();
+            rtmCallManager.setEventListener(new RtmCallEventListener() {
+                @Override
+                public void onLocalInvitationReceivedByPeer(LocalInvitation var1) {
+                    for (RtmCallEventListener listener : rtmCallEventListenerList) {
+                        listener.onLocalInvitationReceivedByPeer(var1);
+                    }
+                }
+
+                @Override
+                public void onLocalInvitationAccepted(LocalInvitation var1, String var2) {
+                    for (RtmCallEventListener listener : rtmCallEventListenerList) {
+                        listener.onLocalInvitationAccepted(var1,var2);
+                    }
+                }
+
+                @Override
+                public void onLocalInvitationRefused(LocalInvitation var1, String var2) {
+                    for (RtmCallEventListener listener : rtmCallEventListenerList) {
+                        listener.onLocalInvitationRefused(var1,var2);
+                    }
+                }
+
+                @Override
+                public void onLocalInvitationCanceled(LocalInvitation var1) {
+                    for (RtmCallEventListener listener : rtmCallEventListenerList) {
+                        listener.onLocalInvitationCanceled(var1);
+                    }
+                }
+
+                @Override
+                public void onLocalInvitationFailure(LocalInvitation var1, int var2) {
+                    for (RtmCallEventListener listener : rtmCallEventListenerList) {
+                        listener.onLocalInvitationFailure(var1,var2);
+                    }
+                }
+
+                @Override
+                public void onRemoteInvitationReceived(RemoteInvitation var1) {
+                    remoteInvitation = var1;
+                    for (RtmCallEventListener listener : rtmCallEventListenerList) {
+                        listener.onRemoteInvitationReceived(var1);
+                    }
+                }
+
+                @Override
+                public void onRemoteInvitationAccepted(RemoteInvitation var1) {
+                    for (RtmCallEventListener listener : rtmCallEventListenerList) {
+                        listener.onRemoteInvitationAccepted(var1);
+                    }
+                }
+
+                @Override
+                public void onRemoteInvitationRefused(RemoteInvitation var1) {
+                    for (RtmCallEventListener listener : rtmCallEventListenerList) {
+                        listener.onRemoteInvitationRefused(var1);
+                    }
+                }
+
+                @Override
+                public void onRemoteInvitationCanceled(RemoteInvitation var1) {
+                    for (RtmCallEventListener listener : rtmCallEventListenerList) {
+                        listener.onRemoteInvitationCanceled(var1);
+                    }
+                }
+
+                @Override
+                public void onRemoteInvitationFailure(RemoteInvitation var1, int var2) {
+                    for (RtmCallEventListener listener : rtmCallEventListenerList) {
+                        listener.onRemoteInvitationFailure(var1,var2);
+                    }
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
 
-
+    public RemoteInvitation getRemoteInvitation() {
+        return remoteInvitation;
+    }
 
     public RtmClient getRtmClient() {
         return rtmClient;
+    }
+
+    public RtmCallManager getRtmCallManager() {
+        return rtmCallManager;
+    }
+
+    public void registerCallListener(RtmCallEventListener listener) {
+        rtmCallEventListenerList.add(listener);
+    }
+
+
+
+    public void unregisterCallListener(RtmCallEventListener listener) {
+        rtmCallEventListenerList.remove(listener);
     }
 
 

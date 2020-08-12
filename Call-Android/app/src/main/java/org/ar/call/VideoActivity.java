@@ -23,6 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.gyf.immersionbar.ImmersionBar;
+import com.kongzue.dialog.v3.MessageDialog;
 import com.kongzue.dialog.v3.WaitDialog;
 import com.lzf.easyfloat.EasyFloat;
 import com.lzf.easyfloat.enums.ShowPattern;
@@ -91,7 +92,7 @@ public class VideoActivity extends AppCompatActivity implements RtmClientListene
         int widthPixels = outMetrics.widthPixels;
         RelativeLayout.MarginLayoutParams marginLayoutParams = (RelativeLayout.MarginLayoutParams) rl_local_video.getLayoutParams();
         marginLayoutParams.topMargin = DensityUtil.dip2px(VideoActivity.this, 12);
-        marginLayoutParams.leftMargin = widthPixels-DensityUtil.dip2px(VideoActivity.this, 90+12);//90是View的宽  12 是margin
+        marginLayoutParams.leftMargin = widthPixels - DensityUtil.dip2px(VideoActivity.this, 90 + 12);//90是View的宽  12 是margin
         rl_local_video.setLayoutParams(marginLayoutParams);
 
 
@@ -224,6 +225,7 @@ public class VideoActivity extends AppCompatActivity implements RtmClientListene
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    Toast.makeText(VideoActivity.this,"对方已挂断",Toast.LENGTH_SHORT).show();
                     release();
                 }
             });
@@ -290,7 +292,6 @@ public class VideoActivity extends AppCompatActivity implements RtmClientListene
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    showLongToast("onError" + err);
                 }
             });
         }
@@ -306,28 +307,9 @@ public class VideoActivity extends AppCompatActivity implements RtmClientListene
             EasyFloat.dismissAppFloat();
             isSmall = false;
         }
-        WaitDialog.show(this, "请稍候...");
         rlVideo.removeAllViews();
-        //destory会阻塞主线程  所以建议放在子线程执行 执行完毕再退出页面 执行完毕 才能创建新的实例
-        int version = android.os.Build.VERSION.SDK_INT;
-        if (version > 15) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    RtcEngine.destroy();
-                    finish();
-                }
-            }).start();
-        } else {
-            mRtcEngine.leaveChannel();
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    RtcEngine.destroy();
-                    finish();
-                }
-            }, 500);
-        }
+        mRtcEngine.leaveChannel();
+        finish();
 
 
     }
@@ -366,7 +348,7 @@ public class VideoActivity extends AppCompatActivity implements RtmClientListene
         if (Build.VERSION.SDK_INT >= 11) { // honeycomb
             ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
             List<ActivityManager.RunningTaskInfo> recentTasks = manager.getRunningTasks(Integer.MAX_VALUE);
-            for (int i = 0; i < recentTasks.size(); i++){
+            for (int i = 0; i < recentTasks.size(); i++) {
                 // bring to front
                 if (recentTasks.get(i).baseActivity.toShortString().indexOf("org.ar.call.VideoActivity") > -1) {
                     manager.moveTaskToFront(recentTasks.get(i).id, ActivityManager.MOVE_TASK_WITH_HOME);
@@ -396,14 +378,14 @@ public class VideoActivity extends AppCompatActivity implements RtmClientListene
                             public void onClick(View v) {
                                 EasyFloat.dismissAppFloat();
                                 isSmall = false;
-                                if (Build.VERSION.SDK_INT >= 29){
-                                    startActivity(new Intent(VideoActivity.this,VideoActivity.class));
-                                }else {
+                                if (Build.VERSION.SDK_INT >= 29) {
+                                    startActivity(new Intent(VideoActivity.this, VideoActivity.class));
+                                } else {
                                     moveToFront();
                                 }
 
 
-                                if (rlVideo.getLastLeft()!=-1){
+                                if (rlVideo.getLastLeft() != -1) {
                                     RelativeLayout.MarginLayoutParams marginLayoutParams = (RelativeLayout.MarginLayoutParams) rl_local_video.getLayoutParams();
                                     marginLayoutParams.leftMargin = rlVideo.getLastLeft();
                                     marginLayoutParams.topMargin = rlVideo.getLastTop();
@@ -473,6 +455,7 @@ public class VideoActivity extends AppCompatActivity implements RtmClientListene
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        RtcEngine.destroy();
         CallApplication.the().getCallManager().setCall(false);
         CallApplication.the().getCallManager().unregisterListener(this);
     }
@@ -544,7 +527,7 @@ public class VideoActivity extends AppCompatActivity implements RtmClientListene
 
         rl_remote_video.removeViewAt(1);
         rl_local_video.removeViewAt(1);
-        if (rlVideo.getLastLeft()!=-1){
+        if (rlVideo.getLastLeft() != -1) {
             RelativeLayout.MarginLayoutParams marginLayoutParams = (RelativeLayout.MarginLayoutParams) rl_local_video.getLayoutParams();
             marginLayoutParams.leftMargin = rlVideo.getLastLeft();
             marginLayoutParams.topMargin = rlVideo.getLastTop();
