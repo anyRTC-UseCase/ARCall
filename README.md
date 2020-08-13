@@ -4,7 +4,7 @@
 
 ## 项目概述
 
-ARCall 是anyRTC专为2人通话的示例项目，演示了如何通过 anyRTC云服务，并配合 anyRTC RTC SDK、anyRTC RTM SDK，快速实现呼叫邀请通话的场景。
+ARCall 是anyRTC模仿微信呼叫的示例项目，演示了如何通过 anyRTC云服务，并配合 anyRTC RTC SDK、anyRTC RTM SDK，快速实现呼叫邀请通话的场景。
 - 可拓展多人呼叫邀请。
 - 可运用自采集模块，加载第三方美颜库，实现美颜贴图功能。
 - 可对接第三方推送实现推送功能。
