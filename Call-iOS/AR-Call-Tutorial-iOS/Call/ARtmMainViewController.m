@@ -116,11 +116,7 @@
             [self initializeRtcKit];
         }
     }];
-    
-    //订阅指定单个或多个用户的在线状态
-    [ARtmManager.rtmKit subscribePeersOnlineStatus:@[calleeId] completion:^(ARtmPeerSubscriptionStatusErrorCode errorCode) {
-        NSLog(@"subscribePeersOnlineStatus errorcode == %ld",(long)errorCode);
-    }];
+    [self subscribePeersOnline:self.localInvitation.calleeId];
 }
 
 - (IBAction)didClickCallButton:(id)sender {
@@ -165,11 +161,10 @@
     //被订阅用户在线状态改变回调
     if (onlineStatus.count != 0) {
         ARtmPeerOnlineStatus *status = onlineStatus[0];
-        if (status.state != ARtmPeerOnlineStateOnline) {
+        if (status.state != ARtmPeerOnlineStateOnline && self.rtmCallView) {
             [self.callKit cancelLocalInvitation:self.localInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
                 NSLog(@"cancelLocalInvitation == %ld",(long)errorCode);
             }];
-            [self unsubscribePeers:self.localInvitation.calleeId];
             [self endRtmCall];
             [ARCallCommon showInfoWithStatus:ARtmUserOffline];
         }
@@ -187,7 +182,6 @@
     //被叫已接受呼叫邀请
     NSLog(@"%@",ARtmAcceptedInvitation);
     [self playMusic:NO];
-    [self unsubscribePeers:self.localInvitation.calleeId];
     
     self.rtmCallView.callView.hidden = YES;
     self.rtmCallView.toolView.hidden = NO;
@@ -206,7 +200,6 @@
         [ARCallCommon showInfoWithStatus:ARtmRemoteRefusedInvitation];
     }
     
-    [self unsubscribePeers:self.localInvitation.calleeId];
     [self endRtmCall];
 }
 
@@ -257,6 +250,7 @@
     [self.rtcKit joinChannelByToken:nil channelId:remoteInvitation.content uid:self.localUid joinSuccess:^(NSString * _Nonnull channel, NSString * _Nonnull uid, NSInteger elapsed) {
         NSLog(@"joinChannelByToken");
     }];
+    [self subscribePeersOnline:remoteInvitation.callerId];
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationCanceled:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
@@ -289,7 +283,10 @@
 
 - (void)rtcEngine:(ARtcEngineKit *)engine didOfflineOfUid:(NSString *)uid reason:(ARUserOfflineReason)reason {
     //远端用户（通信场景）/主播（直播场景）离开当前频道回调
-    [self endRtmCall];
+    if (self.rtmCallView) {
+        [ARCallCommon showInfoWithStatus:ARtmCallend];
+        [self endRtmCall];
+    }
 }
 
 - (void)rtcEngine:(ARtcEngineKit *_Nonnull)engine remoteVideoStateChangedOfUid:(NSString *_Nonnull)uid state:(ARVideoRemoteState)state reason:(ARVideoRemoteStateReason)reason elapsed:(NSInteger)elapsed {
@@ -307,8 +304,6 @@
     switch (sender.tag) {
         case 50:
             if (isCall) {
-                //取消呼叫
-                [self unsubscribePeers:self.localInvitation.calleeId];
                 //取消给对方的呼叫邀请
                 [self.callKit cancelLocalInvitation:self.localInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
                     NSLog(@"cancelLocalInvitation == %ld",(long)errorCode);
@@ -330,7 +325,6 @@
             [self.callKit acceptRemoteInvitation:self.remoteInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
                 NSLog(@"acceptRemoteInvitation == %ld",(long)errorCode);
             }];
-            self.remoteInvitation = nil;
             break;
         case 52:
             //大小屏
@@ -378,6 +372,15 @@
 
 //MARK: - other
 
+- (void)subscribePeersOnline:(NSString *)calleeId {
+    //订阅指定单个或多个用户的在线状态
+    if (calleeId.length != 0) {
+        [ARtmManager.rtmKit subscribePeersOnlineStatus:@[calleeId] completion:^(ARtmPeerSubscriptionStatusErrorCode errorCode) {
+            NSLog(@"subscribePeersOnlineStatus errorcode == %ld",(long)errorCode);
+        }];
+    }
+}
+
 - (void)playMusic:(BOOL)play {
     if (play) {
         NSString * path = [NSBundle.mainBundle pathForResource:@"rtm_call" ofType:@"mp3"];
@@ -395,17 +398,17 @@
     }
 }
 
-- (void)unsubscribePeers:(NSString *)peerId {
-    //退订指定单个或多个用户的在线状态
+- (void)endRtmCall {
+    NSString *peerId;
+    self.localInvitation ? (peerId = self.localInvitation.calleeId) : 0;
+    self.remoteInvitation ? (peerId = self.remoteInvitation.callerId) : 0;
     if (peerId.length != 0) {
+        //退订指定单个或多个用户的在线状态
         [ARtmManager.rtmKit unsubscribePeersOnlineStatus:@[peerId] completion:^(ARtmPeerSubscriptionStatusErrorCode errorCode) {
             NSLog(@"unsubscribePeersOnlineStatus errorCode == %ld",(long)errorCode);
         }];
     }
-}
-
-- (void)endRtmCall {
-    //结束通话
+    
     [self.rtmCallView removeFromSuperview];
     [self.localView removeFromSuperview];
     [self.remoteView removeFromSuperview];

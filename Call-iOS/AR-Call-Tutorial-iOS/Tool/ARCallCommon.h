@@ -23,6 +23,7 @@ UIKIT_EXTERN NSString *const ARtmRefusedInvitation;
 UIKIT_EXTERN NSString *const ARtmRemoteCanceledInvitation;
 UIKIT_EXTERN NSString *const ARtmRemoteCallBusy;
 UIKIT_EXTERN NSString *const ARtmReconnection;
+UIKIT_EXTERN NSString *const ARtmCallend;
 
 @interface ARCallCommon : NSObject
 

@@ -8,7 +8,7 @@
 
 #import "ARCallCommon.h"
 
-NSString *const ARtmUserOffline = @"当前用户不在线";
+NSString *const ARtmUserOffline = @"当前用户已离线";
 NSString *const ARtmCallerIdInvalid = @"自己不能呼叫自己";
 NSString *const ARtmCallProgress = @"当前会话正在进行中...";
 NSString *const ARtmReceivedInvitationByPeer = @"被叫已收到呼叫邀请";
@@ -20,7 +20,8 @@ NSString *const ARtmRepeatReceivedInvitation = @"收到一个新的呼叫请求�
 NSString *const ARtmRefusedInvitation = @"拒绝呼叫邀请成功";
 NSString *const ARtmRemoteCanceledInvitation = @"对方已取消呼叫";
 NSString *const ARtmRemoteCallBusy = @"对方正在通话中...";
-NSString *const ARtmReconnection = @"正在重连...";
+NSString *const ARtmReconnection = @"已离线,正在重连...";
+NSString *const ARtmCallend = @"对方已挂断";
 
 @implementation ARCallCommon
 
