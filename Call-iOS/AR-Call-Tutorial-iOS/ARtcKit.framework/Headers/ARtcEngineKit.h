@@ -1027,13 +1027,41 @@ __attribute__((visibility("default"))) @interface ARtcEngineKit : NSObject
 
 //MARK: - 音频自采集 (仅适用于 push 模式)
 
+/**-----------------------------------------------------------------------------
+ * @name 音频自采集 (仅适用于 push 模式)
+ * -----------------------------------------------------------------------------
+ */
+
+/** 开启外部音频采集
+
+ 该方法必须在加入频道前调用
+
+ @param sampleRate       外部音频源的采样率 (Hz)，可设置为 8000，16000，32000，44100 或 48000
+ @param channelsPerFrame 外部音频源的通道数，可设置为 1 或 2:
+ - 1: 单声道
+ - 2: 双声道
+ */
 - (void)enableExternalAudioSourceWithSampleRate:(NSUInteger)sampleRate channelsPerFrame:(NSUInteger)channelsPerFrame;
 
+/** 关闭外部音频采集
+*/
 - (void)disableExternalAudioSource;
 
+/** 推送外部音频帧
+
+ @param data     外部音频数据
+ @param samples   音频帧的样本数量
+ @param timestamp 外部音频帧的时间戳。该参数为必填。你可以使用该时间戳还原音频帧顺序；在有视频的场景中（包含使用外部视频源的场景），该参数可以帮助实现音视频同步。
+ @return YES方法调用成功，NO方法调用失败
+ */
 - (BOOL)pushExternalAudioFrameRawData:(void *_Nonnull)data samples:(NSUInteger)samples timestamp:(NSTimeInterval)timestamp;
 
-- (BOOL)pushExternalAudioFrameSampleBuffer:(CMSampleBufferRef _Nonnull)sampleBuffer;
+/** 推送外部 CMSampleBuffer 音频帧
+
+ @param sampleBuffer 采样缓冲区
+ @return YES方法调用成功，NO方法调用失败
+ */
+- (BOOL)pushExternalAudioFrameSampleBuffer:(CMSampleBufferRef _Nonnull)sampleBuffer type:(ARAudioType)type;
 
 //MARK: - 视频自采集 (仅适用于 push 模式)
 

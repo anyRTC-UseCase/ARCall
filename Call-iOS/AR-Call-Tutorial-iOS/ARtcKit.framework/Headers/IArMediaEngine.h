@@ -203,6 +203,11 @@ class IVideoFrameObserver {
    * - false: Ignore the current video frame, and do not send it back to the SDK.
    */
   virtual bool onPreEncodeVideoFrame(VideoFrame& videoFrame) { return true; }
+  /** Occurs each time the SDK receives a video encoded data after encoding.
+  * 
+  * After you successfully register the video frame observer, the SDK triggers this callback each time when it receives a video frame. In this callback, you can get the video enccoded data after encoding. You can then process the data according to your particular scenarios.
+  */
+  virtual bool onEncodeVideoData(bool keyFrame, const char*vidData, int vidLen) { return true; }
   /** Occurs each time the SDK receives a video frame sent by the remote user.
    * 
    * After you successfully register the video frame observer, the SDK triggers this callback each time a video frame is received. In this callback, 
