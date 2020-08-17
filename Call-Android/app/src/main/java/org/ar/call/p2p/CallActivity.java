@@ -1,44 +1,37 @@
-package org.ar.call;
+package org.ar.call.p2p;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.collection.ArraySet;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.media.MediaPlayer;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.gyf.immersionbar.ImmersionBar;
-import com.gyf.immersionbar.OnKeyboardListener;
-import com.kongzue.dialog.interfaces.OnDialogButtonClickListener;
 import com.kongzue.dialog.interfaces.OnDismissListener;
-import com.kongzue.dialog.util.BaseDialog;
-import com.kongzue.dialog.v3.FullScreenDialog;
 import com.kongzue.dialog.v3.MessageDialog;
 import com.kongzue.dialog.v3.TipDialog;
 import com.lzf.easyfloat.EasyFloat;
 import com.tuo.customview.VerificationCodeView;
 
+import org.ar.call.CallApplication;
+import org.ar.call.R;
+import org.ar.call.SettingActivity;
+import org.ar.call.utils.KeyBoardHeightProvider;
 import org.ar.rtm.ErrorInfo;
 import org.ar.rtm.LocalInvitation;
 import org.ar.rtm.RemoteInvitation;

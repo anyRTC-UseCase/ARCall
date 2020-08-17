@@ -1,4 +1,4 @@
-package org.ar.call;
+package org.ar.call.weight;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -25,6 +25,9 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.ar.call.R;
+import org.ar.call.utils.DensityUtil;
 
 import java.util.ArrayList;
 import java.util.regex.Pattern;

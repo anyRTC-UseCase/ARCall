@@ -12,6 +12,8 @@ import com.gyf.immersionbar.ImmersionBar;
 import com.kongzue.dialog.interfaces.OnMenuItemClickListener;
 import com.kongzue.dialog.v3.BottomMenu;
 
+import org.ar.call.p2p.CallActivity;
+import org.ar.call.utils.SpUtil;
 import org.ar.rtm.LocalInvitation;
 import org.ar.rtm.RemoteInvitation;
 import org.ar.rtm.RtmCallEventListener;
@@ -114,7 +116,7 @@ public class SettingActivity extends AppCompatActivity implements RtmCallEventLi
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Intent i = new Intent(SettingActivity.this,CallActivity.class);
+                    Intent i = new Intent(SettingActivity.this, CallActivity.class);
                     i.putExtra("RecCall",true);
                     startActivity(i);
                     finish();

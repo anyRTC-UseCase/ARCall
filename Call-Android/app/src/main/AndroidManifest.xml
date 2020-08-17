@@ -13,10 +13,10 @@
         <activity android:name=".SettingActivity"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".VideoActivity"
+            android:name=".p2p.VideoActivity"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait" />
-        <activity android:name=".CallActivity"
+        <activity android:name=".p2p.CallActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing"/>

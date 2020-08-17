@@ -2,11 +2,10 @@ package org.ar.call;
 
 import android.app.Application;
 
-import com.gyf.immersionbar.ImmersionBar;
 import com.kongzue.dialog.util.DialogSettings;
 import com.lzf.easyfloat.EasyFloat;
 
-import org.ar.rtc.RtcEngine;
+import org.ar.call.utils.SpUtil;
 
 
 public class CallApplication extends Application {

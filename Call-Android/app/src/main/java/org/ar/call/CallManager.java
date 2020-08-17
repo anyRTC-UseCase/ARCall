@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.ar.call.CallApplication.RTC_APPID;
 
 public class CallManager {
 

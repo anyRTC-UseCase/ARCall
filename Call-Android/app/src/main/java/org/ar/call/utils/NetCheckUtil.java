@@ -1,4 +1,4 @@
-package org.ar.call;
+package org.ar.call.utils;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

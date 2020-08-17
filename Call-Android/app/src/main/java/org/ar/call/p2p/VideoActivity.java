@@ -1,4 +1,4 @@
-package org.ar.call;
+package org.ar.call.p2p;
 
 
 import android.Manifest;
@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -24,8 +23,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.collection.ArraySet;
 
 import com.gyf.immersionbar.ImmersionBar;
-import com.kongzue.dialog.v3.MessageDialog;
-import com.kongzue.dialog.v3.WaitDialog;
 import com.lzf.easyfloat.EasyFloat;
 import com.lzf.easyfloat.enums.ShowPattern;
 import com.lzf.easyfloat.interfaces.OnFloatCallbacks;
@@ -33,6 +30,11 @@ import com.lzf.easyfloat.interfaces.OnInvokeView;
 import com.lzf.easyfloat.interfaces.OnPermissionResult;
 import com.lzf.easyfloat.permission.PermissionUtils;
 
+import org.ar.call.CallApplication;
+import org.ar.call.R;
+import org.ar.call.utils.DensityUtil;
+import org.ar.call.utils.SpUtil;
+import org.ar.call.weight.DragViewLayout;
 import org.ar.rtc.Constants;
 import org.ar.rtc.IRtcEngineEventHandler;
 import org.ar.rtc.RtcEngine;
@@ -355,7 +357,7 @@ public class VideoActivity extends AppCompatActivity implements RtmClientListene
             List<ActivityManager.RunningTaskInfo> recentTasks = manager.getRunningTasks(Integer.MAX_VALUE);
             for (int i = 0; i < recentTasks.size(); i++) {
                 // bring to front
-                if (recentTasks.get(i).baseActivity.toShortString().indexOf("org.ar.call.VideoActivity") > -1) {
+                if (recentTasks.get(i).baseActivity.toShortString().indexOf("org.ar.call.p2p.VideoActivity") > -1) {
                     manager.moveTaskToFront(recentTasks.get(i).id, ActivityManager.MOVE_TASK_WITH_HOME);
                 }
             }
