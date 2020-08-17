@@ -19,6 +19,8 @@ public class CallApplication extends Application {
 
     private CallManager callManager;
 
+    private String userId = (int)((Math.random()*9+1)*1000)+"";
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -28,6 +30,10 @@ public class CallApplication extends Application {
         DialogSettings.style = DialogSettings.STYLE.STYLE_IOS;
         SpUtil.init(this);
         EasyFloat.init(this);
+    }
+
+    public String getUserId() {
+        return userId;
     }
 
     public static CallApplication the() {

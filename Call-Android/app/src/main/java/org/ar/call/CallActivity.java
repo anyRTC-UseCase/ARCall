@@ -101,7 +101,7 @@ public class CallActivity extends AppCompatActivity implements RtmCallEventListe
         setContentView(R.layout.activity_call);
         bottomView = findViewById(R.id.bottom_view);
         tvUserId = findViewById(R.id.tv_user);
-        userId = getIntent().getStringExtra("user");
+        userId = CallApplication.the().getUserId();
         tvUserId.setText("您的呼叫ID:" + userId);
         rlInput = findViewById(R.id.rl_input);
         btnCall = findViewById(R.id.btn_call);

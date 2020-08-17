@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ImmersionBar.with(this).statusBarDarkFont(false,0.2f).init();
         tvUser = findViewById(R.id.tv_user);
-        userId = (int)((Math.random()*9+1)*1000)+"";
+        userId = CallApplication.the().getUserId();
         tvUser.setText("您的呼叫ID:"+userId);
         if (!AndPermission.hasPermissions(this,Permission.RECORD_AUDIO,Permission.CAMERA,Permission.WRITE_EXTERNAL_STORAGE,Permission.READ_EXTERNAL_STORAGE)){
             AndPermission.with(this)
@@ -68,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         TipDialog.show(MainActivity.this, "成功！", TipDialog.TYPE.SUCCESS);
                         Intent intent = new Intent(MainActivity.this,CallActivity.class);
-                        intent.putExtra("user",userId);
                         startActivity(intent);
                         finish();
                     }

@@ -1,6 +1,5 @@
 package org.ar.call;
 
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -21,6 +20,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.collection.ArraySet;
 
 import com.gyf.immersionbar.ImmersionBar;
 import com.kongzue.dialog.v3.MessageDialog;
@@ -44,6 +45,7 @@ import org.ar.rtm.RtmMessage;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.ar.call.CallApplication.RTC_APPID;
 
@@ -97,6 +99,9 @@ public class VideoActivity extends AppCompatActivity implements RtmClientListene
 
 
         rtmClient = CallApplication.the().getCallManager().getRtmClient();
+        CallApplication.the().getCallManager().registerListener(this);
+        CallApplication.the().getCallManager().setCall(true);
+        Subscribe(remoteUserId);
         initEngineAndJoinChannel();
 
     }
@@ -447,14 +452,13 @@ public class VideoActivity extends AppCompatActivity implements RtmClientListene
     @Override
     protected void onResume() {
         super.onResume();
-        CallApplication.the().getCallManager().registerListener(this);
-        CallApplication.the().getCallManager().setCall(true);
     }
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        UnSubscribe(remoteUserId);
         RtcEngine.destroy();
         CallApplication.the().getCallManager().setCall(false);
         CallApplication.the().getCallManager().unregisterListener(this);
@@ -515,7 +519,18 @@ public class VideoActivity extends AppCompatActivity implements RtmClientListene
 
     @Override
     public void onPeersOnlineStatusChanged(Map<String, Integer> map) {
-
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (map.containsKey(remoteUserId)){
+                    if (map.get(remoteUserId)!=0) {//离线了
+                        Toast.makeText(VideoActivity.this,"对方异常退出",Toast.LENGTH_SHORT).show();
+                        mRtcEngine.leaveChannel();
+                        finish();
+                    }
+                }
+            }
+        });
     }
 
 
@@ -552,5 +567,17 @@ public class VideoActivity extends AppCompatActivity implements RtmClientListene
         } else {
             rlBtnGroup.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void Subscribe(String peerId){
+        Set<String> list = new ArraySet<>();
+        list.add(peerId);
+        rtmClient.subscribePeersOnlineStatus(list,null);
+    }
+
+    public void UnSubscribe(String peerId){
+        Set<String> list = new ArraySet<>();
+        list.add(peerId);
+        rtmClient.unsubscribePeersOnlineStatus(list,null);
     }
 }
