@@ -1233,5 +1233,17 @@ typedef NS_ENUM(NSInteger, ARVideoBufferType ) {
     ARVideoBufferTypeRawData = 2,
 };
 
+/** 音频采集类型 */
+typedef NS_ENUM(NSInteger, ARAudioType) {
+    /**
+     1:音频由App产生
+     */
+    ARAudioTypeApp = 1,
+    /**
+     2:音频由麦克风产生
+     */
+    ARAudioTypeMic = 2,
+};;
+
 
 #endif /* AREnumerates_h */

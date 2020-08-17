@@ -61,8 +61,8 @@
                                 </button>
                                 <button opaque="NO" tag="101" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cIF-I6-DFC">
                                     <rect key="frame" x="80" y="0.0" width="60" height="60"/>
-                                    <state key="normal" image="icon_speaker"/>
-                                    <state key="selected" image="icon_speakers"/>
+                                    <state key="normal" image="icon_speakers"/>
+                                    <state key="selected" image="icon_speaker"/>
                                     <connections>
                                         <action selector="didClickButton:" destination="iN0-l3-epB" eventType="touchUpInside" id="LtU-c9-OPl"/>
                                     </connections>
@@ -236,8 +236,8 @@
         <image name="icon_closevideo" width="57" height="57"/>
         <image name="icon_hangup" width="65" height="65"/>
         <image name="icon_head" width="132" height="132"/>
-        <image name="icon_openaudio" width="56" height="56"/>
-        <image name="icon_openvideo" width="56" height="56"/>
+        <image name="icon_openaudio" width="57" height="57"/>
+        <image name="icon_openvideo" width="57" height="57"/>
         <image name="icon_speaker" width="56" height="56"/>
         <image name="icon_speakers" width="57" height="57"/>
         <image name="icon_switch" width="57" height="57"/>
