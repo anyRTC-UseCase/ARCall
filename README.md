@@ -99,7 +99,3 @@ QQ咨询群：580477436
 
 获取更多帮助前往：[www.anyrtc.io](http://www.anyrtc.io)
 
-项目交流微信群,请扫描下方二维码进群
-
-![image](https://github.com/anyRTC-UseCase/ARCall/blob/master/resource/qrcode.png)
-
