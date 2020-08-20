@@ -11,8 +11,8 @@ var Utils = {
 
 //配置
 var Config = {
-  RTC_APPID: "",//RTC 应用ID
-  RTM_APPID: "",//RTM 应用ID
+  RTC_APPID: "110ce31a7dc3a4719f37ba5e54a4046d",//RTC 应用ID 407ad2d7b9e74eae76fefde3659d6db4
+  RTM_APPID: "110ce31a7dc3a4719f37ba5e54a4046d",//RTM 应用ID ee0ca1b2bf559ea6823698acb0600e62
   RTC_MODE: "live",//RTC 通信模式
   RTC_CODEC: "h264",//RTC 视频编码格式
   SELECT_CAMERA_DEVICE: sessionStorage.getItem("defaultCameraDeviceId") || undefined
@@ -58,13 +58,17 @@ var rtmClient = ArRTM.createInstance(Config.RTM_APPID);
   rtcClient.on("user-unpublished", async function(user, mediaType) {
     if (mediaType === "video") {
       document.getElementById(user.uid).remove();
-    } 
+    }
   });
   rtcClient.on("user-joined", function() {
     Utils.printLog("user-joined");
   });
   rtcClient.on("user-left", function() {
     Utils.printLog("user-left");
+
+    // if (callMode === 1) {
+      !$("#mineVideoPreview").hasClass("audio") && $("#mineVideoPreview").addClass("audio");
+    // }
     //释放资源
     Store.iscalling = false;
     Store.localTracks.videoTrack && (Store.localTracks.videoTrack.close(), Store.localTracks.videoTrack = null, Store.hasVideoTrack = false);
@@ -84,8 +88,9 @@ var rtmClient = ArRTM.createInstance(Config.RTM_APPID);
     uid: Store.ownUserId
   }).then(async function() {
     Store.rtcLogin = true;
-    $("#ownUserIdView").html(Store.ownUserId);
-    $("#makeCallBtn").attr("disabled", false);
+    $(".own-user-id-view").html(Store.ownUserId);
+    $("#openP2PInvite").attr("disabled", false);
+    $("#openMultiInvite").attr("disabled", false);
   }).catch(function(err) {
     Store.rtcLogin = false;
     alertError("RTM 登录失败");
@@ -113,11 +118,19 @@ var rtmClient = ArRTM.createInstance(Config.RTM_APPID);
       Store.remoteInvitation = remoteInvitation;
       
       $("#callerIdView").html(remoteInvitation.callerId);
+
+      var invitationContent = JSON.parse(remoteInvitation.content);
+      if (invitationContent.Mode === 0) {
+        $(".switch-audio-call_item").fadeIn();
+      }
+
       //显示被呼叫页面
       !$("#homePage").hasClass("d-none") && $("#homePage").addClass("d-none");
       $("#reciveCallPage").hasClass("d-none") && $("#reciveCallPage").removeClass("d-none");
     } else {
-      remoteInvitation.response = "calling";
+      remoteInvitation.response = JSON.parse({
+        Reason: "calling"
+      });
       remoteInvitation.refuse();
     }
 
@@ -128,10 +141,18 @@ var rtmClient = ArRTM.createInstance(Config.RTM_APPID);
       Store.iscalling = false;
       Store.remoteInvitation = null;
 
+      var invitationContent = JSON.parse(remoteInvitation.content);
+      var invitationResponse = JSON.parse(remoteInvitation.response);
+      // Mode: callMode,
+      // Conference: isP2p,
+      // ChanId: Utils.generateNumber(9),
+      // UserData: "",
+      // SipData: ""
+
       //加入实时通讯频道
-      Store.ownUserId = await rtcClient.join(Config.RTC_APPID, remoteInvitation.content, null, Store.ownUserId);
+      Store.ownUserId = await rtcClient.join(Config.RTC_APPID, invitationContent.ChanId, null, Store.ownUserId);
       //采集并发布媒体流
-      await getUserMediaAndPublish();
+      await getUserMediaAndPublish(invitationResponse.Mode);
     });
     //返回给被叫：拒绝呼叫邀请成功。
     remoteInvitation.on("RemoteInvitationRefused", function() {
@@ -179,18 +200,18 @@ var rtmClient = ArRTM.createInstance(Config.RTM_APPID);
 }
 
 //方法
-async function getUserMediaAndPublish() {
+async function getUserMediaAndPublish(callMode) {
   var [cameras, microhones] = await Promise.all([
     ArRTC.getCameras(),
     ArRTC.getMicrophones(),
   ]);
 
-  if (cameras.length === 0 && microhones.length === 0) {
+  if ((cameras.length === 0 && microhones.length === 0) || (callMode === 0 && cameras.length === 0)) {
     alertError("上麦失败！确实麦克风和摄像头");
     return
   }
 
-  if (cameras.length > 0 && microhones.length > 0) {
+  if (cameras.length > 0 && microhones.length > 0 && callMode === 0) {//仅视频呼叫才打开摄像头
     [Store.localTracks.audioTrack, Store.localTracks.videoTrack] = await ArRTC.createMicrophoneAndCameraTracks(
       null, 
       {
@@ -204,7 +225,7 @@ async function getUserMediaAndPublish() {
       }
     );
   } else {
-    if (cameras.length > 0) {
+    if (cameras.length > 0 && callMode === 0) {
       Store.localTracks.videoTrack = await ArRTC.createCameraVideoTrack({
         encoderConfig: {
           bitrateMax: 1130,
@@ -231,7 +252,10 @@ async function getUserMediaAndPublish() {
     alertError("没有设备无法发布媒体流");
     return
   }
-  
+  //显示 P2P 音频布局
+  if (callMode === 1) {
+    !$("#mineVideoPreview").hasClass("audio") && $("#mineVideoPreview").addClass("audio");
+  }
   
   //预览本地图像
   var videoBox = document.createElement("div");
@@ -260,6 +284,26 @@ function alertError(errorText) {
 
 /**
  * home Page
+ **/
+//打开p2p邀请页面
+$("#openP2PInvite").click(function() {
+  !$("#loginForm").hasClass("show") && $("#loginForm").addClass("show");
+});
+//打开多人邀请页面
+$("#openP2PInvite").click(function() {
+
+});
+//返回首页
+$("#backToHome").click(function() {
+  $("#loginForm").hasClass("show") && $("#loginForm").removeClass("show");
+  //清空表单
+  $("#userInputs > input").each(function(index, el) {
+    el.value = "";
+  });
+});
+
+/**
+ * p2p invite Page
  **/
 //监听用户ID输入
 $('#userInputs > input').bind('input propertychange', function (event) {
@@ -319,7 +363,7 @@ $("#openSettingBtn").click(async function() {
     });
 
     if (cameras.length > 0) {
-      Store.localTracks.videoTrack = await ArRTC.createCameraVideoTrack({
+      Store.localTracks.settingVideoTrack = await ArRTC.createCameraVideoTrack({
         encoderConfig: {
           bitrateMax: 1130,
           // bitrateMin: ,
@@ -330,9 +374,10 @@ $("#openSettingBtn").click(async function() {
       });
       
       if ($("#loginSetting").hasClass("show")) {
-        Store.localTracks.videoTrack.play("settingVideoPreview");
+        Store.localTracks.settingVideoTrack.play("settingVideoPreview");
       } else {
-        Store.localTracks.videoTrack.close();
+        Store.localTracks.settingVideoTrack.close();
+        $("#settingVideoPreview").html("");
       }
     }
   }
@@ -342,15 +387,17 @@ $("#openSettingBtn").click(async function() {
 $("#closeSettingBtn").click(function() {
   if ($("#loginSetting").hasClass("show")) {
     $("#loginSetting").removeClass("show");
-    Store.localTracks.videoTrack.close();
+    Store.localTracks.settingVideoTrack && Store.localTracks.settingVideoTrack.close();
+    $("#settingVideoPreview").html("");
   }
 });
 
 /**
  * makeCallPage Page
  **/
-//监听呼叫按钮点击
-$("#makeCallBtn").click(async function() {
+
+//监听呼叫
+async function makeCall(callMode, isP2p = true) {
   var calleeId = "";
   $("#userInputs > input").each(function(index, el) {
     let inputVal = el.value;
@@ -384,7 +431,13 @@ $("#makeCallBtn").click(async function() {
     Store.peerUserId = calleeId;
     //发起呼叫
     var localInvitation = rtmClient.createLocalInvitation(calleeId);
-    localInvitation.content = Store.ownUserId + calleeId;//这里将呼叫邀请的内容 设置为视频通讯时使用的频道id - 进入同一个频道
+    localInvitation.content = JSON.stringify({
+      Mode: callMode,
+      Conference: isP2p,
+      ChanId: '' + Utils.generateNumber(9),
+      UserData: "",
+      SipData: ""
+    });//这里将呼叫邀请的内容 设置为视频通讯时使用的频道id - 进入同一个频道
     localInvitation.send();
     
     //清空表单
@@ -421,15 +474,18 @@ $("#makeCallBtn").click(async function() {
       //邀请已结束
       Store.localInvitation = null;
 
+      var invitationResponse = JSON.parse(response);
+
       //隐藏邀请页，显示会议页面
       !$("#makeCallPage").hasClass("d-none") && $("#makeCallPage").addClass("d-none");
       $("#meetPage").hasClass("d-none") && $("#meetPage").removeClass("d-none");
       $("#calleeIdView").html("");
 
+      var invitationContent = JSON.parse(localInvitation.content);
       //加入实时通讯频道
-      Store.ownUserId = await rtcClient.join(Config.RTC_APPID, localInvitation.content, null, Store.ownUserId);
+      Store.ownUserId = await rtcClient.join(Config.RTC_APPID, invitationContent.ChanId, null, Store.ownUserId);
       //采集并发布媒体流
-      await getUserMediaAndPublish();
+      await getUserMediaAndPublish(invitationResponse.Mode);
     });
 
     //远端用户拒绝了你的呼叫邀请
@@ -471,7 +527,7 @@ $("#makeCallBtn").click(async function() {
       $("#calleeIdView").html("");
     });
   }
-});
+}
 
 //监听取消呼叫按钮点击
 $("#cancelCallBtn").click(function() {
@@ -490,9 +546,28 @@ $("#cancelCallBtn").click(function() {
  * reciveCallPage Page
  **/
 //监听接收呼叫按钮点击
-$("#acceptCallBtn").click(function() {
+function acceptCall(forceAudioCall = false) {
   if (Store.iscalling && Store.remoteInvitation) {
     Store.peerUserId = Store.remoteInvitation.callerId;
+    var invitationContent = JSON.parse(Store.remoteInvitation.content);
+
+    var callMode = invitationContent.Mode;
+
+    if (callMode === 0) {
+      Store.remoteInvitation.response = JSON.stringify({
+        Mode: 0,
+        Conference: invitationContent.Conference,
+        UserData: "",
+        SipData: ""
+      });
+    } else if (forceAudioCall || callMode === 1) {
+      Store.remoteInvitation.response = JSON.stringify({
+        Mode: 1,
+        Conference: invitationContent.Conference,
+        UserData: "",
+        SipData: ""
+      });
+    }
     Store.remoteInvitation.accept();
     Store.iscalling = false;
     Store.remoteInvitation = null;
@@ -501,7 +576,7 @@ $("#acceptCallBtn").click(function() {
     $("#meetPage").hasClass("d-none") && $("#meetPage").removeClass("d-none");
     $("#callerIdView").html("");
   }
-});
+}
 
 //监听拒绝呼叫按钮点击
 $("#refuseCallBtn").click(function() {
@@ -514,6 +589,11 @@ $("#refuseCallBtn").click(function() {
     $("#homePage").hasClass("d-none") && $("#homePage").removeClass("d-none");
     $("#callerIdView").html("");
   }
+});
+
+//切换音频呼叫按钮点击
+$("#switchToAudioCall").click(function() {
+  
 });
 
 /**
@@ -565,8 +645,8 @@ $("#hangupBtn").click(function() {
     Store.localTracks.audioTrack && (Store.localTracks.audioTrack.close(), Store.localTracks.audioTrack = null, Store.hasAudioTrack = false);
     rtcClient.leave();
     Store.iscalling = false;
-    document.getElementById(Store.ownUserId).remove();
-    document.getElementById(Store.peerUserId).remove();
+    document.getElementById(Store.ownUserId) && document.getElementById(Store.ownUserId).remove();
+    document.getElementById(Store.peerUserId) && document.getElementById(Store.peerUserId).remove();
     //隐藏视频通讯页面
     !$("#meetPage").hasClass("d-none") && $("#meetPage").addClass("d-none");
     $("#homePage").hasClass("d-none") && $("#homePage").removeClass("d-none");
