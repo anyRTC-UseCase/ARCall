@@ -73,6 +73,11 @@ ARCall 示例项目支持以下平台和版本：
 - [iOS 运行指南](https://github.com/anyRTC-UseCase/ARCall/tree/master/Call-iOS)
 - [Web 运行指南](https://github.com/anyRTC-UseCase/ARCall/tree/master/Call-web)
 
+### 与SIP互通
+
+[SipRtcProxy](https://github.com/anyRTC-UseCase/SipRtcProxy)是anyRTC开源的sip proxy,实现了rtc与sip的互通。
+
+
 ## 常见问题
 
 详见[常见问题](https://docs.anyrtc.io/platforms/docs/platforms/FAQ/faq)。
@@ -92,6 +97,8 @@ ARCall 示例项目支持以下平台和版本：
 联系电话：021-65650071
 
 QQ咨询群：580477436
+
+ARCall技术交流群：597181019
 
 咨询邮箱：hi@dync.cc
 
