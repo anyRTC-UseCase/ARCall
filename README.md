@@ -10,7 +10,7 @@ ARCall 是anyRTC模仿微信呼叫的示例项目，演示了如何通过 anyRTC
 - 可对接第三方推送实现推送功能。
 
 ## 代码下载
-Github代码下载如何很慢，请移步至[码云](https://gitee.com/anyRTC/ARCall)下载
+Github代码下载慢，请移步至[码云](https://gitee.com/anyRTC/ARCall)下载
 
 ### 支持场景
 
