@@ -7,6 +7,14 @@ body,
 	overflow: hidden;
 }
 
+img {
+	user-select: none;
+}
+
+p {
+	margin: 0;
+}
+
 .page.d-none {
 	display: none !important;
 }
@@ -22,7 +30,7 @@ body,
 .login {
 	width: 800px;
 	position: relative;
-	box-shadow: 0 0 20px 0px rgba(0,0,0,0.3);
+	box-shadow: 0 0 20px 0px rgba(0, 0, 0, 0.3);
 	border-radius: 20px;
 	overflow: hidden;
 }
@@ -43,14 +51,15 @@ body,
 }
 
 /* login-left */
-.login-left > .img-responsive {
+.login-left>.img-responsive {
 	width: 100%;
 }
 
 /* login-right */
-.login-right > .full-wrap {
+.login-right>.full-wrap {
 	padding: 15px 30px;
 }
+
 .login-form {
 	position: absolute;
 	top: 0;
@@ -64,9 +73,11 @@ body,
 	padding: 15px;
 	background-color: #fff;
 }
+
 .login-form.show {
 	left: 0;
 }
+
 .login-form_bd {
 	padding: 140px 0 10px;
 }
@@ -79,6 +90,20 @@ body,
 	color: #949494;
 }
 
+#multiUserInputs input {
+	outline: none;
+	border: 4px solid #dddddd;
+	border-radius: 10px;
+	font-size: 1.5em;
+	color: #949494;
+}
+#userMutiModalInputs input {
+	outline: none;
+	border: 4px solid #dddddd;
+	border-radius: 10px;
+	font-size: 1.5em;
+	color: #949494;
+}
 .login-form_bt {
 	color: #949494;
 }
@@ -91,24 +116,33 @@ body,
 }
 
 .login-form_submit {
-	margin: 60px 40px 10px;
+	margin: 60px 0 10px;
 }
 
-.login-form_submit > button:first-child {
-	margin-bottom: 30px;
+.login-form_us>button {
+	margin: 2px;
 }
+
+/* .login-form_submit > button:first-child {
+	margin-bottom: 30px;
+} */
 
 .container-fluid {
-	height: 52px;
+	/* height: 52px; */
+	padding: 14px 0;
 	border-color: #40a3fc;
 	background: #40a3fc;
-	border-radius: 26px;
+	/* border-radius: 26px; */
 	box-shadow: 0px 3px 3px 0px rgba(0, 0, 0, 0.17);
 	font-size: 1.2em;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 0 10px;
 }
 
 .login-form_ownid {
-	/* margin-bottom: 15px; */
+	padding-bottom: 60px;
 }
 
 .login_bg {
@@ -134,9 +168,16 @@ body,
 	z-index: 10;
 	text-align: center;
 }
-.warning_box .close{
+
+.warning_box .close {
 	outline: none;
 	line-height: 20px;
+}
+
+.warning_whole {
+	left: 40%;
+	right: 40%;
+	z-index: 1060;
 }
 
 .userid-inputs {}
@@ -200,7 +241,7 @@ body,
 }
 
 /* meet page */
-.video-preview_title {
+/* .video-preview_title {
 	user-select: none;
 	margin: 20px;
 	width: 400px;
@@ -210,25 +251,28 @@ body,
 	border: 1px solid #999999;
 	position: absolute;
 }
+
 .video-preview_title.audio {
 	top: 20%;
 	left: 50%;
 	transform: translate(-50%, -50%);
 	width: 120px;
 	height: 120px;
-}
+} */
+
 .video-preview_big {
 	width: 100%;
 	height: 756px;
 	background: #333;
-	border-radius: 10px;
 	position: relative;
 }
+
 .video-preview_box {
 	position: relative;
 	width: 100%;
 	height: 100%;
 }
+
 .video-operate {
 	position: absolute;
 	bottom: 60px;
@@ -273,5 +317,162 @@ body,
 	background-size: initial;
 	border-radius: 20px;
 	box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.3);
+}
 
+/* 音频通话 */
+.audio_bg {
+	height: 100%;
+	background: url(../images/audio_bg.png) no-repeat;
+	background-position: center;
+	background-size: 100%;
+	/* box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.3); */
+}
+
+.audio_time {
+	font-size: 1.5em;
+	font-weight: 400;
+	text-align: center;
+	color: #ffffff;
+	letter-spacing: 1px;
+	text-shadow: 0px 2px 1px 0px rgba(0, 0, 0, 0.35);
+}
+
+.audio_option {
+	background: #fff;
+	width: 175px;
+	border-radius: 40px;
+	justify-content: space-evenly;
+}
+
+.audio_option>button {
+	outline: none;
+	border: 0;
+	background: #fff;
+	color: #515151;
+	font-size: 1em;
+
+}
+
+.meet-control_icon {
+	font-size: 1.5em;
+}
+
+.seting-mutil_height {
+	padding: 5px 0;
+	height: 50px;
+	border-bottom: 1px solid #ddd;
+}
+
+/*  */
+.prompt_little {
+	padding: 0 10px;
+	background-color: rgba(35,35,35,1);
+	position: absolute;
+	z-index: 99;
+	bottom: 0;
+}
+
+.prompt_big {
+	position: absolute;
+	z-index: 99;
+	bottom: 0;
+	color: #fff;
+}
+
+.prompt_little > i,
+.prompt_little > div {
+	margin: 0 5px;
+	opacity: 1;
+}
+
+.prompt_little > i {
+	margin-right: 5px;
+}
+
+.prompt_little > div {
+	color: #fff;
+}
+
+.icon_color_blue {
+	color: #40A3FC;
+}
+
+.icon_color_red {
+	color: #f97171;
+}
+.multiple_call_span::after{
+	content: ",";
+}
+.user_characteristic {
+	font-size: 1.5em;
+	height: 54px;
+}
+/* 多人视频 */
+.video-preview_small {
+	flex-wrap: nowrap;
+	position: absolute;
+	top: 0;
+	/* overflow: auto; */
+	width: 100%;
+	overflow-y: hidden;
+	overflow-x: auto;
+	z-index: 1;
+}
+
+.video-preview_small_box {
+	box-sizing: border-box;
+	user-select: none;
+	width: 200px;
+	height: 168px;
+	z-index: 14;
+	border: 1px solid #999999;
+	position: relative;
+}
+
+.video-preview {
+	margin: 0;
+	width: 100%;
+	height: 100%;
+	position: relative;
+	background-color: #232323;
+}
+
+.video-preview_state {
+	position: absolute;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background-color: #232323;
+}
+
+.video-preview_status {
+	color: #fff;
+}
+.video-icon_font {
+	font-size: 2.5em;
+}
+/* 模态框 */
+.modal-form_bd{
+	padding: 30px;
+}
+
+.user-tag > .icon-delete_open {
+	display: none;
+}
+
+.user-tag:hover > .icon-delete_close {
+	display: none;
+}
+.user-tag:hover > .icon-delete_open {
+	display: inline-block;
+}
+
+.invite-btn > .icon-request_opacity {
+	display: none;
+}
+.invite-btn:hover > .icon-request_transparent {
+	display: none;
+}
+.invite-btn:hover > .icon-request_opacity {
+	display: inline-block;
 }
