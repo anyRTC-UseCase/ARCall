@@ -75,7 +75,6 @@ var RTC = {
           return user.userId === Store.ownUserId;
         });
         if (mediaType === "video") {
-          // user.videoTrack.stop();
           findUser.videoTrack = null;
         } else if (mediaType === "audio") {
           findUser.audioTrack = null;
@@ -208,7 +207,7 @@ var RTM = {
 
       // RTM SDK 监听回调
       // 登录信令服务
-      rtmClient.login({
+      Store.rtmClient.login({
         uid: Store.ownUserId
       }).then(async function () {
         $(".own-user-id-view").html(Store.ownUserId);
@@ -219,20 +218,19 @@ var RTM = {
       });
 
       // 通知 SDK 与 RTM 系统的连接状态发生了改变。
-      rtmClient.on("ConnectionStateChanged", function (newState, reason) {
+      Store.rtmClient.on("ConnectionStateChanged", function (newState, reason) {
 
       });
 
       // 收到来自主叫的呼叫邀请。
-      rtmClient.on("RemoteInvitationReceived", function (remoteInvitation) {
+      Store.rtmClient.on("RemoteInvitationReceived", function (remoteInvitation) {
         Utils.printLog("[info]", "You recive an invitation from "+ remoteInvitation.callerId);
 
         if (!Store.iscalling) {
           Store.iscalling = true;
-          Store.remoteInvitation = remoteInvitation;
 
           var invitationContent = JSON.parse(remoteInvitation.content);
-          var invitationUsers = JSON.parse(invitationContent.UserData);
+          var invitationUsers = invitationContent.UserData;
           Store.invitationUserIds = JSON.parse(JSON.stringify(invitationUsers));// 拷贝数组
           for (var i = Store.invitationUserIds.length - 1; i >= 0; i--) {
             if (Store.invitationUserIds[i] === Store.ownUserId) {
@@ -380,7 +378,7 @@ var RTM = {
       });
 
       //（SDK 断线重连时触发）当前使用的 RTM Token 已超过 24 小时的签发有效期。
-      rtmClient.on("TokenExpired", function () {
+      Store.rtmClient.on("TokenExpired", function () {
 
       });
     }
@@ -417,7 +415,8 @@ var RTM = {
       });
       // 监听频道人员加入, 如果人数超过512，该回调失效
       rtmChannel.on("MemberJoined", function (memberId) {
-
+        // 创建用户视图窗口 - 等待界面
+        CustomUI.createUserView(memberId, 3);
       });
       // 监听频道人员离开
       rtmChannel.on("MemberLeft", function (memberId) {
@@ -435,7 +434,7 @@ var RTM = {
       Mode: 0,// 呼叫的类型0:视频 1:语音
       Conference: true,
       ChanId: channelId,
-      UserData: JSON.stringify([Store.ownUserId].concat(Store.invitationUserIds)),// 邀请的人员添加到UserData
+      UserData: [Store.ownUserId].concat(Store.invitationUserIds),// 邀请的人员添加到UserData
       SipData: ""
     });
     // 发送邀请
@@ -824,6 +823,7 @@ $("#MultipleCalls").click(async function () {
         }, Store.setting.invitationTimeout);
       }
     });
+    $("#multiUserBtn").html("");
 
     if (!Store.inChannel) {
       // 采集本地图像
@@ -859,7 +859,7 @@ $("#hangupMutiBtn").click(function() {
     Store.localTracks.videoTrack && Store.localTracks.videoTrack.close();
     Store.localTracks.audioTrack && Store.localTracks.audioTrack.close();
     //退出频道
-    Store.rtmClient.logout();
+    RTM.rtmChannel.leave();
     Store.rtcClient.leave();
 
     // 关闭页面，清空所有状态、视图
@@ -868,15 +868,15 @@ $("#hangupMutiBtn").click(function() {
     
     // 返回呼叫邀请页面
     CustomUI.showCallPage();
-
+    
+    RTM.rtmChannel = null;
     // 清空标识 reset
     {
-      Store.RTM.rtmChannel = null;
-      Store.inChannel = false;
-      Store.rtmClient = null;
-      Store.rtcClient = null;
+      // Store.ownUserId = "";
+      Store.iscalling = false;
       Store.channelId = "";
-      Store.invitationUserIds = [];
+      Store.inChannel = false;
+      Store.bigViewUserId  = "";
       Store.localTracks = {
         videoTrack       : null,
         audioTrack       : null,
@@ -884,17 +884,8 @@ $("#hangupMutiBtn").click(function() {
         enableVideo      : true,   // 本地摄像头是否关闭
         enableAudio      : true,   // 本地麦克风是否关闭
       };
-      Store.ownUserId = "";
       Store.roomUser = [];
-      Store.setting = {
-        // 点对点呼叫设置
-        videoSize  : [320, 180],   // 设置视频采集的分辨率大小
-        audioDevice: "default",    // 设置音频设备ID
-        videoDevice: "default",    // 设置视频设备ID
-        // 多人呼叫设置
-        enableAudio: true,   //
-        enableVideo: true,   //
-      };
+      Store.invitationUserIds = [];
     }
   }
 });

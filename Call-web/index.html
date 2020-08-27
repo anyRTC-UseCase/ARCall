@@ -1,46 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="google" content="notranslate" />
-		<title>anyrtc呼叫 - anyRTC</title>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate" />
+    <title>anyrtc 呼叫邀请DEMO - anyRTC</title>
 
-		<!-- CSS only -->
-		<link rel="stylesheet" href="./assets/css/bootstrap.min.css">
-		<link rel="stylesheet" type="text/css" href="assets/font/iconfont.css" />
-		<!-- 覆盖bootstrap样式 -->
-		<link rel="stylesheet" href="./assets/css/index.css">
+    <!-- CSS only -->
+    <link rel="stylesheet" href="./assets/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/font/iconfont.css" />
+    <!-- JS, Popper.js, and jQuery -->
+    <!-- <script src="./assets/js/jquery.slim.min.js"></script> -->
+    <script src="./assets/js/jquery-3.5.1.min.js"></script>
+    <script src="./assets/js/bootstrap.min.js"></script>
 
-	</head>
-	<body class="notranslate">
-		<!-- 首页 --> 
-		<div class="page d-flex flex-col justify-content-center align-items-center">
-			<!--  -->
-			<div class="login d-flex flex-row align-items-stretch">
-				<!-- 警告框 -->
-				<div class="warning_box" id="warningBox"></div>
-				<!--  -->
-				<div class="flex-fill flex-basis-0 login-left">
-					<img draggable="false" class="img-responsive" src="assets/images/BG.png" />
-				</div>
-				<!--  -->
-				<div class="flex-fill flex-basis-0 login-right">
-					<!-- 邀请 -->
-					<div class="d-flex flex-column full-wrap" id="loginHome">
-						<div class="flex-fill">
-							<div class="d-flex flex-column align-items-center justify-content-center full-wrap">
-								<a href="./p2pCall.html" type="button" class="container-fluid btn btn-primary" disabled id="openP2PInvite">
-									<img src="assets/images/Dcall.png">点对点呼叫邀请
-								</a>
-								<a href="./multiCall.html" type="button" class="container-fluid btn btn-primary" disabled id="openMultiInvite" style="margin-top: 45px;">
-									<img src="assets/images/Mcalls.png">多人呼叫邀请
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</body>
+    <!-- 覆盖bootstrap样式 -->
+    <link rel="stylesheet" href="./assets/css/index.css">
+
+  </head>
+  <body class="notranslate">
+    <!-- 全局警告框 -->
+    <div class="warning_box warning_whole" id="warningWholeBox"></div>
+    
+    <!-- 首页 -->
+    <div class="page d-flex flex-col justify-content-center align-items-center" id="homePage">
+      <!--  -->
+      <div class="login d-flex flex-row align-items-stretch">
+        <!-- 警告框 -->
+        <div class="warning_box" id="warningBox"></div>
+        <!--  -->
+        <div class="flex-fill flex-basis-0 login-left">
+          <img draggable="false" class="img-responsive" src="assets/images/BG.png" />
+        </div>
+        <!--  -->
+        <div class="flex-fill flex-basis-0 login-right">
+          <!-- 邀请 -->
+          <div class="d-flex flex-column full-wrap" id="loginHome">
+            <div class="flex-fill">
+              <div class="d-flex flex-column align-items-center justify-content-center full-wrap">
+                <a href="./p2pCall.html" type="button" class="container-fluid btn btn-primary" disabled id="openP2PInvite">
+                  <img src="assets/images/Dcall.png">点对点呼叫邀请
+                </a>
+                <a href="./multiCall.html" type="button" class="container-fluid btn btn-primary" disabled id="openMultiInvite" style="margin-top: 45px;">
+                  <img src="assets/images/Mcalls.png">多人呼叫邀请
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
