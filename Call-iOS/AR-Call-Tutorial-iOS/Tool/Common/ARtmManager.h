@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)setLocalUid:(NSString *)uid;
 + (NSString *)getLocalUid;
 + (void)addOfflineMessage:(ARtmMessage * _Nonnull)message fromUser:(NSString * _Nonnull)uid;
++ (UIWindow *)rtmWindow;
++ (void)dismissWindow;
 
 @end
 

@@ -8,28 +8,27 @@
 
 #import "ARtmMainViewController.h"
 #import <AVFoundation/AVFoundation.h>
+#import "ARtmConfigController.h"
 
-@interface ARtmMainViewController ()<UITextFieldDelegate,ARtmCallDelegate,ARtmDelegate,ARtcEngineDelegate,ARtmCallViewDelegate>
+@implementation ARtmCollectionViewCell
 
+@end
+
+@interface ARtmMainViewController ()<UITextFieldDelegate,ARtmCallDelegate,ARtmDelegate,ARtcEngineDelegate,UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout>
+
+@property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *calleeIdLabel;
 @property (weak, nonatomic) IBOutlet UIStackView *stackView;
 @property (weak, nonatomic) IBOutlet UIButton *callButton;
+@property (weak, nonatomic) IBOutlet UICollectionView *rtmCollectionView;
+@property (weak, nonatomic) IBOutlet UILabel *tipsLabel;
 
 @property (nonatomic, strong) UITextField *calleeIdTextField;
-/* 呼叫弹框 **/
-@property (nonatomic, strong) ARtmCallView *rtmCallView;
-@property (nonatomic, strong) WMDragView *localView;
-@property (nonatomic, strong) WMDragView *remoteView;
-@property (nonatomic, strong) ARtmCallKit *callKit;
 @property (nonatomic, strong) ARtcEngineKit *rtcKit;
-
+@property (nonatomic, strong) ARtmCallKit *rtmCallKit;
 @property (nonatomic, copy) NSString *localUid;
 @property (nonatomic, copy) NSString *remoteUid;
-@property (nonatomic, assign) BOOL callMinimize;
-/* 本地呼叫请求 **/
-@property (nonatomic, strong) ARtmLocalInvitation * localInvitation;
-/* 远程呼叫邀请 **/
-@property (nonatomic, strong) ARtmRemoteInvitation * remoteInvitation;
+@property (nonatomic, strong) NSMutableArray *callArr;
 @property (nonatomic, strong) AVAudioPlayer *player;
 
 @end
@@ -42,12 +41,17 @@
     UIApplication.sharedApplication.idleTimerDisabled = YES;
     self.localUid = ARtmManager.getLocalUid;
     self.calleeIdLabel.text = [NSString stringWithFormat:@"您的呼叫ID：%@",self.localUid];
+    if (self.type) {
+        self.titleLabel.text = @"多人呼叫邀请";
+        self.tipsLabel.text = @"请输入对方的ID，可输入多个";
+        self.callArr = [NSMutableArray arrayWithCapacity:6];
+    }
     
     ARtmManager.rtmKit.aRtmDelegate = self;
-    //一个 ARtmCallKit 实例
-    self.callKit = [ARtmManager.rtmKit getRtmCallKit];
-    self.callKit.callDelegate = self;
+    self.rtmCallKit = [ARtmManager.rtmKit getRtmCallKit];
+    self.rtmCallKit.callDelegate = self;
     [self initializeUIKit];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(rtmCallEnd:) name:ARtmCallEndNotification object:nil];
 }
 
 - (void)initializeUIKit {
@@ -62,88 +66,97 @@
     [self.calleeIdTextField addTarget:self action:@selector(limitTextField:) forControlEvents:UIControlEventEditingChanged];
 }
 
-- (void)initializeRtcKit {
-    //===================== rtc 模块 =======================
-    ARVideoEncoderConfiguration *config = [[ARVideoEncoderConfiguration alloc] init];
-    ARtmUserInfo *userInfo = [ARtmUserManager fetchUserInfo];
-    if ([userInfo.dimensions isEqualToString:@"320P"]) {
-        config.dimensions = CGSizeMake(320, 180);
-    } else if ([userInfo.dimensions isEqualToString:@"480P"]) {
-        config.dimensions = CGSizeMake(640, 480);
-    } else {
-        config.dimensions = CGSizeMake(1280, 720);
+- (IBAction)didClickCallButton:(id)sender {
+    [ARCallCommon hideKeyBoard];
+    //当前是否正在通话
+    BOOL index = false;
+    for (UIWindow *window in UIApplication.sharedApplication.windows) {
+        if (window.tag == ARtmWindowIdentifier) {
+            index = true;
+        }
     }
     
-    //实例化ARtcEngineKit对象
-    self.rtcKit = [ARtcEngineKit sharedEngineWithAppId:appID delegate:self];
-    //分辨率
-    config.frameRate = userInfo.frameRate;
-    //码率
-    config.bitrate = 1000;
-    //编码方向
-    config.orientationMode = ARVideoOutputOrientationModeAdaptative;
-    //设置视频编码配置
-    [self.rtcKit setVideoEncoderConfiguration:config];
-    
-    //开启视频模块
-    [self.rtcKit enableVideo];
-    //初始化本地视图
-    ARtcVideoCanvas *videoCanvas = [[ARtcVideoCanvas alloc] init];
-    videoCanvas.uid = [ARtmManager getLocalUid];
-    self.localView.frame = CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    [self.rtmCallView insertSubview:self.localView atIndex:0];
-    videoCanvas.view = self.localView;
-    [self.rtcKit setupLocalVideo:videoCanvas];
-    //开启视频预览
-    [self.rtcKit startPreview];
-}
-
-- (void)makeCall:(NSString *)calleeId {
-    [self playMusic:YES];
-    //创建本地呼叫请求
-    self.localInvitation = nil;
-    self.localInvitation = [[ARtmLocalInvitation alloc] initWithCalleeId:calleeId];
-    self.localInvitation.content = [ARCallCommon randomNumber:9];
-    self.rtmCallView = [ARtmCallView loadCallView:self call:YES uid:calleeId];
-    UIWindow *window = UIApplication.sharedApplication.delegate.window;
-    [window addSubview:self.rtmCallView];
-    
-    //发送呼叫请求
-    @weakify(self);
-    [self.callKit sendLocalInvitation:self.localInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
-        @strongify(self);
-        if (errorCode == ARtmInvitationApiCallErrorAlreadySent) {
-            [self initializeRtcKit];
-        }
-    }];
-    [self subscribePeersOnline:self.localInvitation.calleeId];
-}
-
-- (IBAction)didClickCallButton:(id)sender {
-    __block NSString *calleeId = self.calleeIdTextField.text;
-    if (![calleeId isEqualToString:[ARtmManager getLocalUid]]) {
-        if (!self.rtmCallView) {
-            if (calleeId.length == 4) {
-                @weakify(self);
-                [self.calleeIdTextField resignFirstResponder];
-                //查询指定用户的在线状态
-                [ARtmManager.rtmKit queryPeersOnlineStatus:@[calleeId] completion:^(NSArray<ARtmPeerOnlineStatus *> * _Nullable peerOnlineStatus, ARtmQueryPeersOnlineErrorCode errorCode) {
-                    if (errorCode == ARtmQueryPeersOnlineErrorOk && peerOnlineStatus.count != 0) {
-                        @strongify(self);
-                        ARtmPeerOnlineStatus *onlineStatus = peerOnlineStatus[0];
-                        if (onlineStatus.state == ARtmPeerOnlineStateOnline) {
-                            [self makeCall:calleeId];
-                        } else {
-                            [ARCallCommon showInfoWithStatus:ARtmUserOffline];
-                        }
-                    }
-                }];
+    if (!index) {
+        if (self.type) {
+            //多人呼叫
+            if (self.callArr.count != 0) {
+                ARtmMeetViewController *meetVc = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ARtm_Meet"];
+                meetVc.channelId = [ARCallCommon randomNumber:9];
+                meetVc.calling = YES;
+                meetVc.callArr = self.callArr;
+                ARtmManager.rtmWindow.rootViewController = meetVc;
             }
         } else {
-            [ARCallCommon showInfoWithStatus:ARtmCallProgress];
+            //单人呼叫
+            __block NSString *calleeId = self.calleeIdTextField.text;
+            if (![calleeId isEqualToString:[ARtmManager getLocalUid]]) {
+                if (calleeId.length == 4) {
+                    @weakify(self);
+                    [self.calleeIdTextField resignFirstResponder];
+                    //查询指定用户的在线状态
+                    [ARtmManager.rtmKit queryPeersOnlineStatus:@[calleeId] completion:^(NSArray<ARtmPeerOnlineStatus *> * _Nullable peerOnlineStatus, ARtmQueryPeersOnlineErrorCode errorCode) {
+                        if (errorCode == ARtmQueryPeersOnlineErrorOk && peerOnlineStatus.count != 0) {
+                            @strongify(self);
+                            ARtmPeerOnlineStatus *onlineStatus = peerOnlineStatus[0];
+                            if (onlineStatus.state == ARtmPeerOnlineStateOnline) {
+                                [self makeRtmCall];
+                            } else {
+                                [ARCallCommon showInfoWithStatus:ARtmUserOffline];
+                            }
+                        }
+                    }];
+                }
+            } else {
+                [ARCallCommon showInfoWithStatus:ARtmCallerIdInvalid];
+            }
         }
     } else {
-        [ARCallCommon showInfoWithStatus:ARtmCallerIdInvalid];
+        [ARCallCommon showInfoWithStatus:@"当前正在通话中..."];
+    }
+}
+
+- (void)makeRtmCall {
+    //点对点呼叫邀请
+    @weakify(self);
+    [UIAlertController showActionSheetInViewController:self withTitle:nil message:nil cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@[@"视频呼叫",@"语音呼叫"] popoverPresentationControllerBlock:^(UIPopoverPresentationController * _Nonnull popover) {
+        
+    } tapBlock:^(UIAlertController * _Nonnull controller, UIAlertAction * _Nonnull action, NSInteger buttonIndex) {
+        if (buttonIndex != 0) {
+            @strongify(self);
+            ARtmCallViewController *callVc = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ARtm_Call"];
+            callVc.calling = YES;
+            callVc.callerId = self.calleeIdTextField.text;
+            callVc.channelId = [ARCallCommon randomNumber:9];
+            (buttonIndex == 2) ? (callVc.mode = 0) : (callVc.mode = 1);
+            ARtmManager.rtmWindow.rootViewController = callVc;
+        }
+    }];
+}
+
+- (IBAction)didClickLogoutButton:(id)sender {
+    if (self.childViewControllers.count == 0) {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    } else {
+        [ARCallCommon showInfoWithStatus:@"当前正在通话中..."];
+    }
+}
+
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    UINavigationController *nav = segue.destinationViewController;
+    ARtmConfigController *configVc = nav.childViewControllers[0];
+    configVc.type = self.type;
+}
+
+- (void)rtmCallEnd:(NSNotificationCenter *)nofit {
+    ARtmManager.rtmKit.aRtmDelegate = self;
+    self.rtmCallKit.callDelegate = self;
+    NSLog(@"rtmCallEnd Main Refresh");
+    if (self.type) {
+        [self.callArr removeAllObjects];
+        [self.rtmCollectionView reloadData];
+        self.callButton.selected = NO;
+        self.callButton.backgroundColor = RGBA(224, 224, 224, 1);
     }
 }
 
@@ -159,16 +172,6 @@
 
 - (void)rtmKit:(ARtmKit * _Nonnull)kit peersOnlineStatusChanged:(NSArray< ARtmPeerOnlineStatus *> * _Nonnull)onlineStatus {
     //被订阅用户在线状态改变回调
-    if (onlineStatus.count != 0) {
-        ARtmPeerOnlineStatus *status = onlineStatus[0];
-        if (status.state != ARtmPeerOnlineStateOnline && self.rtmCallView) {
-            [self.callKit cancelLocalInvitation:self.localInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
-                NSLog(@"cancelLocalInvitation == %ld",(long)errorCode);
-            }];
-            [self endRtmCall];
-            [ARCallCommon showInfoWithStatus:ARtmUserOffline];
-        }
-    }
 }
 
 //MARK: - ARtmCallDelegate
@@ -181,26 +184,11 @@
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationAccepted:(ARtmLocalInvitation * _Nonnull)localInvitation withResponse:(NSString * _Nullable) response {
     //被叫已接受呼叫邀请
     NSLog(@"%@",ARtmAcceptedInvitation);
-    [self playMusic:NO];
-    
-    self.rtmCallView.callView.hidden = YES;
-    self.rtmCallView.toolView.hidden = NO;
-    [self.rtcKit joinChannelByToken:nil channelId:self.localInvitation.content uid:self.localUid joinSuccess:^(NSString * _Nonnull channel, NSString * _Nonnull uid, NSInteger elapsed) {
-        NSLog(@"joinChannelByToken");
-    }];
-    self.localInvitation = nil;
+    [ARCallCommon playMusic:NO];
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationRefused:(ARtmLocalInvitation * _Nonnull)localInvitation withResponse:(NSString * _Nullable) response {
     //被叫已拒绝呼叫邀请
-    if ([response isEqualToString:@"calling"]) {
-        //对方正在通话中...
-        [ARCallCommon showInfoWithStatus:ARtmRemoteCallBusy];
-    } else {
-        [ARCallCommon showInfoWithStatus:ARtmRemoteRefusedInvitation];
-    }
-    
-    [self endRtmCall];
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationCanceled:(ARtmLocalInvitation * _Nonnull)localInvitation {
@@ -210,33 +198,33 @@
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationFailure:(ARtmLocalInvitation * _Nonnull)localInvitation errorCode:(ARtmLocalInvitationErrorCode)errorCode {
     //呼叫邀请发送失败
-    [self endRtmCall];
-    if (errorCode == ARtmLocalInvitationErrorRemoteOffline) {
-        [ARCallCommon showInfoWithStatus:ARtmUserOffline];
-    } else {
-        [ARCallCommon showInfoWithStatus:ARtmFailureInvitation];
-    }
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationReceived:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
     //收到一个呼叫邀请
-    if (self.rtmCallView) {
-        //拒绝标识(正在通话中...)
-        remoteInvitation.response = @"calling";
-        [self.callKit refuseRemoteInvitation:remoteInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
-            if (errorCode == ARtmInvitationApiCallErrorOk) {
-                NSLog(@"remoteInvitationReceived");
-            }
-        }];
+    [ARCallCommon hideKeyBoard];
+    NSDictionary *dic = [ARCallCommon dictionaryWithJSONString:remoteInvitation.content];
+    NSString *channelId = [dic objectForKey:@"ChanId"];
+    if ([[dic objectForKey:@"Conference"] boolValue]) {
+        //多人呼叫
+        NSMutableArray *arr = [NSMutableArray arrayWithArray:[dic objectForKey:@"UserData"]];
+        [arr removeObject:[ARtmManager getLocalUid]];
+        
+        ARtmMeetViewController *meetVc = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ARtm_Meet"];
+        meetVc.calling = NO;
+        meetVc.remoteInvitation = remoteInvitation;
+        meetVc.channelId = channelId;
+        meetVc.callArr = arr;
+        ARtmManager.rtmWindow.rootViewController = meetVc;
     } else {
-        //弹出通话框
-        [ARCallCommon hideKeyBoard];
-        [self playMusic:YES];
-        self.remoteInvitation = remoteInvitation;
-        self.rtmCallView = [ARtmCallView loadCallView:self call:NO uid:remoteInvitation.callerId];
-        UIWindow *window = UIApplication.sharedApplication.delegate.window;
-        [window addSubview:self.rtmCallView];
-        [self initializeRtcKit];
+        //点对点呼叫
+        ARtmCallViewController *callVc = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ARtm_Call"];
+        callVc.remoteInvitation = remoteInvitation;
+        callVc.calling = NO;
+        callVc.callerId = remoteInvitation.callerId;
+        callVc.channelId = [dic objectForKey:@"ChanId"];
+        callVc.mode =  [[dic objectForKey:@"Mode"] intValue];
+        ARtmManager.rtmWindow.rootViewController = callVc;
     }
 }
 
@@ -247,118 +235,14 @@
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationAccepted:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
     //接受呼叫邀请成功
-    [self.rtcKit joinChannelByToken:nil channelId:remoteInvitation.content uid:self.localUid joinSuccess:^(NSString * _Nonnull channel, NSString * _Nonnull uid, NSInteger elapsed) {
-        NSLog(@"joinChannelByToken");
-    }];
-    [self subscribePeersOnline:remoteInvitation.callerId];
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationCanceled:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
     //主叫已取消呼叫邀请
-    [self endRtmCall];
-    [ARCallCommon showInfoWithStatus:ARtmRemoteCanceledInvitation];
-    NSLog(@"%@",ARtmRemoteCanceledInvitation);
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationFailure:(ARtmRemoteInvitation * _Nonnull)remoteInvitation errorCode:(ARtmRemoteInvitationErrorCode) errorCode {
     //来自对端的邀请失败
-    [self endRtmCall];
-}
-
-//MARK: - ARtcEngineDelegate
-
-- (void)rtcEngine:(ARtcEngineKit *_Nonnull)engine firstRemoteVideoDecodedOfUid:(NSString *_Nonnull)uid size:(CGSize)size elapsed:(NSInteger)elapsed {
-    //已完成远端视频首帧解码回调
-    ARtcVideoCanvas *videoCanvas = [[ARtcVideoCanvas alloc] init];
-    self.remoteView.frame = CGRectMake(SCREEN_WIDTH - 140, 30, 120, 160);
-    [UIApplication.sharedApplication.delegate.window addSubview:self.remoteView];
-    videoCanvas.uid = uid;
-    videoCanvas.view = self.remoteView;
-    //初始化远端用户视图
-    [self.rtcKit setupRemoteVideo:videoCanvas];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self switchVideoSize];
-    });
-}
-
-- (void)rtcEngine:(ARtcEngineKit *)engine didOfflineOfUid:(NSString *)uid reason:(ARUserOfflineReason)reason {
-    //远端用户（通信场景）/主播（直播场景）离开当前频道回调
-    if (self.rtmCallView) {
-        [ARCallCommon showInfoWithStatus:ARtmCallend];
-        [self endRtmCall];
-    }
-}
-
-- (void)rtcEngine:(ARtcEngineKit *_Nonnull)engine remoteVideoStateChangedOfUid:(NSString *_Nonnull)uid state:(ARVideoRemoteState)state reason:(ARVideoRemoteStateReason)reason elapsed:(NSInteger)elapsed {
-    //远端视频状态发生改变回调
-    if (reason == ARVideoRemoteStateReasonRemoteMuted) {
-        self.remoteView.placeholderView.hidden = NO;
-    } else if (reason == ARVideoRemoteStateReasonRemoteUnmuted) {
-        self.remoteView.placeholderView.hidden = YES;
-    }
-}
-
-//MARK: - ARtmCallViewDelegate
-
-- (void)rtmCallViewdidClick:(UIButton *)sender call:(BOOL)isCall{
-    switch (sender.tag) {
-        case 50:
-            if (isCall) {
-                //取消给对方的呼叫邀请
-                [self.callKit cancelLocalInvitation:self.localInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
-                    NSLog(@"cancelLocalInvitation == %ld",(long)errorCode);
-                }];
-                [self endRtmCall];
-            } else {
-                //拒绝呼叫
-                [self.callKit refuseRemoteInvitation:self.remoteInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
-                    NSLog(@"refuseRemoteInvitation == %ld",(long)errorCode);
-                }];
-                [self endRtmCall];
-            }
-            break;
-        case 51:
-            //同意呼叫
-            self.rtmCallView.callView.hidden = YES;
-            self.rtmCallView.toolView.hidden = NO;
-            [self playMusic:NO];
-            [self.callKit acceptRemoteInvitation:self.remoteInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
-                NSLog(@"acceptRemoteInvitation == %ld",(long)errorCode);
-            }];
-            break;
-        case 52:
-            //大小屏
-            if (self.localView.superview != self.rtmCallView) {
-                [self switchVideoSize];
-            }
-            self.rtmCallView.hidden = YES;
-            self.callMinimize = YES;
-            break;
-        case 53:
-            //离开
-            [self.rtcKit leaveChannel:nil];
-            [self endRtmCall];
-            break;
-        case 100:
-            //音频
-            [self.rtcKit muteLocalAudioStream:sender.selected];
-            break;
-        case 101:
-            //扬声器
-            [self.rtcKit setEnableSpeakerphone:!sender.selected];
-            break;
-        case 102:
-            //视频
-            [self.rtcKit muteLocalVideoStream:sender.selected];
-            self.localView.placeholderView.hidden = !sender.selected;
-            break;
-        case 103:
-            //旋转摄像头
-            [self.rtcKit switchCamera];
-            break;
-        default:
-            break;
-    }
 }
 
 //MARK: - UITextFieldDelegate
@@ -370,100 +254,103 @@
     return [ARCallCommon validateNumber:string];
 }
 
+//MARK: - UICollectionViewDelegate,UICollectionViewDataSource
+
+- (NSInteger)collectionView:(UICollectionView*)collectionView numberOfItemsInSection:(NSInteger)section{
+    return self.callArr.count;
+}
+
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath*)indexPath{
+    return CGSizeMake((0.84 * SCREEN_WIDTH - 30)/3, 44);
+}
+
+- (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+    ARtmCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"ARtm_CollectionCell" forIndexPath:indexPath];
+    cell.deleteButton.tag = indexPath.row;
+    [cell.deleteButton addTarget:self action:@selector(removeLabel:) forControlEvents:UIControlEventTouchUpInside];
+    cell.titleLabel.text = self.callArr[indexPath.row];
+    return cell;
+}
+
 //MARK: - other
 
-- (void)subscribePeersOnline:(NSString *)calleeId {
-    //订阅指定单个或多个用户的在线状态
-    if (calleeId.length != 0) {
-        [ARtmManager.rtmKit subscribePeersOnlineStatus:@[calleeId] completion:^(ARtmPeerSubscriptionStatusErrorCode errorCode) {
-            NSLog(@"subscribePeersOnlineStatus errorcode == %ld",(long)errorCode);
-        }];
+- (void)removeLabel:(UIButton *)sender {
+    //删除标签
+    [self.callArr removeObjectAtIndex:sender.tag];
+    if (self.callArr.count < 2) {
+        CGFloat itemWidth = self.rtmCollectionView.frame.size.width;
+        self.rtmCollectionView.contentInset = UIEdgeInsetsMake(0, 0, 0, itemWidth - (itemWidth - 30)/3);
     }
-}
-
-- (void)playMusic:(BOOL)play {
-    if (play) {
-        NSString * path = [NSBundle.mainBundle pathForResource:@"rtm_call" ofType:@"mp3"];
-        NSURL *tempUrl = [NSURL fileURLWithPath:path];
-        NSError *error = nil;
-        if (!self.player) {
-            self.player = [[AVAudioPlayer alloc]initWithContentsOfURL:tempUrl error:&error];
-        }
-        self.player.numberOfLoops = -1;
-        [self.player prepareToPlay];
-        [self.player play];
-    } else {
-        [self.player stop];
-        self.player = nil;
-    }
-}
-
-- (void)endRtmCall {
-    NSString *peerId;
-    self.localInvitation ? (peerId = self.localInvitation.calleeId) : 0;
-    self.remoteInvitation ? (peerId = self.remoteInvitation.callerId) : 0;
-    if (peerId.length != 0) {
-        //退订指定单个或多个用户的在线状态
-        [ARtmManager.rtmKit unsubscribePeersOnlineStatus:@[peerId] completion:^(ARtmPeerSubscriptionStatusErrorCode errorCode) {
-            NSLog(@"unsubscribePeersOnlineStatus errorCode == %ld",(long)errorCode);
-        }];
-    }
+    self.rtmCollectionView.hidden = !self.callArr.count;
+    [self.rtmCollectionView reloadData];
     
-    [self.rtmCallView removeFromSuperview];
-    [self.localView removeFromSuperview];
-    [self.remoteView removeFromSuperview];
-    self.rtmCallView = nil;
-    self.localView = nil;
-    self.remoteView = nil;
-    self.localInvitation = nil;
-    self.remoteInvitation = nil;
-    [self playMusic:NO];
-    [self.rtcKit leaveChannel:nil];
-    self.rtcKit = nil;
-    [ARtcEngineKit destroy];
-}
-
-- (void)switchVideoSize {
-    //大小屏处理
-    if (self.localView.superview == self.rtmCallView) {
-        self.localView.dragEnable = YES;
-        self.remoteView.dragEnable = NO;
-        CGRect rect = self.remoteView.frame;
-        self.remoteView.frame = self.view.bounds;
-        [self.rtmCallView insertSubview:self.remoteView belowSubview:self.rtmCallView.toolView];
-        self.localView.frame = rect;
-        [UIApplication.sharedApplication.delegate.window addSubview:self.localView];
-    } else {
-        self.localView.dragEnable = NO;
-        self.remoteView.dragEnable = YES;
-        CGRect rect = self.localView.frame;
-        self.localView.frame = self.view.bounds;
-        [self.rtmCallView insertSubview:self.localView belowSubview:self.rtmCallView.toolView];
-        self.remoteView.frame = rect;
-        [UIApplication.sharedApplication.delegate.window addSubview:self.remoteView];
+    if (self.callArr.count == 0) {
+        self.callButton.selected = NO;
+        self.callButton.backgroundColor = RGBA(224, 224, 224, 1);
     }
 }
 
 - (void)limitTextField:(UITextField *)textField {
-    //限制纯数字输入
+    //限制输入
     if (textField.text.length > 4) {
         textField.text = [textField.text substringToIndex:4];
     }
-    
-    if (textField.text.length == 4) {
-        self.callButton.selected = YES;
-        self.callButton.backgroundColor = [UIColor whiteColor];
+    if (self.type) {
+        //多人呼叫
+        if (self.callArr.count < 6) {
+            NSArray *arr = [ARCallCommon getSubString:textField.text];
+            for (NSInteger i = 0; i < self.stackView.subviews.count; i++) {
+                NSString *subText;
+                UIButton *button = self.stackView.subviews[i];
+                (i < arr.count) ? (subText = arr[i]) : @"";
+                [button setTitle:subText forState:UIControlStateNormal];
+            }
+            
+            if (textField.text.length == 4) {
+                if ([textField.text isEqualToString:ARtmManager.getLocalUid]) {
+                    [ARCallCommon showInfoWithStatus:ARtmCallerIdInvalid];
+                } else {
+                    //去除重复号码
+                    [self.callArr removeObject:textField.text];
+                    [self.callArr addObject:textField.text];
+                    self.callButton.selected = YES;
+                    self.callButton.backgroundColor = [UIColor whiteColor];
+                    
+                    self.rtmCollectionView.contentInset = UIEdgeInsetsMake(0, 0, 0, 0);
+                    if (self.callArr.count < 2) {
+                        CGFloat itemWidth = self.rtmCollectionView.frame.size.width;
+                        self.rtmCollectionView.contentInset = UIEdgeInsetsMake(0, 0, 0, itemWidth - (itemWidth - 30)/3);
+                    }
+                    
+                    textField.text = @"";
+                    self.rtmCollectionView.hidden = NO;
+                    [self.rtmCollectionView reloadData];
+                    for (NSInteger i = 0; i < self.stackView.subviews.count; i++) {
+                        UIButton *button = self.stackView.subviews[i];
+                        [button setTitle:@"" forState:UIControlStateNormal];
+                    }
+                }
+            }
+        } else {
+            [ARCallCommon showInfoWithStatus:ARtmCallLimitMax];
+        }
     } else {
-        self.callButton.selected = NO;
-        self.callButton.backgroundColor = RGBA(224, 224, 224, 1);
-    }
-    
-    NSArray *arr = [ARCallCommon getSubString:textField.text];
-    for (NSInteger i = 0; i < self.stackView.subviews.count; i++) {
-        NSString *subText;
-        UIButton *button = self.stackView.subviews[i];
-        (i < arr.count) ? (subText = arr[i]) : @"";
-        [button setTitle:subText forState:UIControlStateNormal];
+        //单人呼叫
+        if (textField.text.length == 4) {
+            self.callButton.selected = YES;
+            self.callButton.backgroundColor = [UIColor whiteColor];
+        } else {
+            self.callButton.selected = NO;
+            self.callButton.backgroundColor = RGBA(224, 224, 224, 1);
+        }
+        
+        NSArray *arr = [ARCallCommon getSubString:textField.text];
+        for (NSInteger i = 0; i < self.stackView.subviews.count; i++) {
+            NSString *subText;
+            UIButton *button = self.stackView.subviews[i];
+            (i < arr.count) ? (subText = arr[i]) : @"";
+            [button setTitle:subText forState:UIControlStateNormal];
+        }
     }
 }
 
@@ -479,48 +366,9 @@
     return UIStatusBarStyleLightContent;
 }
 
-- (WMDragView *)localView {
-    if (!_localView) {
-        @weakify(self);
-        _localView = [[WMDragView alloc] init];
-        _localView.placeholderView.backgroundColor = RGBA(28, 28, 28, 1);
-        _localView.ClickDragViewBlock = ^(WMDragView *dragView) {
-            @strongify(self);
-            if (self.callMinimize) {
-                self.rtmCallView.hidden = NO;
-                self.callMinimize = NO;
-            } else {
-                if (self.localView.superview == self.rtmCallView) {
-                    self.rtmCallView.toolView.hidden = NO;
-                } else {
-                    [self switchVideoSize];
-                }
-            }
-        };
-    }
-    return _localView;
-}
-
-- (WMDragView *)remoteView {
-    if (!_remoteView) {
-        @weakify(self);
-        _remoteView = [[WMDragView alloc] init];
-        _remoteView.ClickDragViewBlock = ^(WMDragView *dragView) {
-            @strongify(self);
-            if (self.callMinimize) {
-                [self switchVideoSize];
-                self.rtmCallView.hidden = NO;
-                self.callMinimize = NO;
-            } else {
-                if (self.remoteView.superview == self.rtmCallView) {
-                     self.rtmCallView.toolView.hidden = NO;
-                } else {
-                   [self switchVideoSize];
-                }
-            }
-        };
-    }
-    return _remoteView;
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    NSLog(@"dealloc");
 }
 
 @end

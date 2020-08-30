@@ -10,7 +10,17 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface ARtmCollectionViewCell : UICollectionViewCell
+
+@property (weak, nonatomic) IBOutlet UIButton *deleteButton;
+
+@property (weak, nonatomic) IBOutlet UILabel *titleLabel;
+
+@end
+
 @interface ARtmMainViewController : UIViewController
+//0单人，1多人
+@property (nonatomic, assign) BOOL type;
 
 @end
 

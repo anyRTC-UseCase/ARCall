@@ -14,6 +14,8 @@
     [aCoder encodeObject:self.uid forKey:@"uid"];
     [aCoder encodeObject:self.dimensions forKey:@"dimensions"];
     [aCoder encodeInteger:self.frameRate forKey:@"frameRate"];
+    [aCoder encodeBool:self.video forKey:@"video"];
+    [aCoder encodeBool:self.audio forKey:@"audio"];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder{
@@ -21,6 +23,8 @@
         self.uid = [aDecoder decodeObjectForKey:@"uid"];
         self.dimensions = [aDecoder decodeObjectForKey:@"dimensions"];
         self.frameRate = [aDecoder decodeIntegerForKey:@"frameRate"];
+        self.video = [aDecoder decodeBoolForKey:@"video"];
+        self.audio = [aDecoder decodeBoolForKey:@"audio"];
     }
     return self;
 }

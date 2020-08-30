@@ -375,6 +375,32 @@
  */
 - (void)rtcEngine:(ARtcEngineKit * _Nonnull)engine didAudioRouteChanged:(ARAudioOutputRouting)routing;
 
+#if defined (TARGET_OS_IPHONE) && TARGET_OS_IPHONE
+
+/** 报告本地人脸检测结果。
+ 
+ 调用 enableFaceDetection(YES) 开启本地人脸检测后，你可以通过该回调实时获取以下人脸检测的信息：
+ 
+ - 摄像头采集的画面大小
+ - 人脸在画面中的位置
+ - 人脸距设备屏幕的距离，该值由 SDK 通过摄像头采集的画面大小和人脸在画面中的位置拟合计算得出。
+ 
+**Note**
+ 
+ - 当检测到摄像头前没有人脸时，该回调触发频率会降低，以节省设备耗能。
+ - 当人脸距离设备屏幕过近时，SDK 不会触发该回调。
+ 
+ @param engine ARtcEngineKit 对象。
+ @param width 摄像头采集画面的宽度 (px)。
+ @param height 摄像头采集画面的高度 (px)。
+ @param faces 检测到的人脸信息，详见 ARFacePositionInfo 。
+ 
+ 检测到几张人脸，就会报告几个 ARFacePositionInfo 数组。数组长度可以为 0，表示没有检测到摄像头前出现人脸。
+ */
+- (void)rtcEngine:(ARtcEngineKit * _Nonnull)engine facePositionDidChangeWidth:(int)width previewHeight:(int)height faces:(NSArray<ARFacePositionInfo *> *_Nullable)faces;
+
+#endif
+
 //MARK: - 其它回调方法(不推荐使用)
 /**-----------------------------------------------------------------------------
 * @name 其它回调方法

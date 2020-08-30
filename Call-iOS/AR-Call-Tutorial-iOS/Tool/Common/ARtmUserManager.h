@@ -17,6 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 /** 帧率 */
 @property (nonatomic, assign) ARVideoFrameRate frameRate;
 @property (nonatomic, copy) NSString * uid;
+@property (nonatomic, assign) BOOL video;
+@property (nonatomic, assign) BOOL audio;
 
 @end
 
