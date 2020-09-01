@@ -310,8 +310,11 @@
                 if ([textField.text isEqualToString:ARtmManager.getLocalUid]) {
                     [ARCallCommon showInfoWithStatus:ARtmCallerIdInvalid];
                 } else {
-                    //去除重复号码
-                    [self.callArr removeObject:textField.text];
+                    if ([self.callArr containsObject:textField.text]) {
+                        [ARCallCommon showInfoWithStatus:ARtmCallUserExisting];
+                        return;
+                    }
+
                     [self.callArr addObject:textField.text];
                     self.callButton.selected = YES;
                     self.callButton.backgroundColor = [UIColor whiteColor];

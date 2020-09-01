@@ -30,10 +30,14 @@
 @property (nonatomic, strong) NSMutableArray *rtmCallArr;
 /* 多人视图 **/
 @property (nonatomic, strong) NSMutableArray *videoArr;
+/* 未接通 **/
+@property (nonatomic, strong) NSMutableArray *cancleCallArr;
 /* 通话时长计时 **/
 @property (nonatomic, strong) ARtmTimer *rtmTimer;
 /* 悬浮窗 **/
 @property (nonatomic, strong) ARtmSuspensionView *suspensionView;
+/* 邀请 **/
+@property (nonatomic, strong) ARtmInvitationView *invitationView;
 
 @end
 
@@ -49,6 +53,7 @@
     self.rtmCallView.hidden = self.calling;
     self.videoArr = [NSMutableArray array];
     self.rtmCallArr = [NSMutableArray arrayWithArray:self.callArr];
+    self.cancleCallArr = [NSMutableArray array];
     
     //rtm 回调
     ARtmManager.rtmKit.aRtmDelegate = self;
@@ -63,6 +68,7 @@
     [self makeRtmCall];
     if (self.calling) {
         //主叫初始化rtc
+        [self.cancleCallArr addObjectsFromArray:self.rtmCallArr];
         [self initializeRtcKit];
     } else {
         //被叫
@@ -165,11 +171,12 @@
         {
             //邀请
             @weakify(self);
-            ARtmInvitationView *invitationView = [ARtmInvitationView loadInvitationView:^(NSString * _Nonnull uid) {
+            self.invitationView = [ARtmInvitationView loadInvitationView:^(NSString * _Nonnull uid) {
                 @strongify(self);
                 [self invitationUser:uid];
             }];
-            [ARtmManager.rtmWindow addSubview:invitationView];
+            self.invitationView.callArr = self.rtmCallArr;
+            [ARtmManager.rtmWindow addSubview:self.invitationView];
         }
             break;
         case 52:
@@ -209,6 +216,7 @@
             [self.rtmCallKit acceptRemoteInvitation:self.remoteInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
                 NSLog(@"acceptRemoteInvitation == %ld",(long)errorCode);
             }];
+            [self initializeRtcKit];
             self.rtmCallView.hidden = YES;
             break;
         default:
@@ -218,16 +226,6 @@
 
 - (void)invitationUser:(NSString *)uid {
     //邀请用户
-    if ([ARtmManager.getLocalUid isEqualToString:uid]) {
-        [ARCallCommon showInfoWithStatus:ARtmCallerIdInvalid];
-        return;
-    }
-    
-    if ([self.rtmCallArr containsObject:uid]) {
-        [ARCallCommon showInfoWithStatus:ARtmCallUserExisting];
-        return;
-    }
-    
     if (uid.length != 0) {
         @weakify(self);
         [ARtmManager.rtmKit queryPeersOnlineStatus:@[uid] completion:^(NSArray<ARtmPeerOnlineStatus *> * _Nullable peerOnlineStatus, ARtmQueryPeersOnlineErrorCode errorCode) {
@@ -250,6 +248,7 @@
                 [self createVideoView:uid];
                 
                 //发送呼叫请求
+                [self.cancleCallArr addObject:uid];
                 NSMutableArray * arr = [NSMutableArray arrayWithArray:self.rtmCallArr];
                 [arr insertObject:ARtmManager.getLocalUid atIndex:0];
                 NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithInt:0],@"Mode",[NSNumber numberWithBool:YES],@"Conference",self.channelId,@"ChanId",arr,@"UserData",nil];
@@ -317,6 +316,8 @@
             }
         }];
         [self.rtmCallArr removeObject:uid];
+        self.invitationView ? (self.invitationView.callArr = self.rtmCallArr) : 0;
+        
     }];
     [remoteView.titleButton setTitle:uid forState:UIControlStateNormal];
     remoteView.uid = uid;
@@ -328,11 +329,18 @@
 
 - (void)endCall {
     [ARCallCommon playMusic:NO];
-    [self.videoArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    for (NSString *uid in self.cancleCallArr) {
+        //未接通的取消呼叫邀请
+        ARtmLocalInvitation *localInvitation = [[ARtmLocalInvitation alloc] initWithCalleeId:uid];
+        [self.rtmCallKit cancelLocalInvitation:localInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
+            NSLog(@"cancelLocalInvitation");
+        }];
+    }
+    
+    for (ARVideoView *videoView in self.videoArr) {
         //移除60s定时器
-        ARVideoView *videoView = (ARVideoView *)obj;
         [videoView endCountdown];
-    }];
+    }
     
     //离开频道
     [self.rtmChannel leaveWithCompletion:nil];
@@ -356,7 +364,7 @@
 }
 
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
-    if (self.videoArr.count < 2) {
+    if ((self.videoArr.count == 1 && [self.videoArr containsObject:self.localView]) || (self.videoArr.count == 0)) {
         [self endCall];
     }
 }
@@ -399,9 +407,13 @@
     [self.videoArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         ARVideoView *videoView = (ARVideoView *)obj;
         if ([videoView.uid isEqualToString:localInvitation.calleeId]) {
-            [[self mutableArrayValueForKey:@"videoArr"] removeObject:videoView];
-            [videoView removeFromSuperview];
-            [self videoLayout];
+            if (errorCode == ARtmLocalInvitationErrorRemoteOffline) {
+                videoView.offline = YES;
+            } else {
+                [[self mutableArrayValueForKey:@"videoArr"] removeObject:videoView];
+                [videoView removeFromSuperview];
+                [self videoLayout];
+            }
             *stop = YES;
         }
     }];
@@ -427,13 +439,10 @@
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationAccepted:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
     //接受呼叫邀请成功
-    [self initializeRtcKit];
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationCanceled:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
     //主叫已取消呼叫邀请
-    [ARCallCommon showInfoWithStatus:ARtmRemoteCanceledInvitation];
-    [self endCall];
     NSLog(@"%@",ARtmRemoteCanceledInvitation);
 }
 
@@ -465,6 +474,7 @@
         }
     }];
     [self.rtmCallArr removeObject:member.uid];
+    [self.cancleCallArr removeObject:member.uid];
 }
 
 - (void)channel:(ARtmChannel * _Nonnull)channel messageReceived:(ARtmMessage * _Nonnull)message fromMember:(ARtmMember * _Nonnull)member {
@@ -481,7 +491,6 @@
         }
     }
 }
-
 
 //MARK: - ARtcEngineDelegate
 
@@ -504,6 +513,7 @@
 
 - (void)rtcEngine:(ARtcEngineKit *)engine didJoinedOfUid:(NSString *)uid elapsed:(NSInteger)elapsed {
     //远端用户/主播加入回调
+    [self.cancleCallArr removeObject:uid];
     [ARCallCommon playMusic:NO];
     [self.videoArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         ARVideoView *videoView = (ARVideoView *)obj;
@@ -582,6 +592,8 @@
     }];
 }
 
+//MARK: - other
+
 - (UIStatusBarStyle)preferredStatusBarStyle {
     return UIStatusBarStyleLightContent;
 }
@@ -589,5 +601,7 @@
 - (void)dealloc {
     NSLog(@"Meet dealloc");
 }
+
+
 
 @end

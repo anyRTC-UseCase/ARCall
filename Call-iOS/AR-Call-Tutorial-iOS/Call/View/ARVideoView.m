@@ -15,6 +15,7 @@
 
 @property (nonatomic, copy) ARtmVideoRemoveBlock removeBlock;
 @property (nonatomic, strong) ARtmTimer *rtmTimer;
+@property (nonatomic, assign) NSInteger offlineIndex;
 
 @end
 
@@ -24,6 +25,7 @@
     ARVideoView *videoView = [[[NSBundle mainBundle]loadNibNamed:@"ARVideoView" owner:self options:nil] lastObject];
     videoView.frame = CGRectZero;
     videoView.removeBlock = block;
+    videoView.offlineIndex = 3;
     
     CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
     animation.duration = 2.5;
@@ -52,15 +54,25 @@
             NSLog(@"60s倒计时：%ld",(long)index);
             if (index == 3) {
                 self.stateLabel.hidden = NO;
-            } else if (index == 0) {
+            } else if (index == 0 || (self.offlineIndex == 0)) {
                 if (self.removeBlock) {
                     [self.rtmTimer clear];
                     self.removeBlock();
                     [self removeFromSuperview];
                 }
             }
+            
+            if (self.offline) {
+                self.offlineIndex --;
+                self.stateLabel.hidden = NO;
+                self.stateLabel.text = @"对方不在线";
+            }
         }];
     }
+}
+
+- (void)setOffline:(BOOL)offline {
+    _offline = offline;
 }
 
 - (void)endCountdown {

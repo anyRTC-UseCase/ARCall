@@ -15,16 +15,22 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0lw-yA-7JS">
-                    <rect key="frame" x="72" y="307.5" width="270" height="191"/>
+                    <rect key="frame" x="72" y="297.5" width="270" height="211"/>
                     <subviews>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="邀请用户" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jit-le-yJd">
-                            <rect key="frame" x="101" y="32" width="68" height="24"/>
+                            <rect key="frame" x="101" y="22" width="68" height="24"/>
                             <fontDescription key="fontDescription" name="PingFangSC-Regular" family="PingFang SC" pointSize="17"/>
                             <color key="textColor" red="0.199973762" green="0.2000150383" blue="0.19997116919999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <nil key="highlightedColor"/>
                         </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T8d-Hb-6MZ">
+                            <rect key="frame" x="135" y="51" width="0.0" height="0.0"/>
+                            <fontDescription key="fontDescription" name="PingFangSC-Regular" family="PingFang SC" pointSize="14"/>
+                            <color key="textColor" systemColor="systemRedColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="A7F-hu-SBl">
-                            <rect key="frame" x="0.0" y="141" width="270" height="50"/>
+                            <rect key="frame" x="0.0" y="161" width="270" height="50"/>
                             <subviews>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TdL-iA-Ubb">
                                     <rect key="frame" x="0.0" y="1" width="134.5" height="49"/>
@@ -59,7 +65,7 @@
                             </constraints>
                         </view>
                         <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="XS3-gg-6a5">
-                            <rect key="frame" x="16" y="79.5" width="238" height="44.5"/>
+                            <rect key="frame" x="16" y="90" width="238" height="44.5"/>
                             <subviews>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FgL-ai-5RV">
                                     <rect key="frame" x="0.0" y="0.0" width="52" height="44.5"/>
@@ -144,13 +150,15 @@
                         <constraint firstAttribute="width" constant="270" id="6Bb-Op-DQC"/>
                         <constraint firstItem="A7F-hu-SBl" firstAttribute="leading" secondItem="0lw-yA-7JS" secondAttribute="leading" id="7RI-0z-HBK"/>
                         <constraint firstItem="Jit-le-yJd" firstAttribute="centerX" secondItem="0lw-yA-7JS" secondAttribute="centerX" id="9zb-Os-QQb"/>
-                        <constraint firstItem="XS3-gg-6a5" firstAttribute="top" secondItem="Jit-le-yJd" secondAttribute="bottom" constant="23.5" id="CX2-uB-dfv"/>
+                        <constraint firstItem="XS3-gg-6a5" firstAttribute="top" secondItem="Jit-le-yJd" secondAttribute="bottom" constant="44" id="CX2-uB-dfv"/>
                         <constraint firstAttribute="bottom" secondItem="A7F-hu-SBl" secondAttribute="bottom" id="Myl-wZ-GVD"/>
                         <constraint firstAttribute="trailing" secondItem="A7F-hu-SBl" secondAttribute="trailing" id="PCa-0Z-SC4"/>
+                        <constraint firstItem="T8d-Hb-6MZ" firstAttribute="top" secondItem="Jit-le-yJd" secondAttribute="bottom" constant="5" id="Wwi-OF-ugt"/>
                         <constraint firstItem="XS3-gg-6a5" firstAttribute="width" secondItem="0lw-yA-7JS" secondAttribute="width" multiplier="0.88" id="fJ9-f8-Evh"/>
-                        <constraint firstItem="Jit-le-yJd" firstAttribute="top" secondItem="0lw-yA-7JS" secondAttribute="top" constant="32" id="hA8-SU-Wzd"/>
+                        <constraint firstItem="Jit-le-yJd" firstAttribute="top" secondItem="0lw-yA-7JS" secondAttribute="top" constant="22" id="hA8-SU-Wzd"/>
                         <constraint firstItem="XS3-gg-6a5" firstAttribute="centerX" secondItem="0lw-yA-7JS" secondAttribute="centerX" id="qix-v8-pG8"/>
-                        <constraint firstAttribute="height" constant="191" id="v4p-O7-2WG"/>
+                        <constraint firstItem="T8d-Hb-6MZ" firstAttribute="centerX" secondItem="Jit-le-yJd" secondAttribute="centerX" id="sff-dP-U5Y"/>
+                        <constraint firstAttribute="height" constant="211" id="v4p-O7-2WG"/>
                     </constraints>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
@@ -169,6 +177,7 @@
             <viewLayoutGuide key="safeArea" id="hLM-hO-Im5"/>
             <connections>
                 <outlet property="stackView" destination="XS3-gg-6a5" id="twP-Kb-pKL"/>
+                <outlet property="titleLabel" destination="T8d-Hb-6MZ" id="0s7-ct-mxf"/>
             </connections>
             <point key="canvasLocation" x="-662" y="-269"/>
         </view>

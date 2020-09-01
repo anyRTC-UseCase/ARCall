@@ -12,6 +12,7 @@
 @interface ARtmInvitationView()<KeyBoardViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIStackView *stackView;
+@property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 
 @property (nonatomic, copy) ARtmInvitationBlock invitationBlock;
 @property (nonatomic, copy) NSString *calleeIdText;
@@ -41,12 +42,19 @@
     self.keyBoard.delegate = self;
 }
 
+- (void)setCallArr:(NSMutableArray *)callArr {
+    _callArr = callArr;
+    if (![_callArr containsObject:self.calleeIdText]) {
+        self.titleLabel.text = @"";
+    }
+}
+
 - (IBAction)didClickCancleButton:(id)sender {
     [self removeFromSuperview];
 }
 
 - (IBAction)didClickConfirmButton:(id)sender {
-    if (self.calleeIdText.length == 4) {
+    if (self.calleeIdText.length == 4 && self.titleLabel.text.length == 0) {
         if (self.invitationBlock) {
             self.invitationBlock(self.calleeIdText);
         }
@@ -74,6 +82,17 @@
         if (self.calleeIdText.length < 4) {
             self.calleeIdText = [NSString stringWithFormat:@"%@%@",self.calleeIdText,string];
         }
+    }
+    
+    NSString *callerId = self.calleeIdText;
+    if (callerId.length == 4) {
+        if ([ARtmManager.getLocalUid isEqualToString:callerId]) {
+            self.titleLabel.text = ARtmCallerIdInvalid;
+        } else if ([self.callArr containsObject:callerId]) {
+            self.titleLabel.text = ARtmCallUserExisting;
+        }
+    } else {
+        self.titleLabel.text = @"";
     }
     
     if (self.calleeIdText.length != 0) {

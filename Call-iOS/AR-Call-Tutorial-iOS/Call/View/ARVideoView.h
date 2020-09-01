@@ -18,6 +18,7 @@ typedef void (^ARtmVideoRemoveBlock)(void);
 @property (weak, nonatomic) IBOutlet UIView *loadingView;
 @property (weak, nonatomic) IBOutlet UIButton *titleButton;
 @property (nonatomic, copy) NSString *uid;
+@property (nonatomic, assign) BOOL offline;
 
 + (instancetype)loadVideoView:(ARtmVideoRemoveBlock)block;
 - (void)startCountdown;

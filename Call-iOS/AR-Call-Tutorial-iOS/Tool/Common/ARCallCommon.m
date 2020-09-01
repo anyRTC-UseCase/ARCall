@@ -25,7 +25,7 @@ NSString *const ARtmRemoteCallBusy = @"对方正在通话中...";
 NSString *const ARtmReconnection = @"已离线,正在重连...";
 NSString *const ARtmCallend = @"对方已挂断";
 NSString *const ARtmCallStop = @"当前通话已结束";
-NSString *const ARtmCallUserExisting = @"邀请用户已在会议中...";
+NSString *const ARtmCallUserExisting = @"该id已存在呼叫中";
 
 static AVAudioPlayer *player;
 
@@ -121,7 +121,6 @@ static AVAudioPlayer *player;
 }
 
 + (void)playMusic:(BOOL)play {
-    return;
     if (play) {
         NSString * path = [NSBundle.mainBundle pathForResource:@"rtm_call" ofType:@"mp3"];
         NSURL *tempUrl = [NSURL fileURLWithPath:path];
