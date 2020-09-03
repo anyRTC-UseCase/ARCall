@@ -81,7 +81,7 @@
 
 - (void)rtmCallEnd:(NSNotificationCenter *)nofit {
     if ([ARCallCommon topViewController] == self) {
-        NSLog(@"rtmCallEnd View Refresh");
+        NSLog(@"rtmCallEnd HomeView Refresh");
         ARtmManager.rtmKit.aRtmDelegate = self;
         ARtmCallKit *rtmCallKit = [ARtmManager.rtmKit getRtmCallKit];
         rtmCallKit.callDelegate = self;

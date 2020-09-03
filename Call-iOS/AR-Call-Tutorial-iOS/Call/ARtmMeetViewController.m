@@ -409,6 +409,14 @@
         if ([videoView.uid isEqualToString:localInvitation.calleeId]) {
             if (errorCode == ARtmLocalInvitationErrorRemoteOffline) {
                 videoView.offline = YES;
+                
+                NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:@"RemoteOffline",@"Cmd",localInvitation.calleeId,@"UserId",nil];
+                
+                ARtmMessage *message = [[ARtmMessage alloc] initWithText:[ARCallCommon returnJSONStringWithDictionary:dic]];
+                ARtmSendMessageOptions *options = [[ARtmSendMessageOptions alloc] init];
+                 [self.rtmChannel sendMessage:message sendMessageOptions:options completion:^(ARtmSendChannelMessageErrorCode errorCode) {
+                     NSLog(@"Channel sendMessage Sucess");
+                }];
             } else {
                 [[self mutableArrayValueForKey:@"videoArr"] removeObject:videoView];
                 [videoView removeFromSuperview];
@@ -459,6 +467,14 @@
         [self.rtmCallArr addObject:member.uid];
         [self createVideoView:member.uid];
     }
+    
+    [self.videoArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        ARVideoView *videoView = (ARVideoView *)obj;
+        if ([videoView.uid isEqualToString:member.uid]) {
+            videoView.stateLabel.text = @"";
+            *stop = YES;
+        }
+    }];
 }
 
 - (void)channel:(ARtmChannel * _Nonnull)channel memberLeft:(ARtmMember * _Nonnull)member {
@@ -487,6 +503,14 @@
             if (uid.length != 0) {
                 [self.rtmCallArr addObject:uid];
                 [self createVideoView:uid];
+            }
+        } else if ([value isEqualToString:@"RemoteOffline"]) {
+            NSString *uid = [dic objectForKey:@"UserId"];
+            if (uid.length != 0) {
+                [self.videoArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                    ARVideoView *videoView = (ARVideoView *)obj;
+                    videoView.offline = YES;
+                }];
             }
         }
     }
@@ -519,6 +543,7 @@
         ARVideoView *videoView = (ARVideoView *)obj;
         if ([videoView.uid isEqualToString:uid]) {
             videoView.loadingView.hidden = YES;
+            videoView.stateLabel.text = @"";
             [videoView endCountdown];
             *stop = YES;
         }
@@ -549,6 +574,7 @@
             *stop = YES;
         }
     }];
+    [self.rtmCallArr removeObject:uid];
 }
 
 - (void)rtcEngine:(ARtcEngineKit *_Nonnull)engine remoteVideoStateChangedOfUid:(NSString *_Nonnull)uid state:(ARVideoRemoteState)state reason:(ARVideoRemoteStateReason)reason elapsed:(NSInteger)elapsed {

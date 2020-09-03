@@ -11,7 +11,6 @@
 @interface ARVideoView()
 
 @property (weak, nonatomic) IBOutlet UIImageView *loadingImageView;
-@property (weak, nonatomic) IBOutlet UILabel *stateLabel;
 
 @property (nonatomic, copy) ARtmVideoRemoveBlock removeBlock;
 @property (nonatomic, strong) ARtmTimer *rtmTimer;
@@ -25,7 +24,7 @@
     ARVideoView *videoView = [[[NSBundle mainBundle]loadNibNamed:@"ARVideoView" owner:self options:nil] lastObject];
     videoView.frame = CGRectZero;
     videoView.removeBlock = block;
-    videoView.offlineIndex = 3;
+    videoView.offlineIndex = 1;
     
     CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
     animation.duration = 2.5;
@@ -52,8 +51,8 @@
         [self.rtmTimer creatGCDTimer:60 withTarget:self response:^(NSInteger index) {
             @strongify(self);
             NSLog(@"60s倒计时：%ld",(long)index);
-            if (index == 3) {
-                self.stateLabel.hidden = NO;
+            if (index == 1) {
+                self.stateLabel.text = @"无人接听";
             } else if (index == 0 || (self.offlineIndex == 0)) {
                 if (self.removeBlock) {
                     [self.rtmTimer clear];
@@ -62,17 +61,16 @@
                 }
             }
             
-            if (self.offline) {
-                self.offlineIndex --;
-                self.stateLabel.hidden = NO;
-                self.stateLabel.text = @"对方不在线";
-            }
+            self.offline ? (self.offlineIndex --) : 0;
         }];
     }
 }
 
 - (void)setOffline:(BOOL)offline {
     _offline = offline;
+    if (offline) {
+        self.stateLabel.text = @"无人接听";
+    }
 }
 
 - (void)endCountdown {

@@ -17,6 +17,7 @@ typedef void (^ARtmVideoRemoveBlock)(void);
 @property (weak, nonatomic) IBOutlet UIView *placeholderView;
 @property (weak, nonatomic) IBOutlet UIView *loadingView;
 @property (weak, nonatomic) IBOutlet UIButton *titleButton;
+@property (weak, nonatomic) IBOutlet UILabel *stateLabel;
 @property (nonatomic, copy) NSString *uid;
 @property (nonatomic, assign) BOOL offline;
 

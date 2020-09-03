@@ -147,7 +147,7 @@
                       NSLog(@"refuseRemoteInvitation == %ld",(long)errorCode);
                 }];
             }
-            [self endCall];
+            [self endCall:ARtmCallStop];
             break;
         case 52:
         case 53:
@@ -197,7 +197,7 @@
             [ARtmManager.rtmKit sendMessage:rtmMessage toPeer:self.callerId sendMessageOptions:options completion:^(ARtmSendPeerMessageErrorCode errorCode) {
                 NSLog(@"sendMessage EndCall");
             }];
-            [self endCall];
+            [self endCall:ARtmCallStop];
         }
             break;
         case 57:
@@ -240,7 +240,7 @@
     }
 }
 
-- (void)endCall {
+- (void)endCall:(NSString *)info {
     if (!self.mode) {
         [self.localView removeFromSuperview];
         [self.remoteView removeFromSuperview];
@@ -259,7 +259,7 @@
     [ARCallCommon playMusic:NO];
     [self.rtmTimer clear];
     [NSNotificationCenter.defaultCenter postNotificationName:ARtmCallEndNotification object:nil];
-    [ARCallCommon showInfoWithStatus:ARtmCallStop];
+    [ARCallCommon showInfoWithStatus:info];
     [ARtmManager dismissWindow];
 }
 
@@ -270,7 +270,7 @@
     if (onlineStatus.count != 0) {
         ARtmPeerOnlineStatus *status = onlineStatus[0];
         if (status.state != ARtmPeerOnlineStateOnline) {
-            [self endCall];
+            [self endCall:ARtmUserOffline];
         }
     }
 }
@@ -289,7 +289,7 @@
                 self.backView.hidden = NO;
                 [self popMinimizeSuspension];
             } else if ([value isEqualToString:@"EndCall"]) {
-                [self endCall];
+                [self endCall:ARtmCallStop];
             }
         }
     }
@@ -319,33 +319,34 @@
         [self initializeRtcKit:mode];
         self.stateLabel.hidden = YES;
     } else {
-        [self endCall];
+        [self endCall:ARtmCallStop];
     }
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationRefused:(ARtmLocalInvitation * _Nonnull)localInvitation withResponse:(NSString * _Nullable) response {
     //被叫已拒绝呼叫邀请
     NSLog(@"localInvitationRefused");
+    NSString *info = ARtmCallStop;
     if (response.length != 0) {
         NSDictionary *dic = [ARCallCommon dictionaryWithJSONString:response];
         NSString *value = [dic objectForKey:@"Cmd"];
         if ([value isEqualToString:@"Calling"]) {
-            [ARCallCommon showInfoWithStatus:ARtmRemoteCallBusy];
+            info = ARtmRemoteCallBusy;
         }
     }
-    [self endCall];
+    [self endCall:info];
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationCanceled:(ARtmLocalInvitation * _Nonnull)localInvitation {
     //呼叫邀请已被取消
     NSLog(@"%@",ARtmCanceledInvitation);
-    [self endCall];
+    [self endCall:ARtmCallStop];
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationFailure:(ARtmLocalInvitation * _Nonnull)localInvitation errorCode:(ARtmLocalInvitationErrorCode)errorCode {
     //呼叫邀请发送失败
     NSLog(@"localInvitationFailure");
-    [self endCall];
+    [self endCall:ARtmCallStop];
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationReceived:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
@@ -375,7 +376,7 @@
     [ARCallCommon showInfoWithStatus:ARtmRemoteCanceledInvitation];
     NSLog(@"%@",ARtmRemoteCanceledInvitation);
     if ([self.callerId isEqualToString:remoteInvitation.callerId]) {
-        [self endCall];
+        [self endCall:ARtmRemoteCanceledInvitation];
     }
 }
 
@@ -410,7 +411,7 @@
 
 - (void)rtcEngine:(ARtcEngineKit *)engine didOfflineOfUid:(NSString *)uid reason:(ARUserOfflineReason)reason {
     //远端用户（通信场景）/主播（直播场景）离开当前频道回调
-    [self endCall];
+    [self endCall:ARtmCallStop];
 }
 
 //MARK: - other

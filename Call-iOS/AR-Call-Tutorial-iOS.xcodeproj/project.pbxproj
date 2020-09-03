@@ -8,12 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		0ED0DB8A3EDC39B5F9ED5419 /* Pods_AR_Call_Tutorial_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA097CF202F6D6C055171E6 /* Pods_AR_Call_Tutorial_iOS.framework */; };
+		634444D42500AADB0038189A /* ARtmKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 634444D22500AAD20038189A /* ARtmKit.framework */; };
+		634444D52500AADB0038189A /* ARtmKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 634444D22500AAD20038189A /* ARtmKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		63511E4324C42240004D405B /* ARtmUserManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 63511E4224C42240004D405B /* ARtmUserManager.m */; };
 		6357EC4E24F93480005E0C60 /* ARtmHomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6357EC4D24F93480005E0C60 /* ARtmHomeViewController.m */; };
 		6357EC5724FBEF69005E0C60 /* ARtcKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6357EC5424FBEF60005E0C60 /* ARtcKit.framework */; };
 		6357EC5824FBEF69005E0C60 /* ARtcKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6357EC5424FBEF60005E0C60 /* ARtcKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		6357EC5924FBEF6A005E0C60 /* ARtmKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6357EC5324FBEF5F005E0C60 /* ARtmKit.framework */; };
-		6357EC5A24FBEF6A005E0C60 /* ARtmKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6357EC5324FBEF5F005E0C60 /* ARtmKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		636780C624C2FB8B004D5C1D /* ARtmConfigController.m in Sources */ = {isa = PBXBuildFile; fileRef = 636780C524C2FB8B004D5C1D /* ARtmConfigController.m */; };
 		6369014124F1326900958992 /* ARtmTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6369014024F1326900958992 /* ARtmTimer.m */; };
 		636C20BD24ED5DE10046DCAA /* UIAlertController+Blocks.m in Sources */ = {isa = PBXBuildFile; fileRef = 636C20BC24ED5DE10046DCAA /* UIAlertController+Blocks.m */; };
@@ -47,7 +47,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				6357EC5824FBEF69005E0C60 /* ARtcKit.framework in Embed Frameworks */,
-				6357EC5A24FBEF6A005E0C60 /* ARtmKit.framework in Embed Frameworks */,
+				634444D52500AADB0038189A /* ARtmKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -55,11 +55,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		634444D22500AAD20038189A /* ARtmKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ARtmKit.framework; sourceTree = "<group>"; };
 		63511E4124C42240004D405B /* ARtmUserManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmUserManager.h; sourceTree = "<group>"; };
 		63511E4224C42240004D405B /* ARtmUserManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmUserManager.m; sourceTree = "<group>"; };
 		6357EC4C24F93480005E0C60 /* ARtmHomeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmHomeViewController.h; sourceTree = "<group>"; };
 		6357EC4D24F93480005E0C60 /* ARtmHomeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmHomeViewController.m; sourceTree = "<group>"; };
-		6357EC5324FBEF5F005E0C60 /* ARtmKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ARtmKit.framework; sourceTree = "<group>"; };
 		6357EC5424FBEF60005E0C60 /* ARtcKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ARtcKit.framework; sourceTree = "<group>"; };
 		636780C424C2FB8B004D5C1D /* ARtmConfigController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmConfigController.h; sourceTree = "<group>"; };
 		636780C524C2FB8B004D5C1D /* ARtmConfigController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmConfigController.m; sourceTree = "<group>"; };
@@ -112,7 +112,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6357EC5924FBEF6A005E0C60 /* ARtmKit.framework in Frameworks */,
+				634444D42500AADB0038189A /* ARtmKit.framework in Frameworks */,
 				0ED0DB8A3EDC39B5F9ED5419 /* Pods_AR_Call_Tutorial_iOS.framework in Frameworks */,
 				6357EC5724FBEF69005E0C60 /* ARtcKit.framework in Frameworks */,
 			);
@@ -197,8 +197,8 @@
 		63CA2EF024C17971003FF0AC /* AR-Call-Tutorial-iOS */ = {
 			isa = PBXGroup;
 			children = (
+				634444D22500AAD20038189A /* ARtmKit.framework */,
 				6357EC5424FBEF60005E0C60 /* ARtcKit.framework */,
-				6357EC5324FBEF5F005E0C60 /* ARtmKit.framework */,
 				63EDCF3924C5C843003AE948 /* Call */,
 				63EDCF3824C5C821003AE948 /* Tool */,
 				63EDCF3724C5C7F7003AE948 /* Base */,
@@ -542,8 +542,8 @@
 			baseConfigurationReference = 8AFC5CD5596F128B5F08D513 /* Pods-AR-Call-Tutorial-iOS.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = 5543CP4MRT;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -558,7 +558,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "AR.AR-Call-Tutorial-iOS";
 				PRODUCT_NAME = "视频通话";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "Call-Tutorial-Dev";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -568,8 +568,8 @@
 			baseConfigurationReference = A3F539A03502FDAC2D396134 /* Pods-AR-Call-Tutorial-iOS.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = 5543CP4MRT;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -584,7 +584,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "AR.AR-Call-Tutorial-iOS";
 				PRODUCT_NAME = "视频通话";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "Call-Tutorial-Dev";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
