@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/dp_79"
+    android:id="@+id/rl_multi_root"
+    android:background="@drawable/shape_float_border"
+    android:layout_height="@dimen/dp_79">
+
+    <LinearLayout
+        android:layout_width="@dimen/dp_64"
+        android:layout_height="@dimen/dp_64"
+        android:layout_centerInParent="true"
+        android:background="@drawable/shape_audio_float"
+        android:orientation="vertical">
+        <ImageView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:scaleType="center"
+            android:layout_marginTop="@dimen/dp_14"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/img_float_phone"/>
+
+        <Chronometer
+            android:id="@+id/chr_multi_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/dp_11"
+            android:textColor="#40A3FB"
+            android:visibility="gone"
+            android:textSize="@dimen/sp_10"/>
+
+        <TextView
+            android:id="@+id/text_multi_wait"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/dp_11"
+            android:textColor="#40A3FB"
+            android:text="等待接听"
+            android:textSize="@dimen/sp_10"/>
+    </LinearLayout>
+
+
+
+</RelativeLayout>

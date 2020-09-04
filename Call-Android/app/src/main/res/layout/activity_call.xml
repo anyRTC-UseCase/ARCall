@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/img_bg"
-    tools:context=".CallActivity">
+    tools:context=".p2p.CallActivity">
 
 
 
@@ -15,7 +15,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
+        <TextView
+            android:id="@+id/tv_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_marginLeft="@dimen/dp_35"
+            android:layout_marginTop="@dimen/dp_80"
+            android:textSize="@dimen/sp_14"
+            android:layout_below="@+id/rl_top"
+            android:text="请输入对方的ID"></TextView>
 
 
     <com.tuo.customview.VerificationCodeView
@@ -25,8 +34,8 @@
         android:layout_marginRight="@dimen/dp_20"
         android:layout_marginLeft="@dimen/dp_20"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/btn_setting"
-        android:layout_marginTop="@dimen/dp_80"
+        android:layout_below="@+id/tv_tip"
+        android:layout_marginTop="@dimen/dp_12"
         app:icv_et_bg_focus="@drawable/shape_et"
         app:icv_et_bg_normal="@drawable/shape_et"
         app:icv_et_number="4"
@@ -35,15 +44,7 @@
         app:icv_et_width="@dimen/dp_73"
         ></com.tuo.customview.VerificationCodeView>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:layout_below="@+id/et_user"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/dp_20"
-            android:textSize="@dimen/sp_14"
-            android:text="请输入对方的ID"></TextView>
+
 
     <Button
         android:id="@+id/btn_call"
@@ -69,106 +70,42 @@
             android:textColor="@color/white"
             android:text="您的呼叫ID:0000"></TextView>
 
-        <ImageButton
-            android:id="@+id/btn_setting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/img_setting"
-            android:background="@null"
-            android:layout_marginTop="@dimen/dp_24"
-            android:layout_alignParentRight="true"
-            android:padding="@dimen/dp_12"
-            android:onClick="Setting"
-            ></ImageButton>
 
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/rl_call_pre"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <ImageView
-            android:id="@+id/iv_user"
-            android:layout_width="wrap_content"
-            android:gravity="center"
-            android:textSize="50sp"
-            android:src="@drawable/img_user_icon"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/dp_140">
-        </ImageView>
-
-        <TextView
-            android:id="@+id/tv_user_pre"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textSize="@dimen/sp_24"
-            android:text="0000"
-            android:textColor="@color/white"
-            android:layout_below="@+id/iv_user"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/dp_40"></TextView>
-
-        <TextView
-            android:id="@+id/tv_state"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="呼叫中"
-            android:textSize="@dimen/sp_15"
-            android:textColor="@color/white"
-            android:layout_marginTop="@dimen/dp_14"
-            android:layout_below="@+id/tv_user_pre"
-            android:layout_centerHorizontal="true">
-        </TextView>
-
-
-
-        <LinearLayout
+        <RelativeLayout
+            android:id="@+id/rl_top"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="30dp"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="40dp">
-            <Button
-                android:id="@+id/btn_hangup"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:drawableTop="@drawable/img_hang_up"
-                android:background="@null"
-                android:textColor="@color/white"
-                android:textSize="@dimen/sp_11"
-                android:drawablePadding="@dimen/dp_13"
+            android:layout_marginTop="@dimen/dp_24"
+            android:layout_height="wrap_content">
+            <ImageButton
+                android:id="@+id/btn_setting"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="12dp"
-                android:text="挂断"
-                android:visibility="gone"
-                android:onClick="HangUp"
-                android:layout_marginRight="12dp"
-                >
-            </Button>
-            <Button
-                android:id="@+id/btn_accept"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:drawableTop="@drawable/img_accept"
-                android:onClick="Accept"
-                android:text="接听"
-                android:visibility="gone"
-                android:textColor="@color/white"
-                android:textSize="@dimen/sp_11"
-                android:drawablePadding="@dimen/dp_13"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="12dp"
+                android:src="@drawable/img_setting"
                 android:background="@null"
-                >
-            </Button>
-        </LinearLayout>
+                android:layout_alignParentRight="true"
+                android:padding="@dimen/dp_12"
+                android:onClick="Setting"
+                ></ImageButton>
+
+
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/dp_12"
+                android:background="@null"
+                android:onClick="Back"
+                android:src="@drawable/img_back"></ImageButton>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="点对点呼叫邀请"
+                android:textSize="@dimen/sp_15"
+                android:layout_centerInParent="true"
+                android:textColor="@color/white"
+                android:layout_centerHorizontal="true"></TextView>
+        </RelativeLayout>
 
 
 

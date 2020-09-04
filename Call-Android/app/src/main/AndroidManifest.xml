@@ -16,8 +16,16 @@
             android:name=".p2p.VideoActivity"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait" />
-        <activity android:name=".p2p.CallActivity"
+        <activity android:name=".p2p.KTCallActivity"
             android:launchMode="standard"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustNothing"/>
+        <activity android:name=".multiuser.MultiUserActivity"
+            android:launchMode="standard"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustNothing"/>
+        <activity android:name=".multiuser.MultiVideoActivity"
+            android:launchMode="singleInstance"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing"/>
         <activity android:name=".MainActivity">

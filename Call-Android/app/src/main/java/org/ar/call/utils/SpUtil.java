@@ -140,6 +140,9 @@ public class SpUtil {
         return prefs.getBoolean(key, false);
     }
 
+    public static boolean getBoolean(String key,boolean defVal) {
+        return prefs.getBoolean(key, defVal);
+    }
 
     /**
      * Set a float value in the preferences editor, to be written back once

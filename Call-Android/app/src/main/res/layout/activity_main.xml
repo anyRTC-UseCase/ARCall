@@ -29,11 +29,12 @@
 
 
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/rl_btns"
         android:layout_width="match_parent"
         android:orientation="vertical"
         android:layout_below="@+id/tv_name"
-        android:layout_marginTop="@dimen/dp_112"
+        android:layout_marginTop="@dimen/dp_55"
         android:layout_centerHorizontal="true"
         android:gravity="center_horizontal"
         android:layout_height="wrap_content">
@@ -41,49 +42,81 @@
             android:id="@+id/btn_login"
             android:layout_width="@dimen/dp_301"
             android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
             android:background="@drawable/shape_login_btn"
-            android:onClick="Login"
             android:textSize="@dimen/sp_14"
             android:text="登录"
-            android:textColor="@color/colorAccent" />
-
-        <Button
-            android:id="@+id/btn_p2p"
-            android:layout_width="@dimen/dp_301"
-            android:layout_height="wrap_content"
-            android:background="@drawable/shape_login_btn"
-            android:onClick="P2P"
-            android:textSize="@dimen/sp_14"
-            android:text="点对点呼叫邀请"
             android:visibility="gone"
             android:textColor="@color/colorAccent" />
-
-        <Button
-            android:id="@+id/btn_multiple"
-            android:layout_width="@dimen/dp_301"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp_18"
-            android:background="@drawable/shape_login_btn"
-            android:onClick="Multiple"
-            android:visibility="gone"
-            android:layout_centerHorizontal="true"
-            android:textSize="@dimen/sp_14"
-            android:text="多人呼叫邀请"
-            android:textColor="@color/colorAccent" />
-
-        <TextView
-            android:id="@+id/tv_user"
+        
+        <LinearLayout
+            android:id="@+id/ll_call_type"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_marginTop="@dimen/dp_45"
-            android:textSize="@dimen/sp_14"
-            android:textColor="@color/white"
-            android:text="您的呼叫ID:0000"></TextView>
-    </LinearLayout>
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_marginLeft="@dimen/dp_28"
+                android:layout_height="@dimen/dp_147"
+                app:cardCornerRadius="@dimen/dp_5">
+
+                <Button
+                    android:id="@+id/btn_p2p"
+                    android:layout_width="@dimen/dp_301"
+                    android:layout_height="wrap_content"
+                    android:onClick="P2P"
+                    android:background="@null"
+                    android:layout_gravity="center"
+                    android:drawableTop="@drawable/img_ptp"
+                    android:textSize="@dimen/sp_14"
+                    android:text="点对点呼叫邀请"
+                    android:textColor="@color/colorAccent" />
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_marginRight="@dimen/dp_28"
+                android:layout_marginLeft="@dimen/dp_10"
+                android:layout_height="@dimen/dp_147"
+                app:cardCornerRadius="@dimen/dp_5">
+                <Button
+                    android:id="@+id/btn_multiple"
+                    android:layout_width="@dimen/dp_301"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:drawableTop="@drawable/img_multiple"
+                    android:onClick="Multiple"
+                    android:layout_gravity="center"
+                    android:layout_centerHorizontal="true"
+                    android:textSize="@dimen/sp_14"
+                    android:text="多人呼叫邀请"
+                    android:textColor="@color/colorAccent" />
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
 
 
 
+
+
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/tv_user"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_below="@+id/rl_btns"
+        android:layout_marginTop="@dimen/dp_45"
+        android:textSize="@dimen/sp_14"
+        android:textColor="@color/white"
+        android:text="您的呼叫ID:0000"></TextView>
 
 
 

@@ -17,7 +17,7 @@
             android:onClick="Back"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:src="@drawable/img_back"
+            android:src="@drawable/back"
             android:paddingRight="@dimen/dp_18"
             android:paddingLeft="@dimen/dp_18"></ImageView>
 
@@ -30,67 +30,124 @@
             android:text="设置"></TextView>
     </RelativeLayout>
 
+    <LinearLayout
+    android:id="@+id/ll_setting_resolution"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+        <TextView
+            android:layout_marginTop="@dimen/dp_11"
+            android:layout_width="match_parent"
+            android:background="#ffffff"
+            android:text="分辨率"
+            android:paddingLeft="@dimen/dp_18"
+            android:textColor="#999999"
+            android:textSize="@dimen/sp_15"
+            android:gravity="center_vertical"
+            android:layout_height="@dimen/dp_47">
+        </TextView>
+
+        <TextView
+            android:id="@+id/tv_xy"
+            android:onClick="FenBianLv"
+            android:layout_width="match_parent"
+            android:text="480*640"
+            android:paddingLeft="@dimen/dp_18"
+            android:textColor="#333333"
+            android:background="@color/white"
+            android:paddingRight="@dimen/dp_18"
+            android:drawableRight="@drawable/img_more"
+            android:textSize="@dimen/sp_15"
+            android:gravity="center_vertical"
+            android:layout_height="@dimen/dp_47">
+        </TextView>
 
 
-    <TextView
-        android:layout_marginTop="@dimen/dp_11"
+        <TextView
+            android:layout_marginTop="@dimen/dp_11"
+            android:layout_width="match_parent"
+            android:background="@color/white"
+            android:text="帧率"
+            android:paddingLeft="@dimen/dp_18"
+            android:textColor="#999999"
+            android:textSize="@dimen/sp_15"
+            android:gravity="center_vertical"
+            android:layout_height="@dimen/dp_47">
+        </TextView>
+
+        <TextView
+            android:id="@+id/tv_frame"
+            android:onClick="Frame"
+            android:layout_width="match_parent"
+            android:text="15"
+            android:background="@color/white"
+            android:paddingLeft="@dimen/dp_18"
+            android:textColor="#333333"
+            android:paddingRight="@dimen/dp_18"
+            android:drawableRight="@drawable/img_more"
+            android:textSize="@dimen/sp_15"
+            android:gravity="center_vertical"
+            android:layout_height="@dimen/dp_47">
+        </TextView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_setting_camera"
         android:layout_width="match_parent"
-        android:background="#ffffff"
-        android:text="分辨率"
-        android:paddingLeft="@dimen/dp_18"
-        android:textColor="#999999"
-        android:textSize="@dimen/sp_15"
-        android:gravity="center_vertical"
-        android:layout_height="@dimen/dp_47">
-    </TextView>
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:orientation="vertical">
+        <RelativeLayout
+            android:layout_marginTop="@dimen/dp_11"
+            android:layout_width="match_parent"
+            android:background="@color/white"
+            android:layout_height="47dp">
 
-    <TextView
-        android:id="@+id/tv_xy"
-        android:onClick="FenBianLv"
-        android:layout_width="match_parent"
-        android:text="480*640"
-        android:paddingLeft="@dimen/dp_18"
-        android:textColor="#333333"
-        android:background="@color/white"
-        android:paddingRight="@dimen/dp_18"
-        android:drawableRight="@drawable/img_more"
-        android:textSize="@dimen/sp_15"
-        android:gravity="center_vertical"
-        android:layout_height="@dimen/dp_47">
-    </TextView>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:paddingLeft="@dimen/dp_18"
+                android:textColor="#999999"
+                android:layout_centerVertical="true"
+                android:text="开启摄像头"/>
 
+            <Button
+                android:id="@+id/setting_camera"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:onClick="openCamera"
+                android:layout_marginRight="10dp"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/close"/>
+        </RelativeLayout>
 
-    <TextView
-        android:layout_marginTop="@dimen/dp_11"
-        android:layout_width="match_parent"
-        android:background="@color/white"
-        android:text="帧率"
-        android:paddingLeft="@dimen/dp_18"
-        android:textColor="#999999"
-        android:textSize="@dimen/sp_15"
-        android:gravity="center_vertical"
-        android:layout_height="@dimen/dp_47">
-    </TextView>
+        <RelativeLayout
+            android:layout_marginTop="@dimen/dp_11"
+            android:layout_width="match_parent"
+            android:background="@color/white"
+            android:layout_height="47dp">
 
-    <TextView
-        android:id="@+id/tv_frame"
-        android:onClick="Frame"
-        android:layout_width="match_parent"
-        android:text="15"
-        android:background="@color/white"
-        android:paddingLeft="@dimen/dp_18"
-        android:textColor="#333333"
-        android:paddingRight="@dimen/dp_18"
-        android:drawableRight="@drawable/img_more"
-        android:textSize="@dimen/sp_15"
-        android:gravity="center_vertical"
-        android:layout_height="@dimen/dp_47">
-    </TextView>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:paddingLeft="@dimen/dp_18"
+                android:textColor="#999999"
+                android:layout_centerVertical="true"
+                android:text="开启麦克风"/>
 
+            <Button
+                android:id="@+id/setting_microphone"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:onClick="closeMicrophone"
+                android:layout_marginRight="10dp"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/open"/>
+        </RelativeLayout>
 
-
-
-
+    </LinearLayout>
 
 
 </LinearLayout>
