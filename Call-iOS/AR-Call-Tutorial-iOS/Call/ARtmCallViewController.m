@@ -115,6 +115,7 @@
     [self.rtcKit joinChannelByToken:nil channelId:self.channelId uid:[ARtmManager getLocalUid] joinSuccess:^(NSString * _Nonnull channel, NSString * _Nonnull uid, NSInteger elapsed) {
         NSLog(@"joinChannelByToken");
     }];
+    [self.rtcKit setEnableSpeakerphone:!self.mode];
 }
 
 - (IBAction)didClickRtmCallButton:(UIButton *)sender {
@@ -182,6 +183,7 @@
             [self switchCallMode:1];
             [self.rtcKit disableVideo];
             self.backView.hidden = NO;
+            [self.rtcKit setEnableSpeakerphone:!self.mode];
         }
             break;
         case 55:
@@ -206,7 +208,7 @@
             break;
         case 58:
             //扬声器
-            [self.rtcKit setEnableSpeakerphone:!sender.selected];
+            [self.rtcKit setEnableSpeakerphone:sender.selected];
             break;
         default:
             break;
@@ -288,6 +290,8 @@
                 [self.rtcKit disableVideo];
                 self.backView.hidden = NO;
                 [self popMinimizeSuspension];
+                self.mode = 1;
+                [self.rtcKit setEnableSpeakerphone:!self.mode];
             } else if ([value isEqualToString:@"EndCall"]) {
                 [self endCall:ARtmCallStop];
             }

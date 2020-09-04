@@ -80,11 +80,31 @@
         if (self.type) {
             //多人呼叫
             if (self.callArr.count != 0) {
-                ARtmMeetViewController *meetVc = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ARtm_Meet"];
-                meetVc.channelId = [ARCallCommon randomNumber:9];
-                meetVc.calling = YES;
-                meetVc.callArr = self.callArr;
-                ARtmManager.rtmWindow.rootViewController = meetVc;
+                [ARtmManager.rtmKit queryPeersOnlineStatus:self.callArr completion:^(NSArray<ARtmPeerOnlineStatus *> * _Nullable peerOnlineStatus, ARtmQueryPeersOnlineErrorCode errorCode) {
+                    NSMutableArray *arr = [NSMutableArray array];
+                    NSString *offlineText = @"";
+                    for (ARtmPeerOnlineStatus * onlineStatus in peerOnlineStatus) {
+                        if (onlineStatus.state == ARtmPeerOnlineStateOnline) {
+                            [arr addObject:onlineStatus.peerId];
+                        } else {
+                            offlineText = [NSString stringWithFormat:@"%@%@ ",offlineText,onlineStatus.peerId];
+                        }
+                    }
+                    
+                    if (offlineText.length != 0) {
+                        [ARCallCommon showInfoWithStatus:[NSString stringWithFormat:@"%@不在线",offlineText]];
+                    }
+                    
+                    if (arr.count != 0) {
+                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                            ARtmMeetViewController *meetVc = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ARtm_Meet"];
+                            meetVc.channelId = [ARCallCommon randomNumber:9];
+                            meetVc.calling = YES;
+                            meetVc.callArr = arr;
+                            ARtmManager.rtmWindow.rootViewController = meetVc;
+                        });
+                    }
+                }];
             }
         } else {
             //单人呼叫

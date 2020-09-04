@@ -12,8 +12,6 @@
 		634444D52500AADB0038189A /* ARtmKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 634444D22500AAD20038189A /* ARtmKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		63511E4324C42240004D405B /* ARtmUserManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 63511E4224C42240004D405B /* ARtmUserManager.m */; };
 		6357EC4E24F93480005E0C60 /* ARtmHomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6357EC4D24F93480005E0C60 /* ARtmHomeViewController.m */; };
-		6357EC5724FBEF69005E0C60 /* ARtcKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6357EC5424FBEF60005E0C60 /* ARtcKit.framework */; };
-		6357EC5824FBEF69005E0C60 /* ARtcKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6357EC5424FBEF60005E0C60 /* ARtcKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		636780C624C2FB8B004D5C1D /* ARtmConfigController.m in Sources */ = {isa = PBXBuildFile; fileRef = 636780C524C2FB8B004D5C1D /* ARtmConfigController.m */; };
 		6369014124F1326900958992 /* ARtmTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6369014024F1326900958992 /* ARtmTimer.m */; };
 		636C20BD24ED5DE10046DCAA /* UIAlertController+Blocks.m in Sources */ = {isa = PBXBuildFile; fileRef = 636C20BC24ED5DE10046DCAA /* UIAlertController+Blocks.m */; };
@@ -24,8 +22,9 @@
 		636C20E124EEA7C90046DCAA /* CALayer+ARBordColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 636C20E024EEA7C90046DCAA /* CALayer+ARBordColor.m */; };
 		636F978F24F3E7D70025094F /* ARtmSuspensionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 636F978E24F3E7D70025094F /* ARtmSuspensionView.m */; };
 		636F979124F3E7E80025094F /* ARtmSuspensionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 636F979024F3E7E80025094F /* ARtmSuspensionView.xib */; };
-		6386846024F8E4F6009C33D5 /* KeyBoardView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6386845F24F8E4F6009C33D5 /* KeyBoardView.m */; };
 		63871CEB24DBFFD9003C220D /* rtm_call.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 63871CEA24DBFFD9003C220D /* rtm_call.mp3 */; };
+		63B400B325028564000D52EC /* ARtcKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63B400B125028551000D52EC /* ARtcKit.framework */; };
+		63B400B425028564000D52EC /* ARtcKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 63B400B125028551000D52EC /* ARtcKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		63B5B69F24F2737C004F3829 /* ARtmInvitationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 63B5B69E24F2737C004F3829 /* ARtmInvitationView.m */; };
 		63B5B6A124F274AB004F3829 /* ARtmInvitationView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 63B5B6A024F274AB004F3829 /* ARtmInvitationView.xib */; };
 		63CA2EF324C17971003FF0AC /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 63CA2EF224C17971003FF0AC /* AppDelegate.m */; };
@@ -46,8 +45,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				6357EC5824FBEF69005E0C60 /* ARtcKit.framework in Embed Frameworks */,
 				634444D52500AADB0038189A /* ARtmKit.framework in Embed Frameworks */,
+				63B400B425028564000D52EC /* ARtcKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -60,7 +59,6 @@
 		63511E4224C42240004D405B /* ARtmUserManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmUserManager.m; sourceTree = "<group>"; };
 		6357EC4C24F93480005E0C60 /* ARtmHomeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmHomeViewController.h; sourceTree = "<group>"; };
 		6357EC4D24F93480005E0C60 /* ARtmHomeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmHomeViewController.m; sourceTree = "<group>"; };
-		6357EC5424FBEF60005E0C60 /* ARtcKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ARtcKit.framework; sourceTree = "<group>"; };
 		636780C424C2FB8B004D5C1D /* ARtmConfigController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmConfigController.h; sourceTree = "<group>"; };
 		636780C524C2FB8B004D5C1D /* ARtmConfigController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmConfigController.m; sourceTree = "<group>"; };
 		6369013F24F1326900958992 /* ARtmTimer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmTimer.h; sourceTree = "<group>"; };
@@ -79,9 +77,8 @@
 		636F978D24F3E7D70025094F /* ARtmSuspensionView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmSuspensionView.h; sourceTree = "<group>"; };
 		636F978E24F3E7D70025094F /* ARtmSuspensionView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmSuspensionView.m; sourceTree = "<group>"; };
 		636F979024F3E7E80025094F /* ARtmSuspensionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ARtmSuspensionView.xib; sourceTree = "<group>"; };
-		6386845E24F8E4F6009C33D5 /* KeyBoardView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyBoardView.h; sourceTree = "<group>"; };
-		6386845F24F8E4F6009C33D5 /* KeyBoardView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeyBoardView.m; sourceTree = "<group>"; };
 		63871CEA24DBFFD9003C220D /* rtm_call.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = rtm_call.mp3; sourceTree = "<group>"; };
+		63B400B125028551000D52EC /* ARtcKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ARtcKit.framework; sourceTree = "<group>"; };
 		63B5B69D24F2737C004F3829 /* ARtmInvitationView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmInvitationView.h; sourceTree = "<group>"; };
 		63B5B69E24F2737C004F3829 /* ARtmInvitationView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmInvitationView.m; sourceTree = "<group>"; };
 		63B5B6A024F274AB004F3829 /* ARtmInvitationView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ARtmInvitationView.xib; sourceTree = "<group>"; };
@@ -113,8 +110,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				634444D42500AADB0038189A /* ARtmKit.framework in Frameworks */,
+				63B400B325028564000D52EC /* ARtcKit.framework in Frameworks */,
 				0ED0DB8A3EDC39B5F9ED5419 /* Pods_AR_Call_Tutorial_iOS.framework in Frameworks */,
-				6357EC5724FBEF69005E0C60 /* ARtcKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -142,8 +139,6 @@
 				636F978D24F3E7D70025094F /* ARtmSuspensionView.h */,
 				636F978E24F3E7D70025094F /* ARtmSuspensionView.m */,
 				636F979024F3E7E80025094F /* ARtmSuspensionView.xib */,
-				6386845E24F8E4F6009C33D5 /* KeyBoardView.h */,
-				6386845F24F8E4F6009C33D5 /* KeyBoardView.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -197,8 +192,8 @@
 		63CA2EF024C17971003FF0AC /* AR-Call-Tutorial-iOS */ = {
 			isa = PBXGroup;
 			children = (
+				63B400B125028551000D52EC /* ARtcKit.framework */,
 				634444D22500AAD20038189A /* ARtmKit.framework */,
-				6357EC5424FBEF60005E0C60 /* ARtcKit.framework */,
 				63EDCF3924C5C843003AE948 /* Call */,
 				63EDCF3824C5C821003AE948 /* Tool */,
 				63EDCF3724C5C7F7003AE948 /* Base */,
@@ -384,7 +379,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6386846024F8E4F6009C33D5 /* KeyBoardView.m in Sources */,
 				636C20D624EE1F220046DCAA /* ARtmMeetViewController.m in Sources */,
 				636F978F24F3E7D70025094F /* ARtmSuspensionView.m in Sources */,
 				636780C624C2FB8B004D5C1D /* ARtmConfigController.m in Sources */,

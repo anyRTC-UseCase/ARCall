@@ -117,6 +117,8 @@
     //开启双流模式
     [self.rtcKit enableDualStreamMode:YES];
     [self videoLayout];
+    
+    [self.rtcKit setDefaultAudioRouteToSpeakerphone:YES];
     [self.rtcKit joinChannelByToken:nil channelId:self.channelId uid:[ARtmManager getLocalUid] joinSuccess:^(NSString * _Nonnull channel, NSString * _Nonnull uid, NSInteger elapsed) {
         NSLog(@"joinChannelByToken");
     }];
@@ -232,31 +234,25 @@
             if (peerOnlineStatus.count != 0) {
                 @strongify(self);
                 ARtmPeerOnlineStatus *onlineStatus = peerOnlineStatus[0];
-                if (onlineStatus.state != ARtmPeerOnlineStateOnline) {
-                    //不在线
-                       NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:@"Invitation",@"Cmd",uid,@"UserId",nil];
-                       
-                       ARtmMessage *message = [[ARtmMessage alloc] initWithText:[ARCallCommon returnJSONStringWithDictionary:dic]];
-                       ARtmSendMessageOptions *options = [[ARtmSendMessageOptions alloc] init];
-                        [self.rtmChannel sendMessage:message sendMessageOptions:options completion:^(ARtmSendChannelMessageErrorCode errorCode) {
-                            NSLog(@"Channel sendMessage Sucess");
-                       }];
+                //在线
+                if (onlineStatus.state == ARtmPeerOnlineStateOnline) {
+                    //邀请
+                    [self.rtmCallArr addObject:uid];
+                    [self createVideoView:uid];
+                    
+                    //发送呼叫请求
+                    [self.cancleCallArr addObject:uid];
+                    NSMutableArray * arr = [NSMutableArray arrayWithArray:self.rtmCallArr];
+                    [arr insertObject:ARtmManager.getLocalUid atIndex:0];
+                    NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithInt:0],@"Mode",[NSNumber numberWithBool:YES],@"Conference",self.channelId,@"ChanId",arr,@"UserData",nil];
+                    ARtmLocalInvitation *localInvitation = [[ARtmLocalInvitation alloc] initWithCalleeId:uid];
+                    localInvitation.content = [ARCallCommon returnJSONStringWithDictionary:dic];
+                    [self.rtmCallKit sendLocalInvitation:localInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
+                        NSLog(@"sendLocalInvitation errorCode = %ld",(long)errorCode);
+                    }];
+                } else {
+                    [UIAlertController showAlertInViewController:self withTitle:[NSString stringWithFormat:@"%@不在线",uid] message:nil cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:@[@"确定"] tapBlock:nil];
                 }
-                
-                //邀请
-                [self.rtmCallArr addObject:uid];
-                [self createVideoView:uid];
-                
-                //发送呼叫请求
-                [self.cancleCallArr addObject:uid];
-                NSMutableArray * arr = [NSMutableArray arrayWithArray:self.rtmCallArr];
-                [arr insertObject:ARtmManager.getLocalUid atIndex:0];
-                NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithInt:0],@"Mode",[NSNumber numberWithBool:YES],@"Conference",self.channelId,@"ChanId",arr,@"UserData",nil];
-                ARtmLocalInvitation *localInvitation = [[ARtmLocalInvitation alloc] initWithCalleeId:uid];
-                localInvitation.content = [ARCallCommon returnJSONStringWithDictionary:dic];
-                [self.rtmCallKit sendLocalInvitation:localInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
-                    NSLog(@"sendLocalInvitation errorCode = %ld",(long)errorCode);
-                }];
             }
         }];
     }
@@ -349,6 +345,7 @@
     
     ARtmManager.rtmKit.aRtmDelegate = nil;
     self.rtmCallKit.callDelegate = nil;
+    [self.invitationView removeFromSuperview];
     [self.suspensionView removeFromSuperview];
     
     if (self.rtcKit) {
@@ -388,12 +385,19 @@
     [self.videoArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         ARVideoView *videoView = (ARVideoView *)obj;
         if ([videoView.uid isEqualToString:localInvitation.calleeId]) {
-            [[self mutableArrayValueForKey:@"videoArr"] removeObject:videoView];
-            [videoView removeFromSuperview];
-            [self videoLayout];
+            if (response.length != 0) {
+                NSDictionary *dic = [ARCallCommon dictionaryWithJSONString:response];
+                NSString *value = [dic objectForKey:@"Cmd"];
+                if ([value isEqualToString:@"Calling"]) {
+                    videoView.state = ARVideoStateinvitationCalling;
+                }
+            } else {
+                videoView.state = ARVideoStateinvitationRefused;
+            }
             *stop = YES;
         }
     }];
+    [self.rtmCallArr removeObject:localInvitation.calleeId];
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationCanceled:(ARtmLocalInvitation * _Nonnull)localInvitation {
@@ -404,28 +408,6 @@
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationFailure:(ARtmLocalInvitation * _Nonnull)localInvitation errorCode:(ARtmLocalInvitationErrorCode)errorCode {
     //呼叫邀请发送失败
     NSLog(@"localInvitationFailure");
-    [self.videoArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        ARVideoView *videoView = (ARVideoView *)obj;
-        if ([videoView.uid isEqualToString:localInvitation.calleeId]) {
-            if (errorCode == ARtmLocalInvitationErrorRemoteOffline) {
-                videoView.offline = YES;
-                
-                NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:@"RemoteOffline",@"Cmd",localInvitation.calleeId,@"UserId",nil];
-                
-                ARtmMessage *message = [[ARtmMessage alloc] initWithText:[ARCallCommon returnJSONStringWithDictionary:dic]];
-                ARtmSendMessageOptions *options = [[ARtmSendMessageOptions alloc] init];
-                 [self.rtmChannel sendMessage:message sendMessageOptions:options completion:^(ARtmSendChannelMessageErrorCode errorCode) {
-                     NSLog(@"Channel sendMessage Sucess");
-                }];
-            } else {
-                [[self mutableArrayValueForKey:@"videoArr"] removeObject:videoView];
-                [videoView removeFromSuperview];
-                [self videoLayout];
-            }
-            *stop = YES;
-        }
-    }];
-    [self.rtmCallArr removeObject:localInvitation.calleeId];
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationReceived:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
@@ -471,7 +453,7 @@
     [self.videoArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         ARVideoView *videoView = (ARVideoView *)obj;
         if ([videoView.uid isEqualToString:member.uid]) {
-            videoView.stateLabel.text = @"";
+            videoView.state = ARVideoStateinvitationOnline;
             *stop = YES;
         }
     }];
@@ -495,25 +477,6 @@
 
 - (void)channel:(ARtmChannel * _Nonnull)channel messageReceived:(ARtmMessage * _Nonnull)message fromMember:(ARtmMember * _Nonnull)member {
     //收到频道消息回调
-    if (message.text.length != 0) {
-        NSDictionary *dic = [ARCallCommon dictionaryWithJSONString:message.text];
-        NSString *value = [dic objectForKey:@"Cmd"];
-        if ([value isEqualToString:@"Invitation"]) {
-            NSString *uid = [dic objectForKey:@"UserId"];
-            if (uid.length != 0) {
-                [self.rtmCallArr addObject:uid];
-                [self createVideoView:uid];
-            }
-        } else if ([value isEqualToString:@"RemoteOffline"]) {
-            NSString *uid = [dic objectForKey:@"UserId"];
-            if (uid.length != 0) {
-                [self.videoArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                    ARVideoView *videoView = (ARVideoView *)obj;
-                    videoView.offline = YES;
-                }];
-            }
-        }
-    }
 }
 
 //MARK: - ARtcEngineDelegate
@@ -543,7 +506,7 @@
         ARVideoView *videoView = (ARVideoView *)obj;
         if ([videoView.uid isEqualToString:uid]) {
             videoView.loadingView.hidden = YES;
-            videoView.stateLabel.text = @"";
+            videoView.state = ARVideoStateinvitationOnline;
             [videoView endCountdown];
             *stop = YES;
         }

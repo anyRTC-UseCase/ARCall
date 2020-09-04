@@ -12,6 +12,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^ARtmVideoRemoveBlock)(void);
 
+typedef NS_ENUM(NSInteger, ARVideoState) {
+    ARVideoStateinvitationOffline = 0,
+    ARVideoStateinvitationOnline = 1,
+    ARVideoStateinvitationFailed = 2,
+    ARVideoStateinvitationRefused = 3,
+    ARVideoStateinvitationCalling = 4
+};
+
 @interface ARVideoView : UIView
 
 @property (weak, nonatomic) IBOutlet UIView *placeholderView;
@@ -19,7 +27,7 @@ typedef void (^ARtmVideoRemoveBlock)(void);
 @property (weak, nonatomic) IBOutlet UIButton *titleButton;
 @property (weak, nonatomic) IBOutlet UILabel *stateLabel;
 @property (nonatomic, copy) NSString *uid;
-@property (nonatomic, assign) BOOL offline;
+@property (nonatomic, assign) ARVideoState state;
 
 + (instancetype)loadVideoView:(ARtmVideoRemoveBlock)block;
 - (void)startCountdown;
