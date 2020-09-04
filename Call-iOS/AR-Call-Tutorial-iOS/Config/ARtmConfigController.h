@@ -8,9 +8,18 @@
 
 #import <UIKit/UIKit.h>
 
+@interface ARtmConfigMeetCell : UITableViewCell
+
+@property (weak, nonatomic) IBOutlet UILabel *rtmLabel;
+@property (weak, nonatomic) IBOutlet UISwitch *rtmSwitch;
+
+@end
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ARtmConfigController : UITableViewController
+//0单人，1多人
+@property (nonatomic, assign) BOOL type;
 
 @end
 

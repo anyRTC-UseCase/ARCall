@@ -20,6 +20,8 @@ FOUNDATION_EXPORT const unsigned char ARtcKitVersionString[];
 #import <ARtcKit/ARtcEngineDelegate.h>
 #import <ARtcKit/AREnumerates.h>
 #import <ARtcKit/ARtcEngineKit.h>
+#import <ARtcKit/ARtcChannel.h>
+#import <ARtcKit/ARtcChannelDelegate.h>
 
 
 

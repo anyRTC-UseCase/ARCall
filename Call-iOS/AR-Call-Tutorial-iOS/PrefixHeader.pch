@@ -16,7 +16,6 @@
 
 //MARK: - 配置开发者信息
 
-static NSString *token = @"";
 static NSString *appID = <#T##NSString#>;
 
 //MARK: - ARtmKit SDK
@@ -32,14 +31,22 @@ static NSString *appID = <#T##NSString#>;
 
 #import <SVProgressHUD/SVProgressHUD.h>
 #import <Masonry/Masonry.h>
+#import "UIAlertController+Blocks.h"
+#import "CALayer+ARBordColor.h"
 
 #import "ARtmManager.h"
 #import "ARCallCommon.h"
 #import "ARtmUserManager.h"
-#import "ARtmCallView.h"
+#import "ARtmTimer.h"
 #import "WMDragView.h"
+#import "ARtmSuspensionView.h"
+#import "ARtmCallViewController.h"
+#import "ARtmMeetViewController.h"
 
 //MARK: - Macro
+
+#define ARtmCallEndNotification @"ARtmCallEndNotification"
+#define ARtmWindowIdentifier 1024
 
 #define SCREEN_WIDTH [UIScreen mainScreen].bounds.size.width
 #define SCREEN_HEIGHT [UIScreen mainScreen].bounds.size.height

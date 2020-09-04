@@ -507,6 +507,9 @@ __attribute__((visibility("default"))) @interface ARtcEngineKit : NSObject
 
 如果你希望在通话中更新远端用户视图的渲染或镜像模式，请使用 setRemoteRenderMode 方法。
  
+- 该参数默认值为空字符 ""。如果用户是通过 ARtcEngineKit 类的 joinChannelByToken 方法加入频道的，则将参数设为默认值，表示该用户在频道内的渲染视图。
+- 如果用户是通过 ARtcChannel 类的 joinChannelByToken 方法加入频道的，则将该参数设为该 ARtcChannel 类对应的 channelId，表示该用户在该 channelId 对应频道内的渲染视图。
+ 
  @param remote 通过 ARtcVideoCanvas 设置远端视频显示属性：
  
  * view 视频显示视窗
@@ -725,6 +728,10 @@ __attribute__((visibility("default"))) @interface ARtcEngineKit : NSObject
 #if TARGET_OS_IPHONE
 
 /** 开启耳返功能
+ 
+**Note**
+ 
+ 用户必须使用有线耳机才能听到耳返效果
 
  @param enabled 开启或关闭耳返功能：
  * YES: 开启耳返功能
@@ -1170,6 +1177,23 @@ __attribute__((visibility("default"))) @interface ARtcEngineKit : NSObject
 @return 0方法调用成功，<0方法调用失败
  */
 - (int)setCameraCapturerConfiguration:(ARCameraCapturerConfiguration * _Nullable)configuration;
+
+/** 开启/关闭本地人脸检测
+
+ 开启本地人脸检测后，SDK 会触发 facePositionDidChangeWidth 回调向你报告人脸检测的信息：:
+
+ - 摄像头采集的画面大小
+ - 人脸在画面中的位置
+ - 人脸距设备屏幕的距离
+ 
+ @param enable 是否开启人脸检测：
+ 
+ - YES: 开启人脸检测
+ - NO: （默认）关闭人脸检测
+ 
+ @return 0方法调用成功，<0方法调用失败
+ */
+- (int)enableFaceDetection:(BOOL)enable;
 
 //MARK: - 摄像头控制
 /**-----------------------------------------------------------------------------
