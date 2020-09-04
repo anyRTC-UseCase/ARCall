@@ -47,16 +47,11 @@ public class InviteDialog extends Dialog implements RtmCallEventListener {
     private VerificationCodeView etInvite;
     private List<String> mUserIdList;
     private String userId;
-    public interface InviteCallBack{
-        void invite(String uid);
-    }
-    private InviteCallBack callBack;
 
-    public InviteDialog(@NonNull Context context,List<String> userIdList,String channelId,InviteCallBack inviteCallBack) {
+    public InviteDialog(@NonNull Context context,List<String> userIdList,String channelId) {
         super(context,R.style.dialog);
         mContent =context;
         mUserIdList =userIdList;
-        callBack =inviteCallBack;
         this.channelId =channelId;
     }
 
@@ -88,15 +83,11 @@ public class InviteDialog extends Dialog implements RtmCallEventListener {
             public void onClick(View v) {
                 if (checkID()){
                     inviteUser();
-                    if (!checkIdOnLine()){
-                        callBack.invite(etInvite.getInputContent());
-                    }
                     dismiss();
                 }
                 mConfirm.setEnabled(false);
                 mConfirm.setTextColor(mContent.getResources().getColor(R.color.invite_color_unfocus));
                 etInvite.clearInputContent();
-
             }
         });
 
@@ -124,7 +115,7 @@ public class InviteDialog extends Dialog implements RtmCallEventListener {
             param.put("Conference",true);
             param.put("UserId",userId);
             param.put("ChanId", channelId);
-            if (checkIdOnLine()){
+            if (CallApplication.the().getCallManager().checkIdOnLine(etInvite.getInputContent())){
                 mUserIdList.add(etInvite.getInputContent());
             }
             if (!mUserIdList.contains(userId)){
@@ -168,32 +159,11 @@ public class InviteDialog extends Dialog implements RtmCallEventListener {
             Toast.makeText(mContent, "不能呼叫自己", Toast.LENGTH_SHORT).show();
             return false;
         }
-        return true;
-    }
-
-    private boolean checkIdOnLine(){
-        Set<String> queryList = new HashSet<>();
-        queryList.add(etInvite.getInputContent());
-        synchronized (object) {
-            rtmClient.queryPeersOnlineStatus(queryList, new ResultCallback<Map<String, Boolean>>() {
-                @Override
-                public void onSuccess(Map<String, Boolean> stringBooleanMap) {
-                    synchronized (object) {
-                        isOnline = stringBooleanMap.get(etInvite.getInputContent());
-                        object.notify();
-                    }
-                }
-                @Override
-                public void onFailure(ErrorInfo errorInfo) {
-                }
-            });
-            try {
-                object.wait(2000);//2秒还未查到就唤醒
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        if (!CallApplication.the().getCallManager().checkIdOnLine(etInvite.getInputContent())){
+            Toast.makeText(mContent, etInvite.getInputContent()+"不在线", Toast.LENGTH_SHORT).show();
+            return false;
         }
-        return isOnline;
+        return true;
     }
 
     @Override

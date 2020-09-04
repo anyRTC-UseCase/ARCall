@@ -5,8 +5,10 @@ import android.util.Log;
 
 import org.ar.rtc.IRtcEngineEventHandler;
 import org.ar.rtc.RtcEngine;
+import org.ar.rtm.ErrorInfo;
 import org.ar.rtm.LocalInvitation;
 import org.ar.rtm.RemoteInvitation;
+import org.ar.rtm.ResultCallback;
 import org.ar.rtm.RtmCallEventListener;
 import org.ar.rtm.RtmCallManager;
 import org.ar.rtm.RtmChannel;
@@ -20,12 +22,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class CallManager {
 
+    private Object object =new Object();
     private Context context;
     private RtmClient rtmClient;
     private RtmCallManager rtmCallManager;
@@ -33,6 +38,7 @@ public class CallManager {
     private List<RtmCallEventListener> rtmCallEventListenerList = new ArrayList<>();
     private List<RtmChannelListener> channelListeners =new ArrayList<>();
     private boolean isCall = false;
+    private boolean isOnline =false;
     private RemoteInvitation remoteInvitation;
     private LocalInvitation localInvitation;
     private List<LocalInvitation> localInvitationList =new ArrayList<>();
@@ -285,13 +291,9 @@ public class CallManager {
         }
     }
 
-
-
     public void unregisterCallListener(RtmCallEventListener listener) {
         rtmCallEventListenerList.remove(listener);
     }
-
-
 
 
     public void registerListener(RtmClientListener listener) {
@@ -300,10 +302,33 @@ public class CallManager {
         }
     }
 
-
-
     public void unregisterListener(RtmClientListener listener) {
         mListenerList.remove(listener);
+    }
+
+    public boolean checkIdOnLine(String uid){
+        Set<String> queryList = new HashSet<>();
+        queryList.add(uid);
+        synchronized (object) {
+            rtmClient.queryPeersOnlineStatus(queryList, new ResultCallback<Map<String, Boolean>>() {
+                @Override
+                public void onSuccess(Map<String, Boolean> stringBooleanMap) {
+                    synchronized (object) {
+                        isOnline = stringBooleanMap.get(uid);
+                        object.notify();
+                    }
+                }
+                @Override
+                public void onFailure(ErrorInfo errorInfo) {
+                }
+            });
+            try {
+                object.wait(2000);//2秒还未查到就唤醒
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return isOnline;
     }
 
     public boolean isCall() {
@@ -313,5 +338,6 @@ public class CallManager {
     public void setCall(boolean call) {
         isCall = call;
     }
+
 
 }

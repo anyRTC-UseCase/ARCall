@@ -105,7 +105,6 @@ public class MultiVideoActivity extends BaseActivity implements View.OnClickList
     private Button mBtnPackUp,mBtnInvite;
     private TextView mTextWaiting;
     private Chronometer mChronometer;
-    private InviteDialog.InviteCallBack inviteCallBack;
     private boolean isOpenCamera,isOpenMicrophone;
     private static final String[] REQUESTED_PERMISSIONS = {
             Manifest.permission.RECORD_AUDIO,
@@ -181,9 +180,6 @@ public class MultiVideoActivity extends BaseActivity implements View.OnClickList
                 mUserIdList.remove(userMultiId);
             }
         }
-        initInviteCallBack();
-        downTimerRemoveView(false,"");
-
     }
 
     private void initEngineAndJoinChannel() {
@@ -191,7 +187,6 @@ public class MultiVideoActivity extends BaseActivity implements View.OnClickList
         setupVideoConfig();
         setShowView();
         joinChannel();
-        Log.i(TAG, "initEngineAndJoinChannel: zhao isOpenCamera ="+isOpenCamera+",isOpenMicrophone ="+isOpenMicrophone);
         if (isOpenCamera){
             setupLocalVideo();
         }else {
@@ -206,76 +201,6 @@ public class MultiVideoActivity extends BaseActivity implements View.OnClickList
             mRtcEngine.muteLocalAudioStream(true);
             arVideoGroup.setMicState("local",false);
         }
-    }
-
-    private void initInviteCallBack(){
-        inviteCallBack =new InviteDialog.InviteCallBack() {
-            @Override
-            public void invite(String uid) {
-                Log.i(TAG, "invite: inviteCallBack  ---->");
-                if (!arVideoGroup.getM_list_video().containsKey(uid)){
-                    TextureView mUidView = RtcEngine.CreateRendererView(getBaseContext());
-                    arVideoGroup.addView(uid,mUidView,false);
-                    arVideoGroup.setTextUid(uid,false);
-                    arVideoGroup.setMicState(uid,false);
-                    arVideoGroup.startRotate(uid);
-                }
-                if (!mUserIdList.contains(uid)){
-                    mUserIdList.add(uid);
-                }
-                JSONObject param =new JSONObject();
-                try {
-                    param.put("Cmd","Invitation");
-                    param.put("UserId",uid);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                rtmChannel.sendMessage(rtmClient.createMessage(param.toString()), null, new ResultCallback<Void>() {
-                    @Override
-                    public void onSuccess(Void var1) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                            }
-                        });
-                    }
-                    @Override
-                    public void onFailure(ErrorInfo var1) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                            }
-                        });
-                    }
-                });
-                downTimerRemoveView(true,uid);
-            }
-        };
-    }
-
-    /**
-     * 倒计时60s,移除不在线的视图
-     */
-    private void downTimerRemoveView(boolean isInvite,String uid){
-        List<String> userList =new ArrayList<>();
-        for (String id: mUserIdList){
-            if (!userList.contains(id)){
-                userList.add(id);
-            }
-        }
-        CountDownTimer mCountDownTimer =new CountDownTimer(30*1000,1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                Log.i(TAG, "onTick:   --->"+millisUntilFinished);
-                queryOffline(isInvite,uid,userList,false);
-            }
-
-            @Override
-            public void onFinish() {
-                queryOffline(isInvite,uid,userList,true);
-            }
-        };
-        mCountDownTimer.start();
     }
 
     private void setShowView(){
@@ -300,7 +225,6 @@ public class MultiVideoActivity extends BaseActivity implements View.OnClickList
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.i(TAG, " zhao onJoinChannelSuccess: ---->");
                 }
             });
         }
@@ -363,7 +287,6 @@ public class MultiVideoActivity extends BaseActivity implements View.OnClickList
                 @Override
                 public void run() {
                     //摄像头开关
-                    Log.i(TAG, "zhao onRemoteVideoStateChanged: reason ="+reason+",uid ="+uid);
                     if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_MUTED){
                         arVideoGroup.setVisibility(uid,false);
                     }else if (reason ==Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED){
@@ -536,7 +459,7 @@ public class MultiVideoActivity extends BaseActivity implements View.OnClickList
                 showSmallScreen();
                 break;
             case R.id.btn_multi_invite:
-                inviteDialog =new InviteDialog(this,mUserIdList,channelMultiId,inviteCallBack);
+                inviteDialog =new InviteDialog(this,mUserIdList,channelMultiId);
                 inviteDialog.show();
                 break;
             default:
@@ -802,54 +725,6 @@ public class MultiVideoActivity extends BaseActivity implements View.OnClickList
         });
     }
 
-    public void queryOffline(boolean isInvite,String uid,List<String> userList,boolean isRemove) {
-        if (userList.size() ==0){
-            return;
-        }
-        Set<String> queryList = new HashSet<>();
-        if (isInvite){
-            queryList.add(uid);
-        }else {
-            for (String id: userList){
-                queryList.add(id);
-            }
-        }
-        rtmClient.queryPeersOnlineStatus(queryList, new ResultCallback<Map<String, Boolean>>() {
-            @Override
-            public void onSuccess(final Map<String, Boolean> var1) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (var1.size()>0){
-                            for(Map.Entry<String, Boolean> entry : var1.entrySet()){
-                                String mapKey = entry.getKey();
-                                boolean mapValue = entry.getValue();
-                                Log.i(TAG, "run: PeersOnline key="+mapKey+",Val ="+mapValue);
-                                if (!mapValue){
-                                    if (isRemove){
-                                        arVideoGroup.setUnmannedText(mapKey,"无人接听");
-                                        removeRemoteVideo(mapKey);
-                                    }else {
-                                        arVideoGroup.setUnmannedText(mapKey,"用户不在线");
-                                    }
-                                }else {
-                                    if (!isRemove){
-                                        arVideoGroup.setUnmannedText(mapKey,"等待接听");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(ErrorInfo var1) {
-
-            }
-        });
-    }
-
     @Override
     public void onLocalInvitationReceivedByPeer(LocalInvitation local) {
         runOnUiThread(new Runnable() {
@@ -1032,7 +907,7 @@ public class MultiVideoActivity extends BaseActivity implements View.OnClickList
 
     /**
      * 频道成员人数更新回调。返回最新频道成员人数
-     * @param var1 最新频道成员人数
+     *      * @param var1 最新频道成员人数
      */
     @Override
     public void onMemberCountUpdated(int var1) {
@@ -1062,26 +937,6 @@ public class MultiVideoActivity extends BaseActivity implements View.OnClickList
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                String uid ="";
-                String cmd ="";
-                try {
-                    JSONObject jsonObject =new JSONObject(var1.getText());
-                    uid = jsonObject.getString("UserId");
-                    cmd =jsonObject.getString("Cmd");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                if (cmd.equals("Invitation")){
-                    if (!arVideoGroup.getM_list_video().containsKey(uid)){
-                        TextureView mUidView = RtcEngine.CreateRendererView(getBaseContext());
-                        arVideoGroup.addView(uid,mUidView,false);
-                        arVideoGroup.setTextUid(uid,false);
-                        arVideoGroup.setMicState(uid,false);
-                        arVideoGroup.startRotate(uid);
-                    }
-                    downTimerRemoveView(true,uid);
-                }
-
             }
         });
     }
@@ -1117,7 +972,6 @@ public class MultiVideoActivity extends BaseActivity implements View.OnClickList
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Log.i(TAG, "onMemberLeft: zhao --->");
                 removeRemoteVideo(rtmChannelMember.getUserId());
             }
         });

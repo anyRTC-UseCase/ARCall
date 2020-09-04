@@ -45,8 +45,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class MultiUserActivity extends BaseActivity implements View.OnClickListener,RtmChannelListener {
@@ -247,6 +249,12 @@ public class MultiUserActivity extends BaseActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         CallApplication.the().getCallManager().registerChannelListener(this);
+        clearAdapter();
+        mUserIdList =new ArrayList<>();
+        mUserLeftList =new ArrayList<>();
+    }
+
+    private void clearAdapter(){
         if (multiTagAdapter.getItemCount() !=0){
             multiTagAdapter.getData().clear();
             multiTagAdapter.notifyDataSetChanged();
@@ -257,10 +265,7 @@ public class MultiUserActivity extends BaseActivity implements View.OnClickListe
         mTextTip.setVisibility(View.GONE);
         mMultiCall.setSelected(false);
         mMultiCall.setEnabled(false);
-        mUserIdList =new ArrayList<>();
-        mUserLeftList =new ArrayList<>();
     }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()){
@@ -296,29 +301,47 @@ public class MultiUserActivity extends BaseActivity implements View.OnClickListe
         JSONObject param =new JSONObject();
         JSONArray jsonArray =new JSONArray();
         String channelId =String.valueOf((int) ((Math.random() * 9 + 1) * 100000000));
-        mUserIdList.add(userId);
+        String uidOffLine="";
+        if (!mUserIdList.contains(userId)){
+            mUserIdList.add(userId);
+        }
         for (int i = 0; i < multiTagAdapter.getItemCount(); i++) {
             if (!mUserIdList.contains(multiTagAdapter.getItem(i).getContent())){
-                mUserIdList.add(multiTagAdapter.getItem(i).getContent());
+                if (CallApplication.the().getCallManager().checkIdOnLine(multiTagAdapter.getItem(i).getContent())){
+                    mUserIdList.add(multiTagAdapter.getItem(i).getContent());
+                }else {
+                    uidOffLine +=multiTagAdapter.getItem(i).getContent()+" ";
+                }
             }
         }
-        try {
-            param.put("Mode",0);
-            param.put("Conference",true);
-            param.put("ChanId",channelId);
-            for (String uid : mUserIdList){
-                jsonArray.put(uid);
-            }
-            param.put("UserData",jsonArray);
+        for (String id :mUserIdList){
+            Log.i(TAG, "multiUserCall: zhao id="+id);
+        }
+        if (mUserIdList.size()>1){
+            try {
+                param.put("Mode",0);
+                param.put("Conference",true);
+                param.put("ChanId",channelId);
+                for (String uid : mUserIdList){
+                    jsonArray.put(uid);
+                }
+                param.put("UserData",jsonArray);
 
-        } catch (JSONException e) {
-            e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            Intent intent =new Intent(MultiUserActivity.this,MultiVideoActivity.class);
+            intent.putExtra("MultiContent", param.toString());
+            intent.putExtra("userMultiId", userId);
+            intent.putExtra("isCall",true);
+            startActivity(intent);
+            if (!"".equals(uidOffLine)){
+                showToast(uidOffLine+"不在线");
+            }
+        }else {
+            clearAdapter();
+            showToast("您邀请人员都不在线");
         }
-        Intent intent =new Intent(MultiUserActivity.this,MultiVideoActivity.class);
-        intent.putExtra("MultiContent", param.toString());
-        intent.putExtra("userMultiId", userId);
-        intent.putExtra("isCall",true);
-        startActivity(intent);
     }
 
     private void startRing() {
