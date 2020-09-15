@@ -69,7 +69,7 @@ static UIWindow *rtmWindow_ = nil;
         rtmWindow_.hidden = NO;
         rtmWindow_.tag = ARtmWindowIdentifier;
         [rtmWindow_ makeKeyAndVisible];
-        rtmWindow_.windowLevel = 100000;
+        rtmWindow_.windowLevel = UIWindowLevelNormal + 2;
         [currentKeyWindow makeKeyWindow];
     }
     return rtmWindow_;

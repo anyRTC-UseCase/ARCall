@@ -7,16 +7,14 @@
 //
 
 #import "ARtmInvitationView.h"
-#import "KeyBoardView.h"
 
-@interface ARtmInvitationView()<KeyBoardViewDelegate>
+@interface ARtmInvitationView()<UITextFieldDelegate>
 
 @property (weak, nonatomic) IBOutlet UIStackView *stackView;
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 
 @property (nonatomic, copy) ARtmInvitationBlock invitationBlock;
 @property (nonatomic, copy) NSString *calleeIdText;
-@property (nonatomic, strong) KeyBoardView *keyBoard;
 
 @end
 
@@ -29,17 +27,46 @@
     return invitationView;
 }
 
+- (IBAction)didClickCancleButton:(id)sender {
+    [self removeFromSuperview];
+}
+
+- (IBAction)didClickConfirmButton:(id)sender {
+    [self.calleeIdTextField resignFirstResponder];
+    if (self.calleeIdTextField.text.length == 4 && self.titleLabel.text.length == 0) {
+        if (self.invitationBlock) {
+            self.invitationBlock(self.calleeIdTextField.text);
+        }
+        [self removeFromSuperview];
+    }
+}
+
 - (void)awakeFromNib {
     [super awakeFromNib];
-    for (UIButton *button in self.stackView.subviews) {
-        [button addTarget:self action:@selector(didClickTextField:) forControlEvents:UIControlEventTouchUpInside];
+    [self.calleeIdTextField addTarget:self action:@selector(limitTextField:) forControlEvents:UIControlEventEditingChanged];
+}
+
+- (void)limitTextField:(UITextField *)textField {
+    self.titleLabel.text = @"";
+    if (textField.text.length > 4) {
+        textField.text = [textField.text substringToIndex:4];
     }
     
-    self.calleeIdText = @"";
-    //隐藏键盘
-    self.keyBoard = [[KeyBoardView alloc] initWithFrame:CGRectMake(0, SCREEN_HEIGHT, SCREEN_WIDTH, 200)];
-    [self addSubview:self.keyBoard];
-    self.keyBoard.delegate = self;
+    if (textField.text.length == 4) {
+        if ([ARtmManager.getLocalUid isEqualToString:textField.text]) {
+             self.titleLabel.text = ARtmCallerIdInvalid;
+         } else if ([self.callArr containsObject:textField.text]) {
+             self.titleLabel.text = ARtmCallUserExisting;
+         }
+    }
+    
+    NSArray *arr = [ARCallCommon getSubString:textField.text];
+    for (NSInteger i = 0; i < self.stackView.subviews.count; i++) {
+        NSString *subText;
+        UIButton *button = self.stackView.subviews[i];
+        (i < arr.count) ? (subText = arr[i]) : @"";
+        [button setTitle:subText forState:UIControlStateNormal];
+    }
 }
 
 - (void)setCallArr:(NSMutableArray *)callArr {
@@ -49,62 +76,17 @@
     }
 }
 
-- (IBAction)didClickCancleButton:(id)sender {
-    [self removeFromSuperview];
+//MARK: - UITextFieldDelegate
+
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+    if ([string isEqualToString:@""]) {
+        return YES;
+    }
+    return [ARCallCommon validateNumber:string];
 }
 
-- (IBAction)didClickConfirmButton:(id)sender {
-    if (self.calleeIdText.length == 4 && self.titleLabel.text.length == 0) {
-        if (self.invitationBlock) {
-            self.invitationBlock(self.calleeIdText);
-        }
-        [self removeFromSuperview];
-    }
-}
-
-- (void)didClickTextField:(UIButton *)button {
-    self.keyBoard.frame = CGRectMake(0, SCREEN_HEIGHT - 200, SCREEN_WIDTH, 200);
-    [UIView animateWithDuration:0.25 animations:^{
-        [self layoutIfNeeded];
-    } completion:^(BOOL finished) {
-        
-    }];
-}
-
-//MARK: - KeyBoardViewDelegate
-
-- (BOOL)keyBoardView:(KeyBoardView *)keyBoardView shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
-    if ([string isEqualToString:@"x"]) {
-        if(self.calleeIdText.length > 0) {
-            self.calleeIdText = [self.calleeIdText substringToIndex:([self.calleeIdText length]-1)];
-        }
-    } else {
-        if (self.calleeIdText.length < 4) {
-            self.calleeIdText = [NSString stringWithFormat:@"%@%@",self.calleeIdText,string];
-        }
-    }
-    
-    NSString *callerId = self.calleeIdText;
-    if (callerId.length == 4) {
-        if ([ARtmManager.getLocalUid isEqualToString:callerId]) {
-            self.titleLabel.text = ARtmCallerIdInvalid;
-        } else if ([self.callArr containsObject:callerId]) {
-            self.titleLabel.text = ARtmCallUserExisting;
-        }
-    } else {
-        self.titleLabel.text = @"";
-    }
-    
-    if (self.calleeIdText.length != 0) {
-        NSArray *arr = [ARCallCommon getSubString:self.calleeIdText];
-        for (NSInteger i = 0; i < self.stackView.subviews.count; i++) {
-            NSString *subText;
-            UIButton *button = self.stackView.subviews[i];
-            (i < arr.count) ? (subText = arr[i]) : @"";
-            [button setTitle:subText forState:UIControlStateNormal];
-        }
-    }
-    return YES;
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    [self.calleeIdTextField resignFirstResponder];
 }
 
 

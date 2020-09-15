@@ -24,7 +24,7 @@
     ARVideoView *videoView = [[[NSBundle mainBundle]loadNibNamed:@"ARVideoView" owner:self options:nil] lastObject];
     videoView.frame = CGRectZero;
     videoView.removeBlock = block;
-    videoView.offlineIndex = 1;
+    videoView.offlineIndex = 2;
     
     CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
     animation.duration = 2.5;
@@ -45,39 +45,71 @@
 
 - (void)startCountdown {
     //开启60s倒计时
-    if (!self.rtmTimer) {
-        self.rtmTimer = [[ARtmTimer alloc] init];
-        @weakify(self);
-        [self.rtmTimer creatGCDTimer:60 withTarget:self response:^(NSInteger index) {
-            @strongify(self);
-            NSLog(@"60s倒计时：%ld",(long)index);
-            if (index == 1) {
-                self.stateLabel.text = @"无人接听";
-            } else if (index == 0 || (self.offlineIndex == 0)) {
-                if (self.removeBlock) {
-                    [self.rtmTimer clear];
-                    self.removeBlock();
-                    [self removeFromSuperview];
-                }
+    [self endCountdown];
+    @weakify(self);
+    [self.rtmTimer creatGCDTimer:60 withTarget:self response:^(NSInteger index) {
+        @strongify(self);
+        NSLog(@"60s倒计时：%ld",(long)index);
+        if (index == 1) {
+            self.stateLabel.text = @"无人接听";
+        } else if (index == 0 || (self.offlineIndex == 0)) {
+            if (self.removeBlock) {
+                [self.rtmTimer clear];
+                self.removeBlock();
+                [self removeFromSuperview];
             }
-            
-            self.offline ? (self.offlineIndex --) : 0;
-        }];
-    }
+        }
+        (self.state > 1) ? (self.offlineIndex --) : 0;
+    }];
 }
 
-- (void)setOffline:(BOOL)offline {
-    _offline = offline;
-    if (offline) {
-        self.stateLabel.text = @"无人接听";
+- (void)setState:(ARVideoState)state {
+    _state = state;
+    switch (state) {
+        case ARVideoStateinvitationOffline:
+            self.stateLabel.text = @"对方不在线";
+            break;
+        case ARVideoStateinvitationOnline:
+            self.stateLabel.text = @"";
+            break;
+        case ARVideoStateinvitationFailed:
+            self.stateLabel.text = @"邀请失败";
+            break;
+        case ARVideoStateinvitationRefused:
+            self.stateLabel.text = @"对方拒绝";
+            break;
+        case ARVideoStateinvitationCalling:
+            self.stateLabel.text = @"对方正忙";
+            break;
+        default:
+            break;
+    }
+    
+    if (state > 1) {
+        [self endCountdown];
+        @weakify(self);
+        [self.rtmTimer creatGCDTimer:2 withTarget:self response:^(NSInteger index) {
+            @strongify(self);
+            if (self.removeBlock && index == 0) {
+                [self.rtmTimer clear];
+                self.removeBlock();
+                [self removeFromSuperview];
+            }
+        }];
     }
 }
 
 - (void)endCountdown {
     //结束倒计时
-    if (self.rtmTimer) {
-        [self.rtmTimer clear];
+    [self.rtmTimer clear];
+    self.rtmTimer = nil;
+}
+
+- (ARtmTimer *)rtmTimer {
+    if (!_rtmTimer) {
+        _rtmTimer = [[ARtmTimer alloc] init];
     }
+    return _rtmTimer;
 }
 
 - (void)dealloc {

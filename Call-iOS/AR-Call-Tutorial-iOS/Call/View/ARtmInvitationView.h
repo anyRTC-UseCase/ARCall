@@ -14,6 +14,7 @@ typedef void (^ARtmInvitationBlock)(NSString *uid);
 
 @interface ARtmInvitationView : UIView
 
+@property (weak, nonatomic) IBOutlet UITextField *calleeIdTextField;
 @property (nonatomic, strong) NSMutableArray *callArr;
 
 + (instancetype)loadInvitationView:(ARtmInvitationBlock)block;
