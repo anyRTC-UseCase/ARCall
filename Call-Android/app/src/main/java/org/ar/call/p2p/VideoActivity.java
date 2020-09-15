@@ -124,6 +124,7 @@ public class VideoActivity extends BaseActivity  {
     private boolean isCalling = false;
 
 
+    private TextView tvRtt;
 
 
 
@@ -148,7 +149,7 @@ public class VideoActivity extends BaseActivity  {
         rl_remote_video = findViewById(R.id.rl_remote_video);
         rl_local_video = findViewById(R.id.rl_local_video);
 
-
+        tvRtt = findViewById(R.id.tv_rtt);
         //呼叫等待页面
         userId = CallApplication.the().getUserId();
         btnCall = findViewById(R.id.btn_call);
@@ -314,11 +315,17 @@ public class VideoActivity extends BaseActivity  {
     }
 
     private void initializeEngine() {
-        try {
             mRtcEngine = RtcEngine.create(this, RTC_APPID, mRtcEventHandler);
-        } catch (Exception e) {
-            throw new RuntimeException("NEED TO check rtc sdk init fatal error\n" + Log.getStackTraceString(e));
-        }
+
+            JSONObject jsonParams = new JSONObject();
+            try {
+                jsonParams.put("Cmd", "ConfPriCloudAddr");
+                jsonParams.put("ServerAdd", "pro.gateway.agrtc.cn");
+                jsonParams.put("Port", 6080);
+//                mRtcEngine.setParameters(jsonParams.toString());
+
+            } catch (Exception e) {
+            }
     }
 
     private void setupVideoConfig() {
@@ -346,6 +353,7 @@ public class VideoActivity extends BaseActivity  {
 
     private void joinChannel() {
         mRtcEngine.joinChannel("",channelId,"",userId);
+
     }
 
     private void setupLocalVideo() {
@@ -413,6 +421,7 @@ public class VideoActivity extends BaseActivity  {
                 }
             });
         }
+
 
         @Override
         public void onFirstRemoteVideoDecoded(final String uid, int width, int height, int elapsed) {
@@ -491,6 +500,7 @@ public class VideoActivity extends BaseActivity  {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    tvRtt.setText("RTT:"+stats.gatewayRtt+"\n"+"txPacketLossRate:"+stats.txPacketLossRate+"\n"+"rxPacketLossRate:"+stats.rxPacketLossRate);
                 }
             });
         }
@@ -829,7 +839,8 @@ public class VideoActivity extends BaseActivity  {
        release();
     }
 
-    public void AudioSwitchSpeak(View view) {
+    public void AudioSwitchSpeak(View view)
+    {
         a_btnSpeak.setSelected(!a_btnSpeak.isSelected());
         mRtcEngine.setEnableSpeakerphone(a_btnSpeak.isSelected());
     }
@@ -985,17 +996,17 @@ public class VideoActivity extends BaseActivity  {
                 }
                 if (map.containsKey(remoteUserId)){
                     if (map.get(remoteUserId)!=0){//离线了
-                        if (CallApplication.the().getCallManager().isCall()){
                             //如果正在呼叫界面
-                            if (isCall){//如果是主动呼叫
-                                rtmCallManager.cancelLocalInvitation(localInvitation,null);
-                            }else {
-                                rtmCallManager.refuseRemoteInvitation(remoteInvitation,null);
+                        if (isWaiting) {
+                            if (isCall) {//如果是主动呼叫
+                                rtmCallManager.cancelLocalInvitation(localInvitation, null);
+                            } else {
+                                rtmCallManager.refuseRemoteInvitation(remoteInvitation, null);
                             }
+                        }
                             UnSubscribe(remoteUserId);
                             Toast.makeText(VideoActivity.this,"对方已离线",Toast.LENGTH_SHORT).show();
                             finish();
-                        }
                     }
                 }
             }

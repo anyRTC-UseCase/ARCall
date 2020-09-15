@@ -41,23 +41,24 @@
             android:layout_marginTop="@dimen/dp_20"
             android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/btn_invite_cancel"
+            <TextView
+                android:id="@+id/tv_invite_cancel"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:gravity="center"
                 android:textSize="@dimen/sp_17"
                 android:text="取消"/>
-<!--                android:background="@drawable/invite_dialog_btn_left"-->
 
-            <Button
-                android:id="@+id/btn_invite_confirm"
+            <TextView
+                android:id="@+id/tv_invite_confirm"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:gravity="center"
+                android:textColor="#40A3FB"
                 android:textSize="@dimen/sp_17"
-                android:text="确定"></Button>
-<!--                android:background="@drawable/invite_dialog_btn_right"/>-->
+                android:text="确定"></TextView>
         </LinearLayout>
 
     </LinearLayout>

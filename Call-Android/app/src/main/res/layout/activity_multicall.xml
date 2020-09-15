@@ -3,139 +3,136 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingTop="@dimen/dp_24"
     android:background="@drawable/img_bg">
 
     <RelativeLayout
-        android:id="@+id/rl_multi_call"
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:id="@+id/rl_input_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <RelativeLayout
-            android:id="@+id/rl_multi_title"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/dp_44"
-            android:background="@color/colorPrimary">
+            android:id="@+id/rl_top"
+            android:layout_width="match_parent"
 
-            <ImageView
-                android:id="@+id/iv_multi_back"
-                android:layout_width="@dimen/dp_30"
-                android:layout_height="@dimen/dp_30"
-                android:src="@drawable/back_img"
-                android:background="@null"
-                android:layout_centerVertical="true"
-                android:padding="@dimen/dp_4" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="多人呼叫邀请"
-                android:textSize="@dimen/sp_18"
-                android:textColor="@color/white"
-                android:layout_centerInParent="true"/>
-
+            android:layout_height="wrap_content">
             <ImageButton
-                android:id="@+id/btn_setting_multi"
+                android:id="@+id/btn_setting"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/img_setting"
                 android:background="@null"
                 android:layout_alignParentRight="true"
-                android:padding="@dimen/dp_12"/>
+                android:padding="@dimen/dp_12"
+                android:onClick="Setting"
+                ></ImageButton>
+
+
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/dp_12"
+                android:background="@null"
+                android:onClick="Back"
+                android:src="@drawable/img_back"></ImageButton>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="多人呼叫邀请"
+                android:textSize="@dimen/sp_15"
+                android:layout_centerInParent="true"
+                android:textColor="@color/white"
+                android:layout_centerHorizontal="true"></TextView>
         </RelativeLayout>
 
         <TextView
+            android:id="@+id/tv_input_tip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/rl_multi_title"
+            android:layout_below="@+id/rl_top"
             android:layout_marginLeft="@dimen/dp_35"
-            android:layout_marginTop="@dimen/dp_22"
             android:text="请输入对方ID，可输入多个"
+            android:layout_marginTop="@dimen/dp_35"
             android:textColor="@color/white"
             android:textSize="@dimen/sp_14" />
 
-
-        <RelativeLayout
-            android:id="@+id/rl_multi_input"
+        <com.tuo.customview.VerificationCodeView
+            android:id="@+id/et_user"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="@dimen/dp_43"
+            android:layout_marginRight="@dimen/dp_20"
+            android:layout_marginLeft="@dimen/dp_20"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/tv_input_tip"
+            android:layout_marginTop="@dimen/dp_12"
+            app:icv_et_bg_focus="@drawable/shape_et"
+            app:icv_et_bg_normal="@drawable/shape_et"
+            app:icv_et_number="4"
+            app:icv_et_text_size="@dimen/sp_24"
+            app:icv_et_text_color="#606060"
+            app:icv_et_width="@dimen/dp_73"
+            ></com.tuo.customview.VerificationCodeView>
 
-            <org.ar.call.weight.VerificationCodeView
-                android:id="@+id/et_multi_user"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/dp_43"
-                android:layout_centerHorizontal="true"
-                android:layout_marginLeft="@dimen/dp_20"
-                android:layout_marginTop="@dimen/dp_97"
-                android:layout_marginRight="@dimen/dp_20"
-                app:icv_et_bg_focus="@drawable/shape_et"
-                app:icv_et_bg_normal="@drawable/shape_et"
-                app:icv_et_number="4"
-                app:icv_et_text_color="#606060"
-                app:icv_et_text_size="@dimen/sp_24"
-                app:icv_et_width="@dimen/dp_73" />
-
-            <Button
-                android:id="@+id/btn_multi_call"
-                android:layout_width="@dimen/dp_301"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/tv_multi_user"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="@dimen/dp_45"
-                android:background="@drawable/select_btn"
-                android:text="开始呼叫"
-                android:textColor="#40A3FB" />
-
-            <TextView
-                android:id="@+id/tv_multi_user"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/btn_login"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="@dimen/dp_130"
-                android:gravity="center"
-                android:text="您的呼叫ID:0000"
-                android:textColor="@color/white"
-                android:textSize="@dimen/sp_14" />
-        </RelativeLayout>
 
         <TextView
             android:id="@+id/text_tip"
+            android:layout_below="@+id/et_user"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableLeft="@drawable/tip_white"
             android:text="点击X图标可删除当前ID"
+            android:visibility="invisible"
             android:padding="@dimen/dp_5"
             android:drawablePadding="@dimen/dp_6"
-            android:layout_marginLeft="@dimen/dp_20"
-            android:layout_marginTop="@dimen/dp_184"
+            android:layout_marginLeft="@dimen/dp_35"
+            android:layout_marginTop="@dimen/dp_30"
             android:textColor="@color/white"></TextView>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/multi_recycler_tag"
+            android:id="@+id/rv_tag"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/dp_20"
             android:layout_marginRight="@dimen/dp_20"
             android:layout_below="@+id/text_tip">
-
         </androidx.recyclerview.widget.RecyclerView>
+
+        <Button
+            android:id="@+id/btn_call"
+            android:layout_width="@dimen/dp_301"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/tv_user"
+            android:text="开始呼叫"
+            android:textColor="#40A3FB"
+            android:onClick="Call"
+            android:background="@drawable/select_btn"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/dp_45"></Button>
+
+        <TextView
+            android:id="@+id/tv_user"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="@dimen/dp_130"
+            android:layout_below="@+id/btn_login"
+            android:textSize="@dimen/sp_14"
+            android:textColor="@color/white"
+            android:text="您的呼叫ID:0000"></TextView>
+
+
 
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/rl_multi_call_pre"
+        android:id="@+id/rl_wait_layout"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/btn_multi_user_pack_up"
-            android:visibility="gone"
-            android:layout_width="@dimen/dp_23"
-            android:layout_height="@dimen/dp_23"
-            android:layout_marginLeft="@dimen/dp_10"
-            android:layout_marginTop="@dimen/dp_10"
-            android:background="@drawable/img_small"/>
 
         <ImageView
             android:id="@+id/iv_multi_user"
@@ -148,7 +145,7 @@
         </ImageView>
 
         <TextView
-            android:id="@+id/tv_multi_user_pre"
+            android:id="@+id/tv_call_user_arr"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
@@ -160,7 +157,7 @@
             android:layout_marginTop="@dimen/dp_40"/>
 
         <TextView
-            android:id="@+id/tv_multi_state"
+            android:id="@+id/tv_state"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="呼叫中..."
@@ -191,6 +188,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="12dp"
                 android:text="挂断"
+                android:onClick="HangUp"
                 android:layout_marginRight="12dp"/>
             <Button
                 android:id="@+id/btn_multi_accept"
@@ -198,6 +196,7 @@
                 android:layout_weight="1"
                 android:drawableTop="@drawable/img_accept"
                 android:text="接听"
+                android:onClick="Accept"
                 android:textColor="@color/white"
                 android:textSize="@dimen/sp_11"
                 android:drawablePadding="@dimen/dp_13"

@@ -1,4 +1,4 @@
-package org.ar.call.multiuser;
+package org.ar.call.multi;
 
 import java.util.List;
 

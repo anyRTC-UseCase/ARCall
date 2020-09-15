@@ -1,81 +1,63 @@
 package org.ar.call.p2p;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.collection.ArraySet;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.gyf.immersionbar.ImmersionBar;
-import com.kongzue.dialog.interfaces.OnDismissListener;
 import com.kongzue.dialog.interfaces.OnMenuItemClickListener;
 import com.kongzue.dialog.v3.BottomMenu;
 import com.kongzue.dialog.v3.MessageDialog;
-import com.kongzue.dialog.v3.TipDialog;
 import com.lzf.easyfloat.EasyFloat;
 import com.tuo.customview.VerificationCodeView;
 
 import org.ar.call.BaseActivity;
 import org.ar.call.CallApplication;
-import org.ar.call.MainActivity;
 import org.ar.call.R;
 import org.ar.call.SettingActivity;
-import org.ar.call.multiuser.MultiUserActivity;
-import org.ar.call.utils.Constans;
-import org.ar.call.utils.DensityUtil;
+import org.ar.call.multi.MultiCallActivity;
 import org.ar.call.utils.KeyBoardHeightProvider;
-import org.ar.call.utils.SpUtil;
 import org.ar.rtm.ErrorInfo;
 import org.ar.rtm.LocalInvitation;
 import org.ar.rtm.RemoteInvitation;
 import org.ar.rtm.ResultCallback;
-import org.ar.rtm.RtmCallEventListener;
 import org.ar.rtm.RtmCallManager;
 import org.ar.rtm.RtmClient;
-import org.ar.rtm.RtmClientListener;
-import org.ar.rtm.RtmMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
-public class CallActivity extends BaseActivity  {
+public class CallActivity extends BaseActivity {
 
     private Object object = new Object();
     private String userId;
     private VerificationCodeView callEditText;
     private TextView tvUserId;
-    private Button  btnCall;
+    private Button btnCall;
     private MediaPlayer player;
 
     private RtmCallManager rtmCallManager;
     private RtmClient rtmClient;
 
 
-
     private LocalInvitation localInvitation;
     private RemoteInvitation remoteInvitation;
 
     private boolean isOnline = false;
-
 
 
     private int screenHeight = 0;
@@ -106,7 +88,7 @@ public class CallActivity extends BaseActivity  {
                 int[] location = new int[2];
                 btnCall.getLocationInWindow(location);
                 mAnchorOriginBottom = location[1] + btnCall.getHeight();
-                int offsetY = mAnchorOriginBottom - (screenHeight - height)+50;
+                int offsetY = mAnchorOriginBottom - (screenHeight - height) + 50;
                 btnCall.setTranslationY(-offsetY);//让按钮移动上去
             } else {
                 btnCall.setTranslationY(0);
@@ -132,7 +114,6 @@ public class CallActivity extends BaseActivity  {
         rtmCallManager = CallApplication.the().getCallManager().getRtmCallManager();//必须登录后获取呼叫管理器实例
 
 
-
     }
 
     public void Call(View view) {
@@ -146,7 +127,7 @@ public class CallActivity extends BaseActivity  {
             return;
         }
 
-        if (callEditText.getInputContent().length()<4){
+        if (callEditText.getInputContent().length() < 4) {
             Toast.makeText(this, "请输入4位呼叫ID", Toast.LENGTH_SHORT).show();
 
             return;
@@ -157,31 +138,30 @@ public class CallActivity extends BaseActivity  {
         }
         Set<String> queryList = new HashSet<>();
         queryList.add(callEditText.getInputContent());
-        synchronized (this) {
-            rtmClient.queryPeersOnlineStatus(queryList, new ResultCallback<Map<String, Boolean>>() {
-                @Override
-                public void onSuccess(Map<String, Boolean> stringBooleanMap) {
-                    synchronized (object) {
-                        isOnline = stringBooleanMap.get(callEditText.getInputContent());
-                        object.notify();
-                    }
+        CountDownLatch latch = new CountDownLatch(1);
+        rtmClient.queryPeersOnlineStatus(queryList, new ResultCallback<Map<String, Boolean>>() {
+            @Override
+            public void onSuccess(Map<String, Boolean> stringBooleanMap) {
+                synchronized (object) {
+                    isOnline = stringBooleanMap.get(callEditText.getInputContent());
+                    latch.countDown();
                 }
+             }
 
-                @Override
-                public void onFailure(ErrorInfo errorInfo) {
+            @Override
+            public void onFailure(ErrorInfo errorInfo) {
 
-                }
-            });
-            try {
-                this.wait(2000);//2秒还未查到就唤醒
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
-            if (!isOnline) {
-                showTipDialog("对方不在线");
-            } else {
-                showCallType();
-            }
+        });
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if (!isOnline) {
+            showTipDialog("对方不在线");
+        } else {
+            showCallType();
         }
     }
 
@@ -191,11 +171,11 @@ public class CallActivity extends BaseActivity  {
         localInvitation = rtmCallManager.createLocalInvitation(callEditText.getInputContent());
         JSONObject param = new JSONObject();
         try {
-            param.put("Mode",type);
-            param.put("Conference",false);
-            param.put("ChanId",String.valueOf((int) ((Math.random() * 9 + 1) * 100000000)));
-            param.put("UserData","");
-            param.put("SipData","");
+            param.put("Mode", type);
+            param.put("Conference", false);
+            param.put("ChanId", String.valueOf((int) ((Math.random() * 9 + 1) * 100000000)));
+            param.put("UserData", "");
+            param.put("SipData", "");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -203,12 +183,12 @@ public class CallActivity extends BaseActivity  {
         CALL_TYPE = type;
         CallApplication.the().getCallManager().setLocalInvitation(localInvitation);
         Intent i = new Intent(CallActivity.this, VideoActivity.class);
-        i.putExtra("ReCall",false);
+        i.putExtra("ReCall", false);
         startActivity(i);
 
     }
 
-    public void showCallType(){
+    public void showCallType() {
         BottomMenu.show(this, new String[]{"视频呼叫", "语音呼叫"}, new OnMenuItemClickListener() {
             @Override
             public void onClick(String text, int index) {
@@ -223,15 +203,15 @@ public class CallActivity extends BaseActivity  {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (EasyFloat.appFloatIsShow()){//说明正在通话中 如果没打开悬浮 不会走这个页面
+                if (EasyFloat.appFloatIsShow()) {//说明正在通话中 如果没打开悬浮 不会走这个页面
                     JSONObject params = new JSONObject();
                     try {
-                        params.put("Cmd","Calling");
+                        params.put("Cmd", "Calling");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     remote.setResponse(params.toString());
-                    rtmCallManager.refuseRemoteInvitation(remote,null);
+                    rtmCallManager.refuseRemoteInvitation(remote, null);
                     return;
                 }
                 try {
@@ -241,13 +221,13 @@ public class CallActivity extends BaseActivity  {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                if (!isConference){
+                if (!isConference) {
                     Intent i = new Intent(CallActivity.this, VideoActivity.class);
-                    i.putExtra("RecCall",true);
+                    i.putExtra("RecCall", true);
                     startActivity(i);
-                }else {
-                    Intent i = new Intent(CallActivity.this, MultiUserActivity.class);
-                    i.putExtra("RecCall",true);
+                } else {
+                    Intent i = new Intent(CallActivity.this, MultiCallActivity.class);
+                    i.putExtra("RecCall", true);
                     startActivity(i);
                     finish();
                 }
@@ -257,8 +237,8 @@ public class CallActivity extends BaseActivity  {
 
 
     public void Setting(View view) {
-        Intent intent =new Intent(this, SettingActivity.class);
-        intent.putExtra("isP2P",true);
+        Intent intent = new Intent(this, SettingActivity.class);
+        intent.putExtra("isP2P", true);
         startActivity(intent);
     }
 
@@ -267,15 +247,12 @@ public class CallActivity extends BaseActivity  {
     }
 
 
-
-
     public void hideSoftKeyboard() {
-            InputMethodManager inputMethodManager = (InputMethodManager) this.getSystemService(Activity.INPUT_METHOD_SERVICE);
-            if (inputMethodManager != null) {
-                inputMethodManager.hideSoftInputFromWindow(callEditText.getWindowToken(), 0);
-            }
+        InputMethodManager inputMethodManager = (InputMethodManager) this.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        if (inputMethodManager != null) {
+            inputMethodManager.hideSoftInputFromWindow(callEditText.getWindowToken(), 0);
+        }
     }
-
 
 
     public void Back(View view) {

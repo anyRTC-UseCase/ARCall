@@ -12,8 +12,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/img_logo"
+        android:layout_marginTop="@dimen/dp_180"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/dp_180"></ImageView>
+       ></ImageView>
 
 
     <TextView
@@ -113,8 +114,8 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_below="@+id/rl_btns"
-        android:layout_marginTop="@dimen/dp_45"
         android:textSize="@dimen/sp_14"
+        android:layout_alignParentBottom="true"
         android:textColor="@color/white"
         android:text="您的呼叫ID:0000"></TextView>
 

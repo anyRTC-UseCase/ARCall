@@ -31,6 +31,11 @@ public class CallApplication extends Application {
         EasyFloat.init(this);
     }
 
+
+    public String getChannelId(){
+        return (int)((Math.random()*9+1)*100000000l)+"";
+    }
+
     public String getUserId() {
         return userId;
     }

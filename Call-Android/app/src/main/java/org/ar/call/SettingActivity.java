@@ -1,7 +1,5 @@
 package org.ar.call;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -14,13 +12,10 @@ import com.gyf.immersionbar.ImmersionBar;
 import com.kongzue.dialog.interfaces.OnMenuItemClickListener;
 import com.kongzue.dialog.v3.BottomMenu;
 
-import org.ar.call.multiuser.MultiUserActivity;
-import org.ar.call.p2p.CallActivity;
 import org.ar.call.p2p.VideoActivity;
+import org.ar.call.multi.MultiCallActivity;
 import org.ar.call.utils.SpUtil;
-import org.ar.rtm.LocalInvitation;
 import org.ar.rtm.RemoteInvitation;
-import org.ar.rtm.RtmCallEventListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -157,7 +152,7 @@ public class SettingActivity extends BaseActivity  {
                             startActivity(i);
                             finish();
                         }else {
-                            Intent i = new Intent(SettingActivity.this, MultiUserActivity.class);
+                            Intent i = new Intent(SettingActivity.this, MultiCallActivity.class);
                             i.putExtra("RecCall",true);
                             startActivity(i);
                             finish();

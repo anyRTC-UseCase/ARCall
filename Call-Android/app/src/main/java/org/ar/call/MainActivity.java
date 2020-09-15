@@ -1,14 +1,10 @@
 package org.ar.call;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,25 +12,17 @@ import android.widget.Toast;
 import com.gyf.immersionbar.ImmersionBar;
 import com.kongzue.dialog.v3.MessageDialog;
 import com.kongzue.dialog.v3.TipDialog;
-import com.kongzue.dialog.v3.WaitDialog;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
 
-import org.ar.call.multiuser.MultiUserActivity;
 import org.ar.call.p2p.CallActivity;
 import org.ar.call.p2p.VideoActivity;
-import org.ar.call.utils.NetCheckUtil;
+import org.ar.call.multi.MultiCallActivity;
 import org.ar.rtm.ErrorInfo;
-import org.ar.rtm.LocalInvitation;
 import org.ar.rtm.RemoteInvitation;
 import org.ar.rtm.ResultCallback;
-import org.ar.rtm.RtmCallEventListener;
-import org.ar.rtm.RtmClientListener;
-import org.ar.rtm.RtmMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Map;
 
 public class MainActivity extends BaseActivity{
 
@@ -158,7 +146,7 @@ public class MainActivity extends BaseActivity{
                 Toast.makeText(this,"请开启相机和录音权限",Toast.LENGTH_SHORT).show();
                 return;
             }
-            Intent intent = new Intent(MainActivity.this, MultiUserActivity.class);
+            Intent intent = new Intent(MainActivity.this, MultiCallActivity.class);
             startActivity(intent);
         }else {
             Login(true);
@@ -179,7 +167,7 @@ public class MainActivity extends BaseActivity{
                         i.putExtra("RecCall",true);
                         startActivity(i);
                     }else {
-                        Intent i = new Intent(MainActivity.this, MultiUserActivity.class);
+                        Intent i = new Intent(MainActivity.this, MultiCallActivity.class);
                         i.putExtra("RecCall",true);
                         startActivity(i);
                     }

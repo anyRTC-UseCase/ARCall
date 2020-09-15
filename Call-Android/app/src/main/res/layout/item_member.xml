@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/dp_125"
+    android:layout_height="@dimen/dp_125">
+
+
+    <RelativeLayout
+        android:id="@+id/rl_video"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/iv_video_close"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="center"
+        android:background="#1C1C1C"
+        android:visibility="gone"
+        android:src="@drawable/logo_blue"></ImageView>
+
+
+
+
+    <RelativeLayout
+        android:id="@+id/rl_wait"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#3C3C3C"
+        android:orientation="vertical">
+
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_centerInParent="true"
+        android:indeterminateBehavior="repeat"
+        android:indeterminateDrawable="@drawable/anim" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/white"
+        android:textSize="@dimen/sp_8"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/loading"
+        android:text="等待接听" />
+
+</RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dp_20"
+        android:background="@color/layout_video_bg"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/iv_audio"
+            android:layout_width="@dimen/dp_11"
+            android:layout_height="@dimen/dp_15"
+            android:layout_marginLeft="@dimen/dp_6"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:background="@drawable/mic_open"/>
+
+        <TextView
+            android:id="@+id/tv_uid"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="00000"
+            android:textSize="@dimen/sp_10"
+            android:layout_marginRight="@dimen/dp_6"
+            android:layout_marginLeft="@dimen/dp_6"
+            android:gravity="center"
+            android:textColor="@color/white"/>
+    </LinearLayout>
+
+</RelativeLayout>
