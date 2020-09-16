@@ -306,6 +306,7 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
                 calledArray.remove(var1?.callerId)
                 if (calledArray.size==0){
                     toast("主叫已取消呼叫")
+                    showInputLayout(true)
                 }
         }
     }

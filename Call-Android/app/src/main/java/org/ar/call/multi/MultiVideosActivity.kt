@@ -6,6 +6,8 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
+import android.os.Looper
+import android.util.Log
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
@@ -23,9 +25,7 @@ import com.lzf.easyfloat.interfaces.OnInvokeView
 import com.lzf.easyfloat.interfaces.OnPermissionResult
 import com.lzf.easyfloat.permission.PermissionUtils.checkPermission
 import com.lzf.easyfloat.permission.PermissionUtils.requestPermission
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.ar.call.BaseActivity
 import org.ar.call.CallApplication
 import org.ar.call.R
@@ -252,19 +252,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
 
     override fun onMemberLeft(var1: RtmChannelMember?) {
         runOnUiThread {
-            var leftIndex = -1
-            memberAdapter.data.forEachIndexed { index, rtcMember ->
-                if (var1?.userId == rtcMember.userId) {
-                    rtcMember.release()
-                    leftIndex = index
-                }
-            }
-            if (leftIndex != -1) {
-                memberAdapter.remove(leftIndex)
-            }
-            if (callArray?.contains(var1?.userId.toString())!!) {
-                callArray?.remove(var1?.userId)
-            }
+            removeMember(var1?.userId.toString())
             if (memberAdapter.data.size == 1) {//only self
                 toast("通话已结束")
                 finish()
@@ -274,6 +262,22 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
 
     fun toast(tip: String) {
         Toast.makeText(this, tip, Toast.LENGTH_SHORT).show()
+    }
+
+    fun removeMember(userId: String){
+        var leftIndex = -1
+        memberAdapter.data.forEachIndexed { index, rtcMember ->
+            if (userId== rtcMember.userId) {
+                rtcMember.release()
+                leftIndex = index
+            }
+        }
+        if (leftIndex != -1) {
+            memberAdapter.remove(leftIndex)
+        }
+        if (callArray?.contains(userId)!!) {
+            callArray?.remove(userId)
+        }
     }
 
     override fun onDestroy() {
@@ -346,6 +350,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
         super.onLocalInvitationRefused(var1, var2)
         runOnUiThread {
             toast("${var1?.calleeId}拒绝了呼叫邀请")
+            removeMember(var1?.calleeId.toString())
         }
     }
 
@@ -353,29 +358,34 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
         CustomDialog.show(this, R.layout.dialog_invite) { dialog, v ->
             val etId = v.findViewById<org.ar.call.weight.VerificationCodeView>(R.id.et_invite)
             v.findViewById<TextView>(R.id.tv_invite_confirm).setOnClickListener {
-                mainScope.launch {
+                if (callArray?.contains(etId.inputContent)!!){
+                    toast("用户已在通话中")
+                    return@setOnClickListener
+                }
+                mainScope.launch() {
                     val isOnlne = queryOnlineMember(etId.inputContent)
-                    if (!isOnlne){
-                        toast("该用户不在线")
-                    }else{
-                        memberAdapter.addData(RtcMember.Factory.create(etId.inputContent))
-                        callArray?.add(etId.inputContent)
-                        val params = JSONObject()
-                        val arr = JSONArray()
-                        arr.put(mineUserId)
-                        params.put("Mode", 0)
-                        params.put("Conference", true)
-                        params.put("ChanId", channelId)
-                        callArray?.forEach{
-                            arr.put(it)
-                        }
-                        params.put("UserData", arr)
-                        val localInvitation = rtmCallManager.createLocalInvitation(etId.inputContent)
-                        localInvitation?.content = params.toString()
-                        localInvitationList?.add(localInvitation!!)
-                        rtmCallManager.sendLocalInvitation(localInvitation!!, null)
-                        dialog.doDismiss()
+                        if (!isOnlne){
+                            toast("该用户不在线")
+                        }else{
+                            memberAdapter.addData(RtcMember.Factory.create(etId.inputContent))
+                            callArray?.add(etId.inputContent)
+                            val params = JSONObject()
+                            val arr = JSONArray()
+                            arr.put(mineUserId)
+                            params.put("Mode", 0)
+                            params.put("Conference", true)
+                            params.put("ChanId", channelId)
+                            callArray?.forEach{
+                                arr.put(it)
+                            }
+                            params.put("UserData", arr)
+                            val localInvitation = rtmCallManager.createLocalInvitation(etId.inputContent)
+                            localInvitation?.content = params.toString()
+                            localInvitationList?.add(localInvitation!!)
+                            rtmCallManager.sendLocalInvitation(localInvitation!!, null)
+                            dialog.doDismiss()
                     }
+
                 }
 
 

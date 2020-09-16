@@ -124,7 +124,6 @@ public class VideoActivity extends BaseActivity  {
     private boolean isCalling = false;
 
 
-    private TextView tvRtt;
 
 
 
@@ -149,7 +148,6 @@ public class VideoActivity extends BaseActivity  {
         rl_remote_video = findViewById(R.id.rl_remote_video);
         rl_local_video = findViewById(R.id.rl_local_video);
 
-        tvRtt = findViewById(R.id.tv_rtt);
         //呼叫等待页面
         userId = CallApplication.the().getUserId();
         btnCall = findViewById(R.id.btn_call);
@@ -316,16 +314,6 @@ public class VideoActivity extends BaseActivity  {
 
     private void initializeEngine() {
             mRtcEngine = RtcEngine.create(this, RTC_APPID, mRtcEventHandler);
-
-            JSONObject jsonParams = new JSONObject();
-            try {
-                jsonParams.put("Cmd", "ConfPriCloudAddr");
-                jsonParams.put("ServerAdd", "pro.gateway.agrtc.cn");
-                jsonParams.put("Port", 6080);
-//                mRtcEngine.setParameters(jsonParams.toString());
-
-            } catch (Exception e) {
-            }
     }
 
     private void setupVideoConfig() {
@@ -500,7 +488,7 @@ public class VideoActivity extends BaseActivity  {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    tvRtt.setText("RTT:"+stats.gatewayRtt+"\n"+"txPacketLossRate:"+stats.txPacketLossRate+"\n"+"rxPacketLossRate:"+stats.rxPacketLossRate);
+                    Log.d("网络质量","RTT:"+stats.gatewayRtt+"\n"+"txPacketLossRate:"+stats.txPacketLossRate+"\n"+"rxPacketLossRate:"+stats.rxPacketLossRate);
                 }
             });
         }
