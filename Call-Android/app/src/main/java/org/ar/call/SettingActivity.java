@@ -1,10 +1,10 @@
 package org.ar.call;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,30 +12,83 @@ import com.gyf.immersionbar.ImmersionBar;
 import com.kongzue.dialog.interfaces.OnMenuItemClickListener;
 import com.kongzue.dialog.v3.BottomMenu;
 
-import org.ar.rtm.LocalInvitation;
+import org.ar.call.p2p.VideoActivity;
+import org.ar.call.multi.MultiCallActivity;
+import org.ar.call.utils.SpUtil;
 import org.ar.rtm.RemoteInvitation;
-import org.ar.rtm.RtmCallEventListener;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-public class SettingActivity extends AppCompatActivity implements RtmCallEventListener {
+public class SettingActivity extends BaseActivity  {
 
     private TextView tvXY,tvFrame;
-
+    private Button mBtnCamera,mBtnMicrophone;
+    private boolean isOpenCamera,isOpenMicrophone;
+    private boolean isP2P;
+    private LinearLayout llSettingResolution,llSettingCamera;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
+        Intent intent =getIntent();
+        isP2P =intent.getBooleanExtra("isP2P",false);
         ImmersionBar.with(this).statusBarDarkFont(true,0.2f).statusBarColor(R.color.white).init();
+        init();
+    }
+
+    private void init(){
         tvXY = findViewById(R.id.tv_xy);
         tvFrame = findViewById(R.id.tv_frame);
-        refresh();
-        CallApplication.the().getCallManager().registerCallListener(this);
+        mBtnCamera =findViewById(R.id.setting_camera);
+        mBtnMicrophone =findViewById(R.id.setting_microphone);
+        llSettingResolution =findViewById(R.id.ll_setting_resolution);
+        llSettingCamera =findViewById(R.id.ll_setting_camera);
+        if (isP2P){
+            llSettingResolution.setVisibility(View.VISIBLE);
+            llSettingCamera.setVisibility(View.GONE);
+            refresh();
+        }else {
+            llSettingResolution.setVisibility(View.GONE);
+            llSettingCamera.setVisibility(View.VISIBLE);
+            isOpenCamera =SpUtil.getBoolean("isOpenCamera",true);
+            isOpenMicrophone =SpUtil.getBoolean("isOpenMicrophone",true);
+            if (isOpenCamera){
+                mBtnCamera.setBackgroundResource(R.drawable.open);
+            }else {
+                mBtnCamera.setBackgroundResource(R.drawable.close);
+            }
+            if (isOpenMicrophone){
+                mBtnMicrophone.setBackgroundResource(R.drawable.open);
+            }else {
+                mBtnMicrophone.setBackgroundResource(R.drawable.close);
+            }
+        }
 
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        CallApplication.the().getCallManager().unregisterCallListener(this);
+    }
+
+    public void openCamera(View view){
+        if (isOpenCamera){
+            mBtnCamera.setBackgroundResource(R.drawable.close);
+        }else {
+            mBtnCamera.setBackgroundResource(R.drawable.open);
+        }
+        isOpenCamera =!isOpenCamera;
+        SpUtil.putBoolean("isOpenCamera",isOpenCamera);
+    }
+
+    public void closeMicrophone(View view){
+        if (isOpenMicrophone){
+            mBtnMicrophone.setBackgroundResource(R.drawable.close);
+        }else {
+            mBtnMicrophone.setBackgroundResource(R.drawable.open);
+        }
+        isOpenMicrophone =!isOpenMicrophone;
+        SpUtil.putBoolean("isOpenMicrophone",isOpenMicrophone);
     }
 
     private void refresh() {
@@ -84,61 +137,31 @@ public class SettingActivity extends AppCompatActivity implements RtmCallEventLi
 
     }
 
-    @Override
-    public void onLocalInvitationReceivedByPeer(LocalInvitation localInvitation) {
-
-    }
-
-    @Override
-    public void onLocalInvitationAccepted(LocalInvitation localInvitation, String s) {
-
-    }
-
-    @Override
-    public void onLocalInvitationRefused(LocalInvitation localInvitation, String s) {
-
-    }
-
-    @Override
-    public void onLocalInvitationCanceled(LocalInvitation localInvitation) {
-
-    }
-
-    @Override
-    public void onLocalInvitationFailure(LocalInvitation localInvitation, int i) {
-
-    }
 
     @Override
     public void onRemoteInvitationReceived(RemoteInvitation remoteInvitation) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Intent i = new Intent(SettingActivity.this,CallActivity.class);
-                    i.putExtra("RecCall",true);
-                    startActivity(i);
-                    finish();
+                    try {
+                        JSONObject jsonObject = new JSONObject(remoteInvitation.getContent());
+                        boolean isConference = jsonObject.getBoolean("Conference");
+                        if (!isConference){
+                            Intent i = new Intent(SettingActivity.this, VideoActivity.class);
+                            i.putExtra("RecCall",true);
+                            startActivity(i);
+                            finish();
+                        }else {
+                            Intent i = new Intent(SettingActivity.this, MultiCallActivity.class);
+                            i.putExtra("RecCall",true);
+                            startActivity(i);
+                            finish();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
     }
 
-    @Override
-    public void onRemoteInvitationAccepted(RemoteInvitation remoteInvitation) {
-
-    }
-
-    @Override
-    public void onRemoteInvitationRefused(RemoteInvitation remoteInvitation) {
-
-    }
-
-    @Override
-    public void onRemoteInvitationCanceled(RemoteInvitation remoteInvitation) {
-
-    }
-
-    @Override
-    public void onRemoteInvitationFailure(RemoteInvitation remoteInvitation, int i) {
-
-    }
 }

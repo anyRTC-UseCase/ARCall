@@ -3,4 +3,16 @@
     <color name="colorPrimary">#40A3FC</color>
     <color name="colorPrimaryDark">#40A3FC</color>
     <color name="colorAccent">#40A3FC</color>
+
+    <color name="colors_focus_bg">#ffee33</color>
+    <!--<color name="colors_normal_bg">#bdc7d8</color>-->
+    <color name="colors_normal_bg">#bdc7d8</color>
+    <color name="colors_trans_bg">#00000000</color>
+    <color name="invite_color_unfocus">#888888</color>
+    <color name="video_title">#FF232426</color>
+    <color name="tag_unfocus">#FF0D71C9</color>
+    <color name="tag_focus">#014B8D</color>
+    <color name="video_bg">#3C3C3C</color>
+    <color name="video_close_bg">#FF1C1C1C</color>
+    <color name="layout_video_bg">#B2000000</color>
 </resources>

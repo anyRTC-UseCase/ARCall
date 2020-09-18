@@ -597,3 +597,51 @@ __attribute__((visibility("default"))) @interface ARVideoFrame : NSObject
  *    // cropLeft, cropTop, cropBottom are set to a default of 0
  */
 @end
+
+/** 检测到的人脸信息
+ */
+__attribute__((visibility("default"))) @interface ARFacePositionInfo : NSObject
+
+/** 人脸在画面中的 x 坐标 (px)。以摄像头采集画面的左上角为原点，x 坐标为人脸左上角相对于原点的横向位移。
+ */
+@property (assign, nonatomic) NSInteger x;
+
+/** 人脸在画面中的 y 坐标 (px)。以摄像头采集画面的左上角为原点，y 坐标为人脸左上角相对原点的纵向位移。
+ */
+@property (assign, nonatomic) NSInteger y;
+
+/** 人脸在画面中的宽度 (px)。
+ */
+@property (assign, nonatomic) NSInteger width;
+
+/** 人脸在画面中的高度 (px)。
+ */
+@property (assign, nonatomic) NSInteger height;
+
+/** 人脸距设备屏幕的距离 (cm)。
+ */
+@property (assign, nonatomic) NSInteger distance;
+
+@end
+
+/** 频道媒体设置选项
+ */
+__attribute__((visibility("default"))) @interface ARtcChannelMediaOptions : NSObject
+/** 设置加入频道时是否自动订阅音频流：
+
+ - YES: （默认）订阅
+ - NO: 不订阅
+ 
+ 该成员功能与 muteAllRemoteAudioStreams 相同。加入频道后，你可以通过 muteAllRemoteAudioStreams 方法重新设置是否订阅频道内的远端音频流。
+ */
+@property (nonatomic, assign) BOOL autoSubscribeAudio;
+
+/** 设置加入频道是是否自动订阅视频流：
+
+ - YES: （默认）订阅
+ - NO: 不订阅
+
+ 该成员功能与 muteAllRemoteVideoStreams 相同。加入频道后，你可以通过 muteAllRemoteVideoStreams 方法重新设置是否订阅频道内的远端视频流。
+ */
+@property (nonatomic, assign) BOOL autoSubscribeVideo;
+@end

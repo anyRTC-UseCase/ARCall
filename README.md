@@ -4,10 +4,15 @@
 
 ## 项目概述
 
-ARCall 是anyRTC专为2人通话的示例项目，演示了如何通过 anyRTC云服务，并配合 anyRTC RTC SDK、anyRTC RTM SDK，快速实现呼叫邀请通话的场景。
-- 可拓展多人呼叫邀请。
+ARCall 是anyRTC模仿微信呼叫的示例项目，演示了如何通过 anyRTC云服务，并配合 anyRTC RTC SDK、anyRTC RTM SDK，快速实现呼叫邀请通话的场景。
+- 一对一视频呼叫。
+- 一对一音频呼叫。
+- 多人音视频通话，最大支持50人同时通话。
 - 可运用自采集模块，加载第三方美颜库，实现美颜贴图功能。
 - 可对接第三方推送实现推送功能。
+
+## 代码下载
+Github代码下载慢，请移步至[码云](https://gitee.com/anyRTC/ARCall)下载
 
 ### 支持场景
 
@@ -70,6 +75,11 @@ ARCall 示例项目支持以下平台和版本：
 - [iOS 运行指南](https://github.com/anyRTC-UseCase/ARCall/tree/master/Call-iOS)
 - [Web 运行指南](https://github.com/anyRTC-UseCase/ARCall/tree/master/Call-web)
 
+### 与SIP互通
+
+[SipRtcProxy](https://github.com/anyRTC-UseCase/SipRtcProxy)是anyRTC开源的sip proxy,实现了rtc与sip的互通。
+
+
 ## 常见问题
 
 详见[常见问题](https://docs.anyrtc.io/platforms/docs/platforms/FAQ/faq)。
@@ -90,13 +100,11 @@ ARCall 示例项目支持以下平台和版本：
 
 QQ咨询群：580477436
 
+ARCall技术交流群：597181019
+
 咨询邮箱：hi@dync.cc
 
 技术问题：[开发者论坛](https://bbs.anyrtc.io)
 
 获取更多帮助前往：[www.anyrtc.io](http://www.anyrtc.io)
-
-项目交流微信群,请扫描下方二维码进群
-
-![image](https://github.com/anyRTC-UseCase/ARCall/blob/master/resource/qrcode.png)
 

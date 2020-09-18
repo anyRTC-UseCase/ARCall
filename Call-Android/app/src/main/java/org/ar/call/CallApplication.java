@@ -2,11 +2,10 @@ package org.ar.call;
 
 import android.app.Application;
 
-import com.gyf.immersionbar.ImmersionBar;
 import com.kongzue.dialog.util.DialogSettings;
 import com.lzf.easyfloat.EasyFloat;
 
-import org.ar.rtc.RtcEngine;
+import org.ar.call.utils.SpUtil;
 
 
 public class CallApplication extends Application {
@@ -19,6 +18,8 @@ public class CallApplication extends Application {
 
     private CallManager callManager;
 
+    private String userId = (int)((Math.random()*9+1)*1000)+"";
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -28,6 +29,15 @@ public class CallApplication extends Application {
         DialogSettings.style = DialogSettings.STYLE.STYLE_IOS;
         SpUtil.init(this);
         EasyFloat.init(this);
+    }
+
+
+    public String getChannelId(){
+        return (int)((Math.random()*9+1)*100000000l)+"";
+    }
+
+    public String getUserId() {
+        return userId;
     }
 
     public static CallApplication the() {
