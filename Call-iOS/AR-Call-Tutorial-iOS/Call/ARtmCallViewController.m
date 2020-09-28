@@ -77,6 +77,7 @@
 - (void)initializeRtcKit:(int)mode {
     //===================== rtc 模块 =======================
     //实例化ARtcEngineKit对象
+    NSLog(@"initializeRtcKit");
     self.rtcKit = [ARtcEngineKit sharedEngineWithAppId:appID delegate:self];
     if (!mode) {
         ARVideoEncoderConfiguration *config = [[ARVideoEncoderConfiguration alloc] init];
@@ -455,7 +456,7 @@
 }
 
 - (void)dealloc {
-    NSLog(@"CallView dealloc");
+    NSLog(@"CallVc dealloc");
 }
 
 - (WMDragView *)localView {

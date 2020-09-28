@@ -929,7 +929,7 @@ typedef NS_ENUM(NSInteger, ARtmConnectionChangeReason) {
     ARtmConnectionChangeReasonBannedByServer = 7,
     
     /**
-     8: 本账号异地登陆，本地断开连接。
+     8: 本账号异地登录，本地断开连接。
      */
     ARtmConnectionChangeReasonRemoteLogin = 8,
 };

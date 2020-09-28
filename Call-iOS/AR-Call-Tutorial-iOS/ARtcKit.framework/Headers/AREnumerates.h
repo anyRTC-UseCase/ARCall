@@ -1243,7 +1243,58 @@ typedef NS_ENUM(NSInteger, ARAudioType) {
      2:音频由麦克风产生
      */
     ARAudioTypeMic = 2,
-};;
+};
 
+/** 录音音质 */
+typedef NS_ENUM(NSInteger, ARAudioRecordingQuality) {
+    /**
+     低音质。采样率为 32 KHz，录制 10 分钟的文件大小为 1.2 M 左右
+     */
+    ARAudioRecordingQualityLow = 0,
+    /**
+     中音质。采样率为 32 KHz，录制 10 分钟的文件大小为 2 M 左右
+     */
+    ARAudioRecordingQualityMedium = 1,
+    /**
+     高音质。采样率为 32 KHz，录制 10 分钟的文件大小为 3.75 M 左右
+     */
+    ARAudioRecordingQualityHigh = 2
+};
+
+/** 音频的采样率 */
+typedef NS_ENUM(NSInteger, ARAudioSampleRateType) {
+    /** 32 kHz. */
+    ARAudioSampleRateType32000 = 32000,
+    /** 44.1 kHz. */
+    ARAudioSampleRateType44100 = 44100,
+    /** 48 kHz. */
+    ARAudioSampleRateType48000 = 48000,
+};
+
+/** 导入的外部视频源状态 */
+typedef NS_ENUM(NSUInteger, ARInjectStreamStatus) {
+    /** 外部视频流导入成功 */
+    ARInjectStreamStatusStartSuccess = 0,
+    /** 外部视频流已存在 */
+    ARInjectStreamStatusStartAlreadyExists = 1,
+    /** 外部视频流导入未经授权 */
+    ARInjectStreamStatusStartUnauthorized = 2,
+    /** 导入外部视频流超时 */
+    ARInjectStreamStatusStartTimedout = 3,
+    /** 外部视频流导入失败*/
+    ARInjectStreamStatusStartFailed = 4,
+    /** 外部视频流停止导入成功 */
+    ARInjectStreamStatusStopSuccess = 5,
+    /** 未找到要停止导入的外部视频流 */
+    ARInjectStreamStatusStopNotFound = 6,
+    /** 要停止导入的外部视频流未经授权*/
+    ARInjectStreamStatusStopUnauthorized = 7,
+    /** 停止导入外部视频流超时 */
+    ARInjectStreamStatusStopTimedout = 8,
+    /** 停止导入外部视频流失败 */
+    ARInjectStreamStatusStopFailed = 9,
+    /** 导入的外部视频流被中断*/
+    ARInjectStreamStatusBroken = 10,
+};
 
 #endif /* AREnumerates_h */

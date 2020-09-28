@@ -342,6 +342,14 @@
 * -----------------------------------------------------------------------------
 */
 
+/** 本地音乐文件播放已结束回调
+
+本地用户调用 startAudioMixing 播放音乐文件音乐结束后，会触发该回调。如果调用 startAudioMixing 失败，会在 didOccurWarning 回调里，返回警告代码 ARWarningCodeAudioMixingOpenError。
+
+@param engine  ARtcEngineKit 对象。
+*/
+- (void)rtcEngineLocalAudioMixingDidFinish:(ARtcEngineKit *_Nonnull)engine;
+
 /** 本地音效文件播放已结束回调
 
  当调用 playEffect 播放音效结束后，会触发该回调。
@@ -353,7 +361,20 @@
 
 //MARK: - CDN Publisher Delegate Methods
 
-//MARK: - Inject Stream URL Delegate Methods
+//MARK: - 直播输入在线媒体流事件回调
+/**-----------------------------------------------------------------------------
+* @name 直播输入在线媒体流事件回调
+* -----------------------------------------------------------------------------
+*/
+
+/** 输入外部视频流状态回调
+
+ @param engine  ARtcEngineKit 对象
+ @param url 输入进直播的外部视频源 URL 地址
+ @param uid 用户 ID
+ @param status 详见ARInjectStreamStatus
+ */
+- (void)rtcEngine:(ARtcEngineKit *_Nonnull)engine streamInjectedStatusOfUrl:(NSString *_Nonnull)url uid:(NSString * _Nonnull)uid status:(ARInjectStreamStatus)status;
 
 //MARK: - Stream Message Delegate Methods
 
