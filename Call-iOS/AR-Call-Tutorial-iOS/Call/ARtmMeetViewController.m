@@ -486,13 +486,17 @@
     [self.videoArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         ARVideoView *videoView = (ARVideoView *)obj;
         if ([videoView.uid isEqualToString:uid]) {
-            videoView.placeholderView.hidden = YES;
+            if (videoView.videoSetting == 0){
+                videoView.placeholderView.hidden = NO;
+            } else if (videoView.videoSetting == 1) {
+                videoView.placeholderView.hidden = YES;
+            }
             ARtcVideoCanvas *videoCanvas = [[ARtcVideoCanvas alloc] init];
             videoCanvas.uid = uid;
             videoCanvas.view = videoView;
             [self.rtcKit setupRemoteVideo:videoCanvas];
             //设置订阅的视频流类型
-            [self.rtcKit setRemoteVideoStream:uid type:ARVideoStreamTypeLow];
+            [self.rtcKit setRemoteVideoStream:uid type:ARVideoStreamTypeHigh];
             *stop = YES;
         }
     }];
@@ -546,8 +550,10 @@
         ARVideoView *videoView = (ARVideoView *)obj;
         if ([videoView.uid isEqualToString:uid]) {
             if (reason == ARVideoRemoteStateReasonRemoteMuted) {
+                videoView.videoSetting = 0;
                 videoView.placeholderView.hidden = NO;
             } else if (reason == ARVideoRemoteStateReasonRemoteUnmuted) {
+                videoView.videoSetting = 1;
                 videoView.placeholderView.hidden = YES;
             }
         }
