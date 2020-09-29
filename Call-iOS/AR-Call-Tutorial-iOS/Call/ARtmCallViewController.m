@@ -413,7 +413,9 @@
         }
     }];
 }
-
+- (void)rtcEngineConnectionDidInterrupted:(ARtcEngineKit *)engine {
+      [self endCall:@"网络连接已断开"];
+}
 - (void)rtcEngine:(ARtcEngineKit *)engine didOfflineOfUid:(NSString *)uid reason:(ARUserOfflineReason)reason {
     //远端用户（通信场景）/主播（直播场景）离开当前频道回调
     [self endCall:ARtmCallStop];

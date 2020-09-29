@@ -580,9 +580,21 @@
         }
     }];
 }
-
+- (void)rtcEngine:(ARtcEngineKit *)engine connectionChangedToState:(ARConnectionStateType)state reason:(ARConnectionChangedReason)reason {
+    if (state == ARConnectionStateReconnecting) {
+        [SVProgressHUD setContainerView:self.view];
+        
+        [SVProgressHUD showImage:[UIImage imageNamed:@"icon_tip"] status:@"网络连接中断，重连中"];
+        [SVProgressHUD dismissWithDelay:10];
+        
+    } else if (state == ARConnectionStateDisconnected) {
+        [self endCall];
+    }
+}
 //MARK: - other
-
+- (void)viewWillDisappear:(BOOL)animated {
+    [SVProgressHUD setContainerView:nil];
+}
 - (UIStatusBarStyle)preferredStatusBarStyle {
     return UIStatusBarStyleLightContent;
 }
