@@ -210,6 +210,51 @@ __attribute__((visibility("default"))) @interface ARtcEngineKit : NSObject
 */
 - (ARConnectionStateType)getConnectionState;
 
+/** 开始跨频道媒体流转发。该方法可用于实现跨频道连麦等场景。
+
+ 成功调用该方法后，SDK 会触发 channelMediaRelayStateDidChange 和 didReceiveChannelMediaRelayEvent 回调，并在回调中报告当前的跨频道媒体流转发状态和事件。
+
+ 如果 channelMediaRelayStateDidChange 回调报告 ARChannelMediaRelayStateRunning(2) 和 ARChannelMediaRelayStateIdle(0)，且 didReceiveChannelMediaRelayEvent 回调报告 ARChannelMediaRelayEventSentToDestinationChannel(4)，则表示 SDK 开始在源频道和目标频道之间转发媒体流。
+ 如果 channelMediaRelayStateDidChange 回调报告 ARChannelMediaRelayStateFailure(3)，则表示跨频道媒体流转发出现异常。
+ 
+**Note**
+
+ - 请在成功加入频道后调用该方法。
+ - 该方法仅对直播场景下的主播有效。
+ - 成功调用该方法后，若你想再次调用该方法，必须先调用 stopChannelMediaRelay 方法退出当前的转发状态。
+ - 跨频道媒体流转发功能需要提交工单联系技术支持开通。
+
+ @param config 跨频道媒体流转发参数配置: ARChannelMediaRelayConfiguration 类。
+
+ @return 0方法调用成功，<0方法调用失败
+ */
+- (int)startChannelMediaRelay:(ARChannelMediaRelayConfiguration * _Nonnull)config;
+
+/** 更新媒体流转发的频道。成功开始跨频道转发媒体流后，如果你希望将流转发到多个目标频道，或退出当前的转发频道，可以调用该方法。
+
+ 成功调用该方法后，SDK 会触发 didReceiveChannelMediaRelayEvent 回调，并在回调中报告状态码 ARChannelMediaRelayEventUpdateDestinationChannel(7)。
+
+ **Note**
+
+ - 请在 startChannelMediaRelay 方法后调用该方法，更新媒体流转发的频道。
+ - 跨频道媒体流转发最多支持 4 个目标频道。如果直播间里已经有 4 个频道了，你可以在调用该方法之前，调用 ARChannelMediaRelayConfiguration 中的 removeDestinationInfoForChannelName 方法移除不需要的频道。
+ 
+ @param config 跨频道媒体流转发参数配置: ARChannelMediaRelayConfiguration 类。
+
+ @return 0方法调用成功，<0方法调用失败
+ */
+- (int)updateChannelMediaRelay:(ARChannelMediaRelayConfiguration * _Nonnull)config;
+
+/** 停止跨频道媒体流转发。一旦停止，主播会退出所有目标频道。
+
+ 成功调用该方法后，SDK 会触发 channelMediaRelayStateDidChange 回调。如果报告 ARChannelMediaRelayStateIdle(0) 和 ARChannelMediaRelayErrorNone(0)，则表示已停止转发媒体流。
+
+ Note: 如果该方法调用不成功，SDK 会触发 channelMediaRelayStateDidChange 回调，并报告状态码 ARChannelMediaRelayErrorServerNoResponse(2) 或 ARChannelMediaRelayEventUpdateDestinationChannelRefused(8)。你可以调用 leaveChannel 方法离开频道，跨频道媒体流转发会自动停止。
+ 
+ @return 0方法调用成功，<0方法调用失败
+ */
+- (int)stopChannelMediaRelay;
+
 //MARK: - 音频核心方法
 
 /**-----------------------------------------------------------------------------

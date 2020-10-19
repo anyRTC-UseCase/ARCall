@@ -1297,4 +1297,103 @@ typedef NS_ENUM(NSUInteger, ARInjectStreamStatus) {
     ARInjectStreamStatusBroken = 10,
 };
 
+/** 跨频道媒体流转发状态码
+ */
+typedef NS_ENUM(NSInteger, ARChannelMediaRelayState) {
+    /** 0: SDK 正在初始化。
+     */
+    ARChannelMediaRelayStateIdle = 0,
+    /** 1: SDK 尝试跨频道。
+     */
+    ARChannelMediaRelayStateConnecting = 1,
+    /** 2: 源频道主播成功加入目标频道。
+     */
+    ARChannelMediaRelayStateRunning = 2,
+    /** 3: 发生异常，详见 error 中提示的错误信息。
+     */
+    ARChannelMediaRelayStateFailure = 3,
+};
+
+/** 跨频道媒体流转发事件码
+ */
+typedef NS_ENUM(NSInteger, ARChannelMediaRelayEvent) {
+    /** 0: 网络中断导致用户与服务器连接断开。
+     */
+    ARChannelMediaRelayEventDisconnect = 0,
+    /** 1: 用户与服务器建立连接。
+     */
+    ARChannelMediaRelayEventConnected = 1,
+    /** 2: 用户已加入源频道。
+     */
+    ARChannelMediaRelayEventJoinedSourceChannel = 2,
+    /** 3: 用户已加入目标频道。
+     */
+    ARChannelMediaRelayEventJoinedDestinationChannel = 3,
+    /** 4: SDK 开始向目标频道发送数据包。
+     */
+    ARChannelMediaRelayEventSentToDestinationChannel = 4,
+    /** 5: 服务器收到了目标频道发送的视频流。
+     */
+    ARChannelMediaRelayEventReceivedVideoPacketFromSource = 5,
+    /** 6: 服务器收到了目标频道发送的音频流。
+     */
+    ARChannelMediaRelayEventReceivedAudioPacketFromSource = 6,
+    /** 7: 目标频道已更新。
+     */
+    ARChannelMediaRelayEventUpdateDestinationChannel = 7,
+    /** 8: 内部原因导致目标频道更新失败。
+     */
+    ARChannelMediaRelayEventUpdateDestinationChannelRefused = 8,
+    /** 9: 目标频道未发生改变，即目标频道更新失败。
+     */
+    ARChannelMediaRelayEventUpdateDestinationChannelNotChange = 9,
+    /** 10: 目标频道名为 NULL。
+     */
+    ARChannelMediaRelayEventUpdateDestinationChannelIsNil = 10,
+    /** 11: 视频属性已发送至服务器。
+     */
+    ARChannelMediaRelayEventVideoProfileUpdate = 11,
+};
+
+/** 跨频道媒体流转发出错的错误码
+ */
+typedef NS_ENUM(NSInteger, ARChannelMediaRelayError) {
+    /** 0: 一切正常。
+     */
+    ARChannelMediaRelayErrorNone = 0,
+    /** 1: 服务器回应出错。
+     */
+    ARChannelMediaRelayErrorServerErrorResponse = 1,
+    /** 2: 服务器无回应。你可以调用 leaveChannel 方法离开频道。
+     */
+    ARChannelMediaRelayErrorServerNoResponse = 2,
+    /** 3: SDK 无法获取服务，可能是因为服务器资源有限导致。
+     */
+    ARChannelMediaRelayErrorNoResourceAvailable = 3,
+    /** 4: 发起跨频道转发媒体流请求失败。
+     */
+    ARChannelMediaRelayErrorFailedJoinSourceChannel = 4,
+    /** 5: 接受跨频道转发媒体流请求失败。
+     */
+    ARChannelMediaRelayErrorFailedJoinDestinationChannel = 5,
+    /** 6: 服务器接收跨频道转发媒体流失败。
+     */
+    ARChannelMediaRelayErrorFailedPacketReceivedFromSource = 6,
+    /** 7: 服务器发送跨频道转发媒体流失败。
+     */
+    ARChannelMediaRelayErrorFailedPacketSentToDestination = 7,
+    /** 8: SDK 因网络质量不佳与服务器断开。你可以调用 leaveChannel 方法离开当前频道。
+     */
+    ARChannelMediaRelayErrorServerConnectionLost = 8,
+    /** 9: 服务器内部出错。
+     */
+    ARChannelMediaRelayErrorInternalError = 9,
+    /** 10: 源频道的 Token 已过期。
+     */
+    ARChannelMediaRelayErrorSourceTokenExpired = 10,
+    /** 11: 目标频道的 Token 已过期。
+     */
+    ARChannelMediaRelayErrorDestinationTokenExpired = 11,
+};
+
 #endif /* AREnumerates_h */

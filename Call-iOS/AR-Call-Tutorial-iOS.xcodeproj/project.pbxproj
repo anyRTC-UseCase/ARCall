@@ -8,11 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		0ED0DB8A3EDC39B5F9ED5419 /* Pods_AR_Call_Tutorial_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA097CF202F6D6C055171E6 /* Pods_AR_Call_Tutorial_iOS.framework */; };
+		634B369D253DA586008C7861 /* ARtcKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 634B3699253DA569008C7861 /* ARtcKit.framework */; };
+		634B369E253DA586008C7861 /* ARtcKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 634B3699253DA569008C7861 /* ARtcKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		634B369F253DA587008C7861 /* ARtmKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 634B369B253DA578008C7861 /* ARtmKit.framework */; };
+		634B36A0253DA587008C7861 /* ARtmKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 634B369B253DA578008C7861 /* ARtmKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		63511E4324C42240004D405B /* ARtmUserManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 63511E4224C42240004D405B /* ARtmUserManager.m */; };
-		6355B0382521BA2100CE968D /* ARtcKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6355B0352521BA1200CE968D /* ARtcKit.framework */; };
-		6355B0392521BA2100CE968D /* ARtcKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6355B0352521BA1200CE968D /* ARtcKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		6355B03A2521BA2200CE968D /* ARtmKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6355B0342521BA1100CE968D /* ARtmKit.framework */; };
-		6355B03B2521BA2200CE968D /* ARtmKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6355B0342521BA1100CE968D /* ARtmKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6357EC4E24F93480005E0C60 /* ARtmHomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6357EC4D24F93480005E0C60 /* ARtmHomeViewController.m */; };
 		636780C624C2FB8B004D5C1D /* ARtmConfigController.m in Sources */ = {isa = PBXBuildFile; fileRef = 636780C524C2FB8B004D5C1D /* ARtmConfigController.m */; };
 		6369014124F1326900958992 /* ARtmTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6369014024F1326900958992 /* ARtmTimer.m */; };
@@ -45,8 +45,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				6355B0392521BA2100CE968D /* ARtcKit.framework in Embed Frameworks */,
-				6355B03B2521BA2200CE968D /* ARtmKit.framework in Embed Frameworks */,
+				634B369E253DA586008C7861 /* ARtcKit.framework in Embed Frameworks */,
+				634B36A0253DA587008C7861 /* ARtmKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -54,10 +54,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		634B3699253DA569008C7861 /* ARtcKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ARtcKit.framework; sourceTree = "<group>"; };
+		634B369B253DA578008C7861 /* ARtmKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ARtmKit.framework; sourceTree = "<group>"; };
 		63511E4124C42240004D405B /* ARtmUserManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmUserManager.h; sourceTree = "<group>"; };
 		63511E4224C42240004D405B /* ARtmUserManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmUserManager.m; sourceTree = "<group>"; };
-		6355B0342521BA1100CE968D /* ARtmKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ARtmKit.framework; sourceTree = "<group>"; };
-		6355B0352521BA1200CE968D /* ARtcKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ARtcKit.framework; sourceTree = "<group>"; };
 		6357EC4C24F93480005E0C60 /* ARtmHomeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmHomeViewController.h; sourceTree = "<group>"; };
 		6357EC4D24F93480005E0C60 /* ARtmHomeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmHomeViewController.m; sourceTree = "<group>"; };
 		636780C424C2FB8B004D5C1D /* ARtmConfigController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmConfigController.h; sourceTree = "<group>"; };
@@ -109,9 +109,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6355B03A2521BA2200CE968D /* ARtmKit.framework in Frameworks */,
+				634B369F253DA587008C7861 /* ARtmKit.framework in Frameworks */,
+				634B369D253DA586008C7861 /* ARtcKit.framework in Frameworks */,
 				0ED0DB8A3EDC39B5F9ED5419 /* Pods_AR_Call_Tutorial_iOS.framework in Frameworks */,
-				6355B0382521BA2100CE968D /* ARtcKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -192,8 +192,8 @@
 		63CA2EF024C17971003FF0AC /* AR-Call-Tutorial-iOS */ = {
 			isa = PBXGroup;
 			children = (
-				6355B0352521BA1200CE968D /* ARtcKit.framework */,
-				6355B0342521BA1100CE968D /* ARtmKit.framework */,
+				634B3699253DA569008C7861 /* ARtcKit.framework */,
+				634B369B253DA578008C7861 /* ARtmKit.framework */,
 				63EDCF3924C5C843003AE948 /* Call */,
 				63EDCF3824C5C821003AE948 /* Tool */,
 				63EDCF3724C5C7F7003AE948 /* Base */,
@@ -544,6 +544,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/AR-Call-Tutorial-iOS",
+					"$(PROJECT_DIR)/AR-Call-Tutorial-iOS/ARtcKit",
 				);
 				GCC_PREFIX_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/PrefixHeader.pch";
 				INFOPLIST_FILE = "AR-Call-Tutorial-iOS/Info.plist";
@@ -573,6 +574,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/AR-Call-Tutorial-iOS",
+					"$(PROJECT_DIR)/AR-Call-Tutorial-iOS/ARtcKit",
 				);
 				GCC_PREFIX_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/PrefixHeader.pch";
 				INFOPLIST_FILE = "AR-Call-Tutorial-iOS/Info.plist";

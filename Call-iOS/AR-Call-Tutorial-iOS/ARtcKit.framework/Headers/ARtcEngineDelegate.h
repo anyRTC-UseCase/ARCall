@@ -422,6 +422,29 @@
 
 #endif
 
+//MARK: - 跨频道媒体流转发回调
+
+/**-----------------------------------------------------------------------------
+* @name 跨频道媒体流转发回调
+* -----------------------------------------------------------------------------
+*/
+/** 跨频道媒体流转发状态发生改变回调。
+
+ 当跨频道媒体流转发状态发生改变时，SDK 会触发该回调，并报告当前的转发状态以及相关的错误信息。
+ 
+ @param engine ARtcEngineKit 对象
+ @param state 跨频道媒体流转发状态 ARChannelMediaRelayState。
+ @param error 跨频道媒体流转发出错的错误码 ARChannelMediaRelayError。
+ */
+- (void)rtcEngine:(ARtcEngineKit * _Nonnull)engine channelMediaRelayStateDidChange:(ARChannelMediaRelayState)state error:(ARChannelMediaRelayError)error;
+
+/** 跨频道媒体流转发事件回调。
+ 
+ @param engine ARtcEngineKit 对象
+ @param event 跨频道媒体流转发事件码
+ */
+- (void)rtcEngine:(ARtcEngineKit * _Nonnull)engine didReceiveChannelMediaRelayEvent:(ARChannelMediaRelayEvent)event;
+
 //MARK: - 其它回调方法(不推荐使用)
 /**-----------------------------------------------------------------------------
 * @name 其它回调方法

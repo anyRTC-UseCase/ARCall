@@ -706,3 +706,71 @@ __attribute__((visibility("default"))) @interface ARLiveInjectStreamConfig: NSOb
  */
 +(ARLiveInjectStreamConfig *_Nonnull) defaultConfig;
 @end
+
+/** 目标频道信息
+ */
+__attribute__((visibility("default"))) @interface ARChannelMediaRelayInfo: NSObject
+/** 能加入频道的 Token。
+ */
+@property (copy, nonatomic) NSString * _Nullable token;
+/** 频道名。
+ */
+@property (copy, nonatomic) NSString * _Nullable channelName;
+/** 用户 ID。
+ */
+@property (copy, nonatomic) NSString * _Nonnull uid;
+/** 初始化 ARChannelMediaRelayInfo 类
+ 
+ @param token 能加入频道的 Token。
+ */
+- (instancetype _Nonnull)initWithToken:(NSString *_Nullable)token;
+@end
+
+/** 跨频道媒体流转发参数配置类
+
+ */
+__attribute__((visibility("default"))) @interface ARChannelMediaRelayConfiguration: NSObject
+/** 目标频道信息 ARChannelMediaRelayInfo ，包含如下成员：
+
+ - `channelName`: 目标频道的频道名。
+ - `uid`: 标识转发流到目标频道的主播 ID。取值范围为 0 到（232-1），请确保与目标频道中的所有 UID 不同。默认值为 0，表示 SDK 随机分配一个 UID。
+ - `token`: 能加入目标频道的 token。由你在 destinationInfos 中设置的 channelName 和 uid 生成。
+
+   - 如未启用 App Certificate，可直接将该参数设为默认值 nil，表示 SDK 填充 App ID。
+   - 如已启用 App Certificate，则务必填入使用 channelName 和 uid 生成的 token。
+ */
+@property (strong, nonatomic, readonly) NSDictionary<NSString *, ARChannelMediaRelayInfo *> *_Nullable destinationInfos;
+/** 源频道信息 ARChannelMediaRelayInfo ，包含如下成员：
+
+ - `channelName`: 源频道名。默认值为 nil，表示 SDK 填充当前的频道名。
+ - `uid`: 标识源频道中想要转发流的主播 ID。默认值为 0，表示 SDK 随机分配一个 uid。请确保设为 0。
+ - `token`: 能加入源频道的 token。由你在 sourceInfo 中设置的 channelName 和 uid 生成。
+
+   - 如未启用 App Certificate，可直接将该参数设为默认值 nil，表示 SDK 填充 App ID。
+   - 如已启用 App Certificate，则务必填入使用 channelName 和 uid 生成的 token，且其中的 uid 必须为 0。
+ */
+@property (strong, nonatomic) ARChannelMediaRelayInfo *_Nonnull sourceInfo;
+/** 设置目标频道信息。
+
+ @param destinationInfo  目标频道信息 ARChannelMediaRelayInfo ，包含如下成员：
+
+ - `channelName`: 目标频道的频道名。
+ - `uid`:标识转发流到目标频道的主播 ID。取值范围为 0 到（232-1），请确保与目标频道中的所有 UID 不同。默认值为 0，表示 SDK 随机分配一个 UID。
+ - `token`: 能加入目标频道的 token。由你在 destinationInfo 中设置的 channelName 和 uid 生成。
+
+   - 如未启用 App Certificate，可直接将该参数设为默认值 nil，表示 SDK 填充 App ID。
+   - 如已启用 App Certificate，则务必填入使用 channelName 和 uid 生成的 token。
+
+ @param channelName 目标频道名，该参数必填，且需与该方法 destinationInfo 参数中的 channelName 一致。
+
+ @return 0方法调用成功，<0方法调用失败
+ */
+- (BOOL)setDestinationInfo:(ARChannelMediaRelayInfo *_Nonnull)destinationInfo forChannelName:(NSString *_Nonnull)channelName;
+/** 删除目标频道。
+
+ @param channelName 想要删除的目标频道名。
+
+ @return 0方法调用成功，<0方法调用失败
+ */
+- (BOOL)removeDestinationInfoForChannelName:(NSString *_Nonnull)channelName;
+@end
