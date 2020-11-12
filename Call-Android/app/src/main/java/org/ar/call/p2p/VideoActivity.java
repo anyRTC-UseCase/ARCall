@@ -3,6 +3,7 @@ package org.ar.call.p2p;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -40,6 +41,8 @@ import com.lzf.easyfloat.interfaces.OnInvokeView;
 import com.lzf.easyfloat.interfaces.OnPermissionResult;
 import com.lzf.easyfloat.permission.PermissionUtils;
 
+import org.ar.call.AIDenoiseCallBack;
+import org.ar.call.AIDenoiseManager;
 import org.ar.call.BaseActivity;
 import org.ar.call.CallApplication;
 import org.ar.call.R;
@@ -65,6 +68,7 @@ import org.ar.rtm.SendMessageOptions;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +95,7 @@ public class VideoActivity extends BaseActivity  {
     private TextView tv_remote_audio_user;
     private Chronometer chronometer;
 
+    private AIDenoiseManager aiDenoiseManager;
 
     private RtcEngine mRtcEngine;
     private RtmClient rtmClient;
@@ -160,8 +165,28 @@ public class VideoActivity extends BaseActivity  {
         btnHangup = findViewById(R.id.btn_hangup);
         rtmClient = CallApplication.the().getCallManager().getRtmClient();
         rtmCallManager = CallApplication.the().getCallManager().getRtmCallManager();
-
-
+        aiDenoiseManager =new AIDenoiseManager(VideoActivity.this);
+        aiDenoiseManager.getInstance(VideoActivity.this).setAIDenoiseCallBack(new AIDenoiseCallBack() {
+            @Override
+            public void updateAI(int val) {
+                JSONObject jsonParams =new JSONObject();
+                if (mRtcEngine !=null){
+                    try {
+                        if (isOpenAIDenoise){
+                            jsonParams.put("Cmd","SetAudioAiNoise");
+                            jsonParams.put("Enable",val);//1 开启智能降噪 0 关闭智能降噪
+                        }else {
+                            jsonParams.put("Cmd","SetAudioAiNoise");
+                            jsonParams.put("Enable",val);//1 开启智能降噪 0 关闭智能降噪
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Log.i("TAG", "updateAI: val ="+val);
+                    mRtcEngine.setParameters(jsonParams.toString());
+                }
+            }
+        });
         isCall = !getIntent().getBooleanExtra("RecCall",false);
         if (isCall){
             localInvitation = CallApplication.the().getCallManager().getLocalInvitation();
@@ -313,7 +338,7 @@ public class VideoActivity extends BaseActivity  {
     }
 
     private void initializeEngine() {
-            mRtcEngine = RtcEngine.create(this, RTC_APPID, mRtcEventHandler);
+        mRtcEngine = RtcEngine.create(this, RTC_APPID, mRtcEventHandler);
     }
 
     private void setupVideoConfig() {

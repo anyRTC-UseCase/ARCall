@@ -26,6 +26,8 @@ import com.lzf.easyfloat.interfaces.OnPermissionResult
 import com.lzf.easyfloat.permission.PermissionUtils.checkPermission
 import com.lzf.easyfloat.permission.PermissionUtils.requestPermission
 import kotlinx.coroutines.*
+import org.ar.call.AIDenoiseCallBack
+import org.ar.call.AIDenoiseManager
 import org.ar.call.BaseActivity
 import org.ar.call.CallApplication
 import org.ar.call.R
@@ -69,6 +71,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
 
     private lateinit var memberAdapter: MemberAdapter
     private val mainScope = MainScope()
+    private lateinit var aIDenoiseManager:AIDenoiseManager
 
 
 
@@ -93,7 +96,6 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
         joinRTMChannel(channelId)
         CallApplication.the().callManager.registerChannelListener(this)
         initRTC()
-
         memberAdapter = MemberAdapter()
         rvVideo.layoutManager = GridLayoutManager(this, 3)
 
@@ -115,6 +117,24 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
                 rtmCallManager.sendLocalInvitation(localInvitation!!, null)
             }
         }
+        aIDenoiseManager = AIDenoiseManager(this).getInstance(this)
+        aIDenoiseManager.setAIDenoiseCallBack(object : AIDenoiseCallBack{
+            override fun updateAI(value: Int) {
+                val isOpenAIDenoise = SpUtil.getBoolean("isOpenAIDenoise", false)
+                val jsonparams = JSONObject()
+                if (rtcEngine !=null){
+                    if (isOpenAIDenoise){
+                        jsonparams.put("Cmd","SetAudioAiNoise")
+                        jsonparams.put("Enable",value)//1 开启智能降噪 0 关闭智能降噪
+                    }else {
+                        jsonparams.put("Cmd","SetAudioAiNoise")
+                        jsonparams.put("Enable",value)//1 开启智能降噪 0 关闭智能降噪
+                    }
+                    Log.d("ATG","updateAI ="+value)
+                    rtcEngine?.setParameters(jsonparams.toString())
+                }
+            }
+        })
 
     }
 

@@ -2,6 +2,7 @@ package org.ar.call;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 import com.gyf.immersionbar.ImmersionBar;
 import com.kongzue.dialog.interfaces.OnMenuItemClickListener;
 import com.kongzue.dialog.v3.BottomMenu;
+import com.lzf.easyfloat.EasyFloat;
 
 import org.ar.call.p2p.VideoActivity;
 import org.ar.call.multi.MultiCallActivity;
@@ -18,6 +20,8 @@ import org.ar.call.utils.SpUtil;
 import org.ar.rtm.RemoteInvitation;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Set;
 
 public class SettingActivity extends BaseActivity  {
 
@@ -27,6 +31,7 @@ public class SettingActivity extends BaseActivity  {
     private boolean isOpenCamera,isOpenMicrophone,isOpenAIDenoise;
     private boolean isP2P;
     private LinearLayout llSettingResolution,llSettingCamera;
+    private AIDenoiseManager aiDenoiseManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +50,7 @@ public class SettingActivity extends BaseActivity  {
         mBtnAIDenoise =findViewById(R.id.ai_denoise);
         llSettingResolution =findViewById(R.id.ll_setting_resolution);
         llSettingCamera =findViewById(R.id.ll_setting_camera);
+        aiDenoiseManager =new AIDenoiseManager(SettingActivity.this);
         if (isP2P){
             llSettingResolution.setVisibility(View.VISIBLE);
             llSettingCamera.setVisibility(View.GONE);
@@ -102,8 +108,15 @@ public class SettingActivity extends BaseActivity  {
     public void openDenoise(View view){
         if (isOpenAIDenoise){
             mBtnAIDenoise.setBackgroundResource(R.drawable.close);
+            if (EasyFloat.appFloatIsShow()){              
+                aiDenoiseManager.getInstance(SettingActivity.this).updateAI(0);
+            }
         }else {
             mBtnAIDenoise.setBackgroundResource(R.drawable.open);
+            Log.i("TAG", "openDenoise: "+EasyFloat.appFloatIsShow());
+            if (EasyFloat.appFloatIsShow()){
+                aiDenoiseManager.getInstance(SettingActivity.this).updateAI(1);
+            }
         }
         isOpenAIDenoise =!isOpenAIDenoise;
         SpUtil.putBoolean("isOpenAIDenoise",isOpenAIDenoise);
