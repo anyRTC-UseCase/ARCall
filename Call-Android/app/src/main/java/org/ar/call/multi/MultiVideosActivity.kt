@@ -33,11 +33,13 @@ import org.ar.call.utils.SpUtil
 import org.ar.rtc.Constants
 import org.ar.rtc.IRtcEngineEventHandler
 import org.ar.rtc.RtcEngine
+import org.ar.rtc.VideoEncoderConfiguration
 import org.ar.rtm.*
 import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlin.math.log
 
 
 class MultiVideosActivity : BaseActivity(), RtmChannelListener {
@@ -118,6 +120,11 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
 
     fun initRTC() {//初始化RTC
         rtcEngine = RtcEngine.create(this, CallApplication.RTC_APPID, rtcEvent)
+        /*val jsonparams = JSONObject()
+        jsonparams.put("Cmd","ConfPriCloudAddr")
+        jsonparams.put("ServerAdd","183.230.140.251")
+        jsonparams.put("Port",6080)
+        rtcEngine?.setParameters(jsonparams.toString())*/
         rtcEngine?.enableVideo()
         rtcEngine?.joinChannel("", channelId, "", mineUserId)
         btnSpeak.isSelected = !btnSpeak.isSelected
@@ -138,6 +145,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
                 rtcEngine?.setupLocalVideo(memberAdapter.getItem(0)?.canvas)
                 val isOpenCamera = SpUtil.getBoolean("isOpenCamera", true)
                 val isOpenAudio = SpUtil.getBoolean("isOpenMicrophone", true)
+                val isOpenAIDenoise = SpUtil.getBoolean("isOpenAIDenoise", false)
                 if (!isOpenCamera){
                     rtcEngine?.muteLocalVideoStream(true)
                     btnVideo.isSelected = true
@@ -158,9 +166,16 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
                         R.drawable.mic_open
                     })
                 }
-
+                val jsonparams = JSONObject()
+                if (isOpenAIDenoise){
+                    jsonparams.put("Cmd","SetAudioAiNoise")
+                    jsonparams.put("Enable",1)//1 开启智能降噪 0 关闭智能降噪
+                }else {
+                    jsonparams.put("Cmd","SetAudioAiNoise")
+                    jsonparams.put("Enable",0)//1 开启智能降噪 0 关闭智能降噪
+                }
+                rtcEngine?.setParameters(jsonparams.toString())
             }
-
         }
 
         override fun onFirstRemoteVideoDecoded(uid: String?, width: Int, height: Int, elapsed: Int) {

@@ -192,6 +192,11 @@ public class CallManager {
                     remoteInvitation =null;
                 }
             });
+            /*JSONObject jsonObject =new JSONObject();
+            jsonObject.put("Cmd","ConfPriCloudAddr");
+            jsonObject.put("ServerAdd","183.230.140.251");
+            jsonObject.put("Port",7080);
+            rtmClient.setParameters(jsonObject.toString());*/
         } catch (Exception e) {
             e.printStackTrace();
         }

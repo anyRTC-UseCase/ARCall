@@ -23,7 +23,8 @@ public class SettingActivity extends BaseActivity  {
 
     private TextView tvXY,tvFrame;
     private Button mBtnCamera,mBtnMicrophone;
-    private boolean isOpenCamera,isOpenMicrophone;
+    private Button mBtnAIDenoise;
+    private boolean isOpenCamera,isOpenMicrophone,isOpenAIDenoise;
     private boolean isP2P;
     private LinearLayout llSettingResolution,llSettingCamera;
     @Override
@@ -41,6 +42,7 @@ public class SettingActivity extends BaseActivity  {
         tvFrame = findViewById(R.id.tv_frame);
         mBtnCamera =findViewById(R.id.setting_camera);
         mBtnMicrophone =findViewById(R.id.setting_microphone);
+        mBtnAIDenoise =findViewById(R.id.ai_denoise);
         llSettingResolution =findViewById(R.id.ll_setting_resolution);
         llSettingCamera =findViewById(R.id.ll_setting_camera);
         if (isP2P){
@@ -62,6 +64,12 @@ public class SettingActivity extends BaseActivity  {
             }else {
                 mBtnMicrophone.setBackgroundResource(R.drawable.close);
             }
+        }
+        isOpenAIDenoise =SpUtil.getBoolean("isOpenAIDenoise",false);
+        if (isOpenAIDenoise){
+            mBtnAIDenoise.setBackgroundResource(R.drawable.open);
+        }else {
+            mBtnAIDenoise.setBackgroundResource(R.drawable.close);
         }
 
     }
@@ -89,6 +97,16 @@ public class SettingActivity extends BaseActivity  {
         }
         isOpenMicrophone =!isOpenMicrophone;
         SpUtil.putBoolean("isOpenMicrophone",isOpenMicrophone);
+    }
+
+    public void openDenoise(View view){
+        if (isOpenAIDenoise){
+            mBtnAIDenoise.setBackgroundResource(R.drawable.close);
+        }else {
+            mBtnAIDenoise.setBackgroundResource(R.drawable.open);
+        }
+        isOpenAIDenoise =!isOpenAIDenoise;
+        SpUtil.putBoolean("isOpenAIDenoise",isOpenAIDenoise);
     }
 
     private void refresh() {

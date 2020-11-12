@@ -119,7 +119,7 @@ public class VideoActivity extends BaseActivity  {
     private RemoteInvitation remoteInvitation;
     private boolean isCall = false; //true 主动呼叫 false 被呼叫
     private boolean isConference;
-
+    private boolean isOpenAIDenoise;
     private boolean isWaiting = false;
     private boolean isCalling = false;
 
@@ -337,6 +337,20 @@ public class VideoActivity extends BaseActivity  {
         }
         videoEncoderConfiguration.bitrate = 1000;
         mRtcEngine.setVideoEncoderConfiguration(videoEncoderConfiguration);
+        isOpenAIDenoise =SpUtil.getBoolean("isOpenAIDenoise",false);
+        JSONObject jsonParams =new JSONObject();
+        try {
+            if (isOpenAIDenoise){
+                jsonParams.put("Cmd","SetAudioAiNoise");
+                jsonParams.put("Enable",1);//1 开启智能降噪 0 关闭智能降噪
+            }else {
+                jsonParams.put("Cmd","SetAudioAiNoise");
+                jsonParams.put("Enable",0);//1 开启智能降噪 0 关闭智能降噪
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        mRtcEngine.setParameters(jsonParams.toString());
     }
 
     private void joinChannel() {
@@ -488,7 +502,10 @@ public class VideoActivity extends BaseActivity  {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d("网络质量","RTT:"+stats.gatewayRtt+"\n"+"txPacketLossRate:"+stats.txPacketLossRate+"\n"+"rxPacketLossRate:"+stats.rxPacketLossRate);
+                    Log.d("RtcStats",
+                            "RTT:"+stats.gatewayRtt+"\n"
+                                    +"txPacketLossRate:"+stats.txPacketLossRate+"\n"
+                                    +"rxPacketLossRate:"+stats.rxPacketLossRate);
                 }
             });
         }
