@@ -16,6 +16,9 @@
 
 //MARK: - 配置开发者信息
 
+/* AppID
+* anyRTC 为 App 开发者签发的 App ID。每个项目都应该有一个独一无二的 App ID。如果你的开发包里没有 App ID，请从anyRTC官网(https://www.anyrtc.io)申请一个新的 App ID
+*/
 static NSString *appID = <#T##NSString#>;
 
 //MARK: - ARtmKit SDK
@@ -46,6 +49,7 @@ static NSString *appID = <#T##NSString#>;
 //MARK: - Macro
 
 #define ARtmCallEndNotification @"ARtmCallEndNotification"
+#define ARtmCallNoiseNotification @"ARtmCallNoiseNotification"
 #define ARtmWindowIdentifier 1024
 
 #define SCREEN_WIDTH [UIScreen mainScreen].bounds.size.width

@@ -34,6 +34,7 @@ static UIWindow *rtmWindow_ = nil;
         userInfo.dimensions = @"480*640";
         userInfo.audio = YES;
         userInfo.video = YES;
+        userInfo.aiNoise = NO;
         [ARtmUserManager saveAccountInformation:userInfo];
     } else {
         [ARtmUserManager deleteAccountInformation];

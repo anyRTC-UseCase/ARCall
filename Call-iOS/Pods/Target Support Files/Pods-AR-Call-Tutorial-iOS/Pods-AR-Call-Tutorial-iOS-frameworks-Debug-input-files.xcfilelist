@@ -1,3 +1,5 @@
 ${PODS_ROOT}/Target Support Files/Pods-AR-Call-Tutorial-iOS/Pods-AR-Call-Tutorial-iOS-frameworks.sh
+${PODS_ROOT}/ARtcKit_iOS/ARtcKit/ARtcKit.framework
+${PODS_ROOT}/ARtmKit_iOS/ARtmKit/ARtmKit.framework
 ${BUILT_PRODUCTS_DIR}/Masonry/Masonry.framework
 ${BUILT_PRODUCTS_DIR}/SVProgressHUD/SVProgressHUD.framework

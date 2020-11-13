@@ -80,6 +80,8 @@
     
     //监听视图
     [self addObserver:self forKeyPath:@"videoArr" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:nil];
+    //监听AI降噪开关配置
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(observerNoise:) name:ARtmCallNoiseNotification object:nil];
 }
 
 - (void)initializeRtcKit {
@@ -130,6 +132,11 @@
     self.audioButton.selected = !userInfo.audio;
     self.localView.titleButton.selected = !userInfo.audio;
     self.localView.placeholderView.hidden = userInfo.video;
+    
+    if (userInfo.aiNoise) {
+        //开启AI降噪
+        [self switchNoise:YES];
+    }
 }
 
 - (void)makeRtmCall {
@@ -224,6 +231,18 @@
         default:
             break;
     }
+}
+
+- (void)observerNoise:(NSNotification *)notification {
+    //监听AI降噪开关配置
+    NSDictionary * infoDic = [notification object];
+    [self switchNoise:[[infoDic objectForKey:@"noise"] boolValue]];
+}
+
+- (void)switchNoise:(BOOL)enable {
+    //开启AI降噪
+    NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:@"SetAudioAiNoise",@"Cmd",[NSNumber numberWithInt:(int)enable],@"Enable",nil];
+    [_rtcKit setParameters:[ARCallCommon returnJSONStringWithDictionary:dic]];
 }
 
 - (void)invitationUser:(NSString *)uid {
@@ -370,18 +389,15 @@
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationReceivedByPeer:(ARtmLocalInvitation * _Nonnull)localInvitation {
     //被叫已收到呼叫邀请
-    NSLog(@"%@",ARtmReceivedInvitationByPeer);
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationAccepted:(ARtmLocalInvitation * _Nonnull)localInvitation withResponse:(NSString * _Nullable) response {
     //被叫已接受呼叫邀请
-    NSLog(@"%@",ARtmAcceptedInvitation);
     [ARCallCommon playMusic:NO];
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationRefused:(ARtmLocalInvitation * _Nonnull)localInvitation withResponse:(NSString * _Nullable) response {
     //被叫已拒绝呼叫邀请
-    NSLog(@"localInvitationRefused");
     [self.videoArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         ARVideoView *videoView = (ARVideoView *)obj;
         if ([videoView.uid isEqualToString:localInvitation.calleeId]) {
@@ -402,12 +418,10 @@
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationCanceled:(ARtmLocalInvitation * _Nonnull)localInvitation {
     //呼叫邀请已被取消
-    NSLog(@"%@",ARtmCanceledInvitation);
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationFailure:(ARtmLocalInvitation * _Nonnull)localInvitation errorCode:(ARtmLocalInvitationErrorCode)errorCode {
     //呼叫邀请发送失败
-    NSLog(@"localInvitationFailure");
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationReceived:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
@@ -424,7 +438,6 @@
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationRefused:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
     //拒绝呼叫邀请成功
-    NSLog(@"%@",ARtmRefusedInvitation);
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationAccepted:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
@@ -433,7 +446,6 @@
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationCanceled:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
     //主叫已取消呼叫邀请
-    NSLog(@"%@",ARtmRemoteCanceledInvitation);
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationFailure:(ARtmRemoteInvitation * _Nonnull)remoteInvitation errorCode:(ARtmRemoteInvitationErrorCode) errorCode {
@@ -444,7 +456,6 @@
 
 - (void)channel:(ARtmChannel * _Nonnull)channel memberJoined:(ARtmMember * _Nonnull)member {
     //远端用户加入频道回调
-    NSLog(@"memberJoined uid == %@",member.uid);
     if (![self.rtmCallArr containsObject:member.uid]) {
         [self.rtmCallArr addObject:member.uid];
         [self createVideoView:member.uid];
@@ -461,7 +472,6 @@
 
 - (void)channel:(ARtmChannel * _Nonnull)channel memberLeft:(ARtmMember * _Nonnull)member {
     //频道成员离开频道回调
-    NSLog(@"memberLeft");
     [self.videoArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         ARVideoView *videoView = (ARVideoView *)obj;
         if ([videoView.uid isEqualToString:member.uid]) {
@@ -565,7 +575,6 @@
     [ARCallCommon playMusic:NO];
     [self.videoArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         ARVideoView *videoView = (ARVideoView *)obj;
-        NSLog(@"videoView == %@ uid == %@",videoView.uid,uid);
         if ([videoView.uid isEqualToString:uid]) {
             videoView.loadingView.hidden = YES;
             *stop = YES;
@@ -606,9 +615,9 @@
 }
 
 - (void)dealloc {
+    [NSNotificationCenter.defaultCenter removeObserver:self];
     NSLog(@"Meet dealloc");
 }
-
 
 
 @end

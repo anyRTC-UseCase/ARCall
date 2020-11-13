@@ -19,6 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString * uid;
 @property (nonatomic, assign) BOOL video;
 @property (nonatomic, assign) BOOL audio;
+/** AI降噪，默认关闭 */
+@property (nonatomic, assign) BOOL aiNoise;
 
 @end
 

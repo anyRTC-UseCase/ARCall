@@ -16,6 +16,7 @@
     [aCoder encodeInteger:self.frameRate forKey:@"frameRate"];
     [aCoder encodeBool:self.video forKey:@"video"];
     [aCoder encodeBool:self.audio forKey:@"audio"];
+    [aCoder encodeBool:self.aiNoise forKey:@"aiNoise"];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder{
@@ -25,6 +26,7 @@
         self.frameRate = [aDecoder decodeIntegerForKey:@"frameRate"];
         self.video = [aDecoder decodeBoolForKey:@"video"];
         self.audio = [aDecoder decodeBoolForKey:@"audio"];
+        self.aiNoise = [aDecoder decodeBoolForKey:@"aiNoise"];
     }
     return self;
 }
