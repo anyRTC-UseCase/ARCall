@@ -18,6 +18,7 @@ import com.yanzhenjie.permission.runtime.Permission;
 import org.ar.call.p2p.CallActivity;
 import org.ar.call.p2p.VideoActivity;
 import org.ar.call.multi.MultiCallActivity;
+import org.ar.call.utils.RTManager;
 import org.ar.rtm.ErrorInfo;
 import org.ar.rtm.RemoteInvitation;
 import org.ar.rtm.ResultCallback;
@@ -41,7 +42,7 @@ public class MainActivity extends BaseActivity{
         llCallType = findViewById(R.id.ll_call_type);
 
         tvUser = findViewById(R.id.tv_user);
-        userId = CallApplication.the().getUserId();
+        userId = CallApp.Companion.getCallApp().getUserId();
         tvUser.setText("您的呼叫ID:"+userId);
         if (!AndPermission.hasPermissions(this,Permission.RECORD_AUDIO,Permission.CAMERA,Permission.WRITE_EXTERNAL_STORAGE,Permission.READ_EXTERNAL_STORAGE)){
             AndPermission.with(this)
@@ -69,7 +70,7 @@ public class MainActivity extends BaseActivity{
     }
 
     public void Login(boolean needTip) {
-        CallApplication.the().getCallManager().getRtmClient().login("", userId, new ResultCallback<Void>() {
+        RTManager.INSTANCE.getRtmClient().login("", userId, new ResultCallback<Void>() {
             @Override
             public void onSuccess(Void var1) {
                 runOnUiThread(new Runnable() {
@@ -108,7 +109,7 @@ public class MainActivity extends BaseActivity{
                 } )
                 .setOnOkButtonClickListener((baseDialog, v) -> {
                     baseDialog.doDismiss();
-                    CallApplication.the().ReleaseAll();
+                    RTManager.INSTANCE.getRtmClient().release();
                     System.exit(0);
                     finish();
                     return true;

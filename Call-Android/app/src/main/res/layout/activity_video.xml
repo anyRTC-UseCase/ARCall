@@ -406,9 +406,8 @@
             android:id="@+id/btn_call_wait_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="CallWaitSmall"
-            android:visibility="gone"
             android:padding="@dimen/dp_20"
+            android:visibility="gone"
             android:background="@null"
             android:src="@drawable/img_small"
             ></ImageButton>

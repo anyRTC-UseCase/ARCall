@@ -6,7 +6,7 @@ import com.kongzue.dialog.interfaces.OnDismissListener;
 import com.kongzue.dialog.v3.MessageDialog;
 import com.kongzue.dialog.v3.TipDialog;
 
-import org.ar.call.p2p.CallActivity;
+import org.ar.call.utils.RTManager;
 import org.ar.rtm.LocalInvitation;
 import org.ar.rtm.RemoteInvitation;
 import org.ar.rtm.RtmCallEventListener;
@@ -32,24 +32,24 @@ public  abstract class BaseActivity extends AppCompatActivity implements RtmClie
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         needUnRegister = true;
-        CallApplication.the().getCallManager().registerListener(this);
-        CallApplication.the().getCallManager().registerCallListener(this);
+        RTManager.INSTANCE.registerRtmEvent(this);
+        RTManager.INSTANCE.registerCallListener(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        CallApplication.the().getCallManager().registerListener(this);
-        CallApplication.the().getCallManager().registerCallListener(this);
+        RTManager.INSTANCE.registerRtmEvent(this);
+        RTManager.INSTANCE.registerCallListener(this);
     }
 
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        if (CallApplication.the().getCallManager().getRemoteInvitation()!=null){
+        if ( RTManager.INSTANCE.getRemoteInvitation()!=null){
             //退到后台 如果有人呼叫 回到页面重新显示
-            onRemoteInvitationReceived(CallApplication.the().getCallManager().getRemoteInvitation());
+            onRemoteInvitationReceived( RTManager.INSTANCE.getRemoteInvitation());
         }
     }
 
@@ -57,8 +57,8 @@ public  abstract class BaseActivity extends AppCompatActivity implements RtmClie
     protected void onStop() {
         super.onStop();
         if (needUnRegister) {
-            CallApplication.the().getCallManager().unregisterListener(this);
-            CallApplication.the().getCallManager().unregisterCallListener(this);
+            RTManager.INSTANCE.unRegisterRtmEvent(this);
+            RTManager.INSTANCE.unRegisterCallListener(this);
         }
     }
 

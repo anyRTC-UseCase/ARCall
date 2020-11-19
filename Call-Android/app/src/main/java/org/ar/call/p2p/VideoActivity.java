@@ -2,15 +2,10 @@ package org.ar.call.p2p;
 
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
 import android.media.MediaPlayer;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -26,9 +21,8 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
+
 import androidx.collection.ArraySet;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.gyf.immersionbar.ImmersionBar;
 import com.kongzue.dialog.v3.MessageDialog;
@@ -40,11 +34,14 @@ import com.lzf.easyfloat.interfaces.OnInvokeView;
 import com.lzf.easyfloat.interfaces.OnPermissionResult;
 import com.lzf.easyfloat.permission.PermissionUtils;
 
+import org.ar.call.AIDenoiseNotify;
 import org.ar.call.BaseActivity;
-import org.ar.call.CallApplication;
+import org.ar.call.BuildConfig;
+import org.ar.call.CallApp;
 import org.ar.call.R;
 import org.ar.call.utils.Constans;
 import org.ar.call.utils.DensityUtil;
+import org.ar.call.utils.RTManager;
 import org.ar.call.utils.SpUtil;
 import org.ar.call.weight.DragViewLayout;
 import org.ar.rtc.Constants;
@@ -56,23 +53,18 @@ import org.ar.rtm.ErrorInfo;
 import org.ar.rtm.LocalInvitation;
 import org.ar.rtm.RemoteInvitation;
 import org.ar.rtm.ResultCallback;
-import org.ar.rtm.RtmCallEventListener;
 import org.ar.rtm.RtmCallManager;
 import org.ar.rtm.RtmClient;
-import org.ar.rtm.RtmClientListener;
 import org.ar.rtm.RtmMessage;
 import org.ar.rtm.SendMessageOptions;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.ar.call.CallApplication.RTC_APPID;
-
-public class VideoActivity extends BaseActivity  {
+public class VideoActivity extends BaseActivity implements AIDenoiseNotify.DenoiseNotifyCallBack {
 
     private FrameLayout flVideoGroup;
     private Button ibtnAudio, ibtnVideo, ibtnSpeak, ibtnSwitch;
@@ -132,6 +124,7 @@ public class VideoActivity extends BaseActivity  {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_video);
+        AIDenoiseNotify.INSTANCE.setCallBack(this);
         ImmersionBar.with(this).statusBarDarkFont(false, 0.2f).keyboardEnable(true).init();
         ibtnAudio = findViewById(R.id.ibtn_audio);
         ibtnVideo = findViewById(R.id.ibtn_video);
@@ -149,7 +142,7 @@ public class VideoActivity extends BaseActivity  {
         rl_local_video = findViewById(R.id.rl_local_video);
 
         //呼叫等待页面
-        userId = CallApplication.the().getUserId();
+        userId = CallApp.Companion.getCallApp().getUserId();
         btnCall = findViewById(R.id.btn_call);
         btnSwitchAudio = findViewById(R.id.btn_switch_audio);
         rl_video_preview = findViewById(R.id.rl_video_preview);
@@ -158,18 +151,18 @@ public class VideoActivity extends BaseActivity  {
         tvState = findViewById(R.id.tv_state);
         btnAccept = findViewById(R.id.btn_accept);
         btnHangup = findViewById(R.id.btn_hangup);
-        rtmClient = CallApplication.the().getCallManager().getRtmClient();
-        rtmCallManager = CallApplication.the().getCallManager().getRtmCallManager();
+        rtmClient =  RTManager.INSTANCE.getRtmClient();
+        rtmCallManager =  RTManager.INSTANCE.getRtmCallManager();
 
 
         isCall = !getIntent().getBooleanExtra("RecCall",false);
         if (isCall){
-            localInvitation = CallApplication.the().getCallManager().getLocalInvitation();
+            localInvitation =  RTManager.INSTANCE.getLocalInvitation();
             try {
                 JSONObject jsonObject = new JSONObject(localInvitation.getContent());
                 callMode = jsonObject.getInt("Mode");
                 channelId = jsonObject.getString("ChanId");
-                userId = CallApplication.the().getUserId();
+                userId = CallApp.Companion.getCallApp().getUserId();
                 remoteUserId = localInvitation.getCalleeId();
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -193,12 +186,12 @@ public class VideoActivity extends BaseActivity  {
 
 
         }else {
-            remoteInvitation = CallApplication.the().getCallManager().getRemoteInvitation();
+            remoteInvitation =  RTManager.INSTANCE.getRemoteInvitation();
             try {
                 JSONObject jsonObject = new JSONObject(remoteInvitation.getContent());
                 callMode = jsonObject.getInt("Mode");
                 channelId = jsonObject.getString("ChanId");
-                userId = CallApplication.the().getUserId();
+                userId = CallApp.Companion.getCallApp().getUserId();
                 remoteUserId = remoteInvitation.getCallerId();
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -313,7 +306,20 @@ public class VideoActivity extends BaseActivity  {
     }
 
     private void initializeEngine() {
-            mRtcEngine = RtcEngine.create(this, RTC_APPID, mRtcEventHandler);
+        mRtcEngine = RtcEngine.create(this, BuildConfig.APPID, mRtcEventHandler);
+        //AI智能降噪
+        boolean isOpen = SpUtil.getBoolean(Constans.OPEN_DENOISE);
+        if (isOpen){
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("Cmd","SetAudioAiNoise");
+                jsonObject.put("Enable",1);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            mRtcEngine.setParameters(jsonObject.toString());
+        }
+
     }
 
     private void setupVideoConfig() {
@@ -337,6 +343,7 @@ public class VideoActivity extends BaseActivity  {
         }
         videoEncoderConfiguration.bitrate = 1000;
         mRtcEngine.setVideoEncoderConfiguration(videoEncoderConfiguration);
+        mRtcEngine.setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY , Constants.AUDIO_SCENARIO_GAME_STREAMING);
     }
 
     private void joinChannel() {
@@ -488,7 +495,10 @@ public class VideoActivity extends BaseActivity  {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d("网络质量","RTT:"+stats.gatewayRtt+"\n"+"txPacketLossRate:"+stats.txPacketLossRate+"\n"+"rxPacketLossRate:"+stats.rxPacketLossRate);
+                    Log.d("RtcStats",
+                            "RTT:"+stats.gatewayRtt+"\n"
+                                    +"txPacketLossRate:"+stats.txPacketLossRate+"\n"
+                                    +"rxPacketLossRate:"+stats.rxPacketLossRate);
                 }
             });
         }
@@ -560,29 +570,14 @@ public class VideoActivity extends BaseActivity  {
             });
             return;
         }
-        moveTaskToBack(true);
+        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        activityManager.moveTaskToFront(CallApp.Companion.getCallApp().getP2pMainActivityTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
         isSmall = true;
-        rl_local_video.removeViewAt(1);
         rl_remote_video.removeViewAt(1);
         showFloatWindow();
 
     }
 
-    @TargetApi(11)
-    protected void moveToFront() {
-        if (Build.VERSION.SDK_INT >= 11) { // honeycomb
-            ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-            List<ActivityManager.RunningTaskInfo> recentTasks = manager.getRunningTasks(Integer.MAX_VALUE);
-            for (int i = 0; i < recentTasks.size(); i++) {
-                // bring to front
-                if (recentTasks.get(i).baseActivity.toShortString().indexOf("org.ar.call.p2p.VideoActivity") > -1) {
-                    manager.moveTaskToFront(recentTasks.get(i).id, ActivityManager.MOVE_TASK_WITH_HOME);
-                }
-            }
-
-        }
-
-    }
 
 
     public void showFloatWindow() {
@@ -604,18 +599,18 @@ public class VideoActivity extends BaseActivity  {
                             public void onClick(View v) {
                                 EasyFloat.dismissAppFloat();
                                 isSmall = false;
-                                if (Build.VERSION.SDK_INT >= 29) {
-                                    startActivity(new Intent(VideoActivity.this, VideoActivity.class));
-                                } else {
-                                    moveToFront();
+                                if (CallApp.Companion.getCallApp().getP2pMeetingActivityTaskId() == -1) {
+                                   return;
                                 }
+                                ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+                                activityManager.moveTaskToFront(CallApp.Companion.getCallApp().getP2pMainActivityTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
+                                activityManager.moveTaskToFront(CallApp.Companion.getCallApp().getP2pMeetingActivityTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
                                 if (rlVideo.getLastLeft() != -1) {
                                     RelativeLayout.MarginLayoutParams marginLayoutParams = (RelativeLayout.MarginLayoutParams) rl_local_video.getLayoutParams();
                                     marginLayoutParams.leftMargin = rlVideo.getLastLeft();
                                     marginLayoutParams.topMargin = rlVideo.getLastTop();
                                     rl_local_video.setLayoutParams(marginLayoutParams);
                                 }
-                                setupLocalVideo();
                                 setupRemoteVideo(remoteVideoId);
                             }
                         });
@@ -686,8 +681,9 @@ public class VideoActivity extends BaseActivity  {
         stopRing();
         isWaiting = false;
         isCalling = false;
-        CallApplication.the().getCallManager().unregisterCallListener(this);
-        CallApplication.the().getCallManager().unregisterListener(this);
+        AIDenoiseNotify.INSTANCE.setCallBack(null);
+        RTManager.INSTANCE.unRegisterCallListener(this);
+        RTManager.INSTANCE.unRegisterRtmEvent(this);
         if (callMode==Constans.AUDIO_MODE&&chronometer!=null){
             chronometer.stop();
         }
@@ -1018,7 +1014,8 @@ public class VideoActivity extends BaseActivity  {
             });
             return;
         }
-        moveTaskToBack(true);
+        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        activityManager.moveTaskToFront(CallApp.Companion.getCallApp().getP2pMainActivityTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
         isSmall = true;
             EasyFloat.with(this)
                     .setShowPattern(ShowPattern.FOREGROUND)
@@ -1038,13 +1035,12 @@ public class VideoActivity extends BaseActivity  {
                                     EasyFloat.dismissAppFloat();
                                     isSmall = false;
                                     chr.stop();
-                                    if (Build.VERSION.SDK_INT >= 29) {
-                                        startActivity(new Intent(VideoActivity.this, VideoActivity.class));
-                                    } else {
-                                        moveToFront();
+                                    if (CallApp.Companion.getCallApp().getP2pMeetingActivityTaskId() == -1) {
+                                        return;
                                     }
-
-
+                                    ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+                                    activityManager.moveTaskToFront(CallApp.Companion.getCallApp().getP2pMainActivityTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
+                                    activityManager.moveTaskToFront(CallApp.Companion.getCallApp().getP2pMeetingActivityTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
                                 }
                             });
 
@@ -1139,28 +1135,9 @@ public class VideoActivity extends BaseActivity  {
 
     public void HangUp(View view) {
         if (isCall) {
-            rtmCallManager.cancelLocalInvitation(localInvitation, new ResultCallback<Void>() {
-                @Override
-                public void onSuccess(Void var1) {
-
-                }
-
-                @Override
-                public void onFailure(ErrorInfo var1) {
-                }
-            });
+            rtmCallManager.cancelLocalInvitation(localInvitation, null);
         } else {
-            rtmCallManager.refuseRemoteInvitation(remoteInvitation, new ResultCallback<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-
-                }
-
-                @Override
-                public void onFailure(ErrorInfo errorInfo) {
-
-                }
-            });
+            rtmCallManager.refuseRemoteInvitation(remoteInvitation, null);
         }
     }
 
@@ -1249,7 +1226,9 @@ public class VideoActivity extends BaseActivity  {
             });
             return;
         }
-        moveTaskToBack(true);
+        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        activityManager.moveTaskToFront(CallApp.Companion.getCallApp().getP2pMainActivityTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
+
         EasyFloat.with(this)
                 .setShowPattern(ShowPattern.FOREGROUND)
                 .setDragEnable(true)
@@ -1259,19 +1238,16 @@ public class VideoActivity extends BaseActivity  {
                     @Override
                     public void invoke(View view) {
                         final RelativeLayout rlRoot = view.findViewById(R.id.rl_root);
-
-
                         rlRoot.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 EasyFloat.dismissAppFloat();
-                                if (Build.VERSION.SDK_INT >= 29) {
-                                    startActivity(new Intent(VideoActivity.this, VideoActivity.class));
-                                } else {
-                                    moveToFront();
+                                if (CallApp.Companion.getCallApp().getP2pMainActivityTaskId() == -1) {
+                                    return;
                                 }
-
-
+                                ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+                                activityManager.moveTaskToFront(CallApp.Companion.getCallApp().getP2pMainActivityTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
+                                activityManager.moveTaskToFront(CallApp.Companion.getCallApp().getP2pMeetingActivityTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
                             }
                         });
 
@@ -1318,4 +1294,18 @@ public class VideoActivity extends BaseActivity  {
     protected void onStop() {//单独处理这个页面
         super.onStop();
     }
+
+    @Override
+    public void openDeNoise(int isOpen) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("Cmd","SetAudioAiNoise");
+            jsonObject.put("Enable",isOpen);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        mRtcEngine.setParameters(jsonObject.toString());
+    }
+
+
 }

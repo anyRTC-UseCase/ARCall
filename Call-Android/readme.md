@@ -2,7 +2,7 @@
 
 1. 如果你还没有注册开发者账号，请先注册[开发者账号](https://console.anyrtc.io/signin)
 2. 注册开发者账号后，请在后台创建一个 **AppID**
-3. 将 AppId 填入本项目中的 CallApplication类中即可
+3. 将 AppId 填入本项目中的App/build.gradle文件中即可
 4. 本项目最低支持 Android 4.4（API 19）CPU架构支持armeabi-v7a，arm64-v8a
 5. 请使用真机运行该项目
 

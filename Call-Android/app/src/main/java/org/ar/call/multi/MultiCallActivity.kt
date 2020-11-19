@@ -18,14 +18,14 @@ import com.kongzue.dialog.v3.MessageDialog
 import com.lzf.easyfloat.EasyFloat
 import com.tuo.customview.VerificationCodeView
 import com.tuo.customview.VerificationCodeView.InputCompleteListener
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import org.ar.call.BaseActivity
-import org.ar.call.CallApplication
+import org.ar.call.*
 import org.ar.call.R
-import org.ar.call.SettingActivity
 import org.ar.call.p2p.VideoActivity
+import org.ar.call.utils.RTManager
 import org.ar.rtm.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -51,12 +51,12 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
     private lateinit var tvCallState : TextView
 
 
-    private val mineUserId = CallApplication.the().userId
+    private val mineUserId = CallApp.callApp.userId
 
     private val mainScope = MainScope()
-    private val rtmClient = CallApplication.the().callManager.rtmClient
+    private val rtmClient = RTManager.rtmClient
     private var rtmChannel: RtmChannel? = null
-    private val rtmCallManager = CallApplication.the().callManager.rtmCallManager
+    private val rtmCallManager = RTManager.rtmCallManager
 
     private var isWaiting = false//是否在呼叫响铃页面
     private var remoteInvitation:RemoteInvitation? =null//主叫的相关对象
@@ -66,7 +66,7 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_multicall)
         ImmersionBar.with(this).statusBarDarkFont(false, 0.2f).keyboardEnable(false).init()
-        CallApplication.the().callManager.registerChannelListener(this)
+        RTManager.registerChannelEvent(this)
         tagAdapter = TagAdapter()
         tagAdapter.setNewData(tagList)
         tagAdapter.onItemChildClickListener = this
@@ -100,7 +100,7 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
         //从其他页面跳过来的
         val isRecCall = intent.getBooleanExtra("RecCall", false)
         if (isRecCall) {
-            remoteInvitation = CallApplication.the().callManager.remoteInvitation
+            remoteInvitation = RTManager.remoteInvitation
             val remoteBean = Gson().fromJson(remoteInvitation?.content, MultiUserBean::class.java)
             calledArray = remoteBean.userData as ArrayList<String>
             calledArray.remove(mineUserId)
@@ -152,12 +152,12 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
             toast("请输入要呼叫的ID")
             return
         }
-      mainScope.launch {
+        mainScope.launch {
           val onlineMember  = queryOnlineMember()
           if (onlineMember.size == 0){
               toast("您邀请的用户都不在线")
           }else{
-              val channelId = CallApplication.the().channelId
+              val channelId = CallApp.callApp.getChannelId()
               val params = JSONObject()
               val callArray = JSONArray()
               callArray.put(mineUserId)
@@ -168,24 +168,24 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
                   callArray.put(it)
               }
               params.put("UserData", callArray)
-                startActivity(Intent(this@MultiCallActivity, MultiVideosActivity::class.java).apply {
-                    putExtra("callArray", onlineMember)
-                    putExtra("channelId", channelId)
-                    putExtra("content", params.toString())
-                    putExtra("isCall", true)
-                })
+              Intent(this@MultiCallActivity, MultiVideosActivity::class.java).let {
+                    it.putExtra("callArray", onlineMember)
+                  it.putExtra("channelId", channelId)
+                  it.putExtra("content", params.toString())
+                  it.putExtra("isCall", true)
+                  startActivity(it)
+                }
               tagList.clear()
               tagAdapter.notifyDataSetChanged()
 
           }
 
       }
-
     }
 
     suspend fun queryOnlineMember(): ArrayList<String> = suspendCoroutine{ continuation ->
         val onlineArray = arrayListOf<String>()
-        rtmClient.queryPeersOnlineStatus(tagList.toSet(), object : ResultCallback<MutableMap<String, Boolean>> {
+        rtmClient?.queryPeersOnlineStatus(tagList.toSet(), object : ResultCallback<MutableMap<String, Boolean>> {
             override fun onSuccess(var1: MutableMap<String, Boolean>?) {
                 var1?.forEach {
                     if (it.value) {
@@ -204,12 +204,12 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
 
 
     fun HangUp(view: View) {
-        rtmCallManager.refuseRemoteInvitation(remoteInvitation!!, null)
+        rtmCallManager?.refuseRemoteInvitation(remoteInvitation!!, null)
         showInputLayout(true)
     }
 
     fun Accept(view: View) {
-        rtmCallManager.acceptRemoteInvitation(remoteInvitation!!, null)
+        rtmCallManager?.acceptRemoteInvitation(remoteInvitation!!, null)
         startActivity(Intent(this@MultiCallActivity, MultiVideosActivity::class.java).apply {
             putExtra("callArray", calledArray)
             putExtra("channelId", channelId)
@@ -223,7 +223,7 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
     }
 
     private fun joinRTMChannel(channelId: String){
-        rtmChannel = CallApplication.the().callManager.createChannel(channelId)
+        rtmChannel = RTManager.createChannel(channelId)
         rtmChannel?.join(null)
     }
 
@@ -250,7 +250,7 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
         tvCallUserArr.text = ""
         rlWaitLayout.visibility = View.GONE
         if (needReleaseChannel) {
-            CallApplication.the().callManager.releaseChannel()
+            RTManager.releaseChannel()
         }
 
     }
@@ -279,7 +279,7 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
                 }
                 remote?.response = param as String
                 remote?.let {
-                    rtmCallManager.refuseRemoteInvitation(it, null)
+                    rtmCallManager?.refuseRemoteInvitation(it, null)
                 }
             }else{
                 if(JSONObject(remote?.content).getBoolean("Conference")){
@@ -314,7 +314,7 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
 
     override fun onDestroy() {
         super.onDestroy()
-        CallApplication.the().callManager.unregisterChannelListener(this)
+        RTManager.unRegisterChannelEvent(this)
         mainScope.cancel()
     }
 
@@ -356,7 +356,7 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
        if (keyCode == KeyEvent.KEYCODE_BACK){
            if (isWaiting){
-               rtmCallManager.refuseRemoteInvitation(remoteInvitation!!, null)
+               rtmCallManager?.refuseRemoteInvitation(remoteInvitation!!, null)
                showInputLayout(true)
            }else{
                finish()

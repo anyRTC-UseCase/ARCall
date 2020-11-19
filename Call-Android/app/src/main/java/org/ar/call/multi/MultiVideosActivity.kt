@@ -1,13 +1,10 @@
 package org.ar.call.multi
 
-import android.annotation.TargetApi
 import android.app.ActivityManager
-import android.content.Intent
+import android.content.Context
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
-import android.os.Looper
-import android.util.Log
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
@@ -25,10 +22,15 @@ import com.lzf.easyfloat.interfaces.OnInvokeView
 import com.lzf.easyfloat.interfaces.OnPermissionResult
 import com.lzf.easyfloat.permission.PermissionUtils.checkPermission
 import com.lzf.easyfloat.permission.PermissionUtils.requestPermission
-import kotlinx.coroutines.*
-import org.ar.call.BaseActivity
-import org.ar.call.CallApplication
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import org.ar.call.*
+import org.ar.call.AIDenoiseNotify.callBack
+import org.ar.call.BuildConfig
 import org.ar.call.R
+import org.ar.call.utils.Constans
+import org.ar.call.utils.RTManager
 import org.ar.call.utils.SpUtil
 import org.ar.rtc.Constants
 import org.ar.rtc.IRtcEngineEventHandler
@@ -40,9 +42,9 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 
-class MultiVideosActivity : BaseActivity(), RtmChannelListener {
+class MultiVideosActivity : BaseActivity(), RtmChannelListener, AIDenoiseNotify.DenoiseNotifyCallBack {
 
-    private var player:MediaPlayer? =null
+    private var player: MediaPlayer? = null
     private lateinit var rvVideo: RecyclerView
     private lateinit var tvWaiting: TextView
     private lateinit var btnInvite: ImageView
@@ -54,20 +56,19 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
     private lateinit var chronometer: Chronometer
 
 
-    private val mineUserId = CallApplication.the().userId
+    private val mineUserId =CallApp.callApp.userId
     private var callArray: ArrayList<String>? = null
     private var channelId: String = ""
     private var isCall: Boolean = false
 
     private var rtcEngine: RtcEngine? = null
     private var rtmChannel: RtmChannel? = null
-    private val rtmClient = CallApplication.the().callManager.rtmClient
-    private val rtmCallManager = CallApplication.the().callManager.rtmCallManager
+    private val rtmClient = RTManager.rtmClient
+    private val rtmCallManager = RTManager.rtmCallManager
     private val localInvitationList: ArrayList<LocalInvitation>? = ArrayList() //主叫需要呼叫的
 
     private lateinit var memberAdapter: MemberAdapter
     private val mainScope = MainScope()
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,6 +76,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContentView(R.layout.activity_multi_videos)
         ImmersionBar.with(this).statusBarColor(R.color.video_title).statusBarDarkFont(false, 0.2f).keyboardEnable(true).init()
+        AIDenoiseNotify.callBack = this
         rvVideo = findViewById(R.id.rv_video)
         btnInvite = findViewById(R.id.btn_invite)
         btnAudio = findViewById(R.id.btn_audio)
@@ -89,7 +91,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
         channelId = intent.getStringExtra("channelId")
         isCall = intent.getBooleanExtra("isCall", false)
         joinRTMChannel(channelId)
-        CallApplication.the().callManager.registerChannelListener(this)
+        RTManager.registerChannelEvent(this)
         initRTC()
 
         memberAdapter = MemberAdapter()
@@ -107,17 +109,25 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
             if (isCall) {//如果是主叫 呼叫所有人
                 startRing()
                 val content = intent.getStringExtra("content")
-                val localInvitation = rtmCallManager.createLocalInvitation(it)
+                val localInvitation = rtmCallManager?.createLocalInvitation(it)
                 localInvitation?.content = content
                 localInvitationList?.add(localInvitation!!)
-                rtmCallManager.sendLocalInvitation(localInvitation!!, null)
+                rtmCallManager?.sendLocalInvitation(localInvitation!!, null)
             }
         }
 
     }
 
     fun initRTC() {//初始化RTC
-        rtcEngine = RtcEngine.create(this, CallApplication.RTC_APPID, rtcEvent)
+        rtcEngine = RtcEngine.create(this, BuildConfig.APPID, rtcEvent)
+        //AI智能降噪
+        var isOpen = SpUtil.getBoolean(Constans.OPEN_DENOISE)
+        if (isOpen){
+            rtcEngine!!.setParameters(JSONObject().apply {
+                put("Cmd", "SetAudioAiNoise")
+                put("Enable", 1)
+            }.toString())
+        }
         rtcEngine?.enableVideo()
         rtcEngine?.joinChannel("", channelId, "", mineUserId)
         btnSpeak.isSelected = !btnSpeak.isSelected
@@ -125,7 +135,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
     }
 
     private fun joinRTMChannel(channelId: String) {//初始化RTM
-        rtmChannel = CallApplication.the().callManager.createChannel(channelId)
+        rtmChannel = RTManager.createChannel(channelId)
         rtmChannel?.join(null)
     }
 
@@ -138,20 +148,20 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
                 rtcEngine?.setupLocalVideo(memberAdapter.getItem(0)?.canvas)
                 val isOpenCamera = SpUtil.getBoolean("isOpenCamera", true)
                 val isOpenAudio = SpUtil.getBoolean("isOpenMicrophone", true)
-                if (!isOpenCamera){
+                if (!isOpenCamera) {
                     rtcEngine?.muteLocalVideoStream(true)
                     btnVideo.isSelected = true
-                    memberAdapter.getItem(0)?.isOpenVideo=true
+                    memberAdapter.getItem(0)?.isOpenVideo = true
                     memberAdapter.getViewByPosition(rvVideo, 0, R.id.iv_video_close)!!.visibility = (if (btnVideo.isSelected) {
                         View.VISIBLE
                     } else {
                         View.GONE
                     })
                 }
-                if (!isOpenAudio){
+                if (!isOpenAudio) {
                     rtcEngine?.muteLocalAudioStream(true)
                     btnAudio.isSelected = true
-                    memberAdapter.getItem(0)?.isOpenAudio=false
+                    memberAdapter.getItem(0)?.isOpenAudio = false
                     memberAdapter.getViewByPosition(rvVideo, 0, R.id.iv_audio)!!.setBackgroundResource(if (btnAudio.isSelected) {
                         R.drawable.mic_close
                     } else {
@@ -163,6 +173,14 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
 
         }
 
+        override fun onUserJoined(uid: String?, elapsed: Int) {
+            super.onUserJoined(uid, elapsed)
+            runOnUiThread {
+
+            }
+        }
+
+
         override fun onFirstRemoteVideoDecoded(uid: String?, width: Int, height: Int, elapsed: Int) {
             super.onFirstRemoteVideoDecoded(uid, width, height, elapsed)
             runOnUiThread {
@@ -173,8 +191,8 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
                 memberAdapter.data.forEachIndexed { index, rtcMember ->
                     if (rtcMember.userId == uid) {
                         rtcEngine?.setupRemoteVideo(rtcMember.canvas)
-                        memberAdapter.getItem(index)?.isWaiting=false
-                        memberAdapter.getItem(index)?.isOpenAudio=true
+                        memberAdapter.getItem(index)?.isWaiting = false
+                        memberAdapter.getItem(index)?.isOpenAudio = true
 
                         if (memberAdapter.getViewByPosition(rvVideo, index, R.id.rl_wait) != null) {
                             memberAdapter.getViewByPosition(rvVideo, index, R.id.rl_wait)!!.visibility = View.GONE
@@ -195,10 +213,10 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
                     memberAdapter.data.forEachIndexed { index, rtcMember ->
                         if (rtcMember.userId == uid) {
                             if (reason == Constants.REMOTE_AUDIO_REASON_REMOTE_MUTED) {
-                                memberAdapter.getItem(index)?.isOpenAudio=false
+                                memberAdapter.getItem(index)?.isOpenAudio = false
                                 memberAdapter.getViewByPosition(rvVideo, index, R.id.iv_audio)!!.setBackgroundResource(R.drawable.mic_close)
                             } else if (reason == Constants.REMOTE_AUDIO_REASON_REMOTE_UNMUTED) {
-                                memberAdapter.getItem(index)?.isOpenAudio=true
+                                memberAdapter.getItem(index)?.isOpenAudio = true
                                 memberAdapter.getViewByPosition(rvVideo, index, R.id.iv_audio)!!.setBackgroundResource(R.drawable.mic_open)
                             }
                             return@forEachIndexed
@@ -215,10 +233,10 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
                     memberAdapter.data.forEachIndexed { index, rtcMember ->
                         if (rtcMember.userId == uid) {
                             if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_MUTED) {
-                                memberAdapter.getItem(index)?.isOpenVideo=false
+                                memberAdapter.getItem(index)?.isOpenVideo = false
                                 memberAdapter.getViewByPosition(rvVideo, index, R.id.iv_video_close)!!.visibility = View.VISIBLE
                             } else if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED) {
-                                memberAdapter.getItem(index)?.isOpenVideo=true
+                                memberAdapter.getItem(index)?.isOpenVideo = true
                                 memberAdapter.getViewByPosition(rvVideo, index, R.id.iv_video_close)!!.visibility = View.GONE
                             }
                             return@forEachIndexed
@@ -264,10 +282,10 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
         Toast.makeText(this, tip, Toast.LENGTH_SHORT).show()
     }
 
-    fun removeMember(userId: String){
+    fun removeMember(userId: String) {
         var leftIndex = -1
         memberAdapter.data.forEachIndexed { index, rtcMember ->
-            if (userId== rtcMember.userId) {
+            if (userId == rtcMember.userId) {
                 rtcMember.release()
                 leftIndex = index
             }
@@ -283,10 +301,11 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
     override fun onDestroy() {
         super.onDestroy()
         stopRing()
+        AIDenoiseNotify.callBack = null
         mainScope.cancel()
-        CallApplication.the().callManager.releaseChannel()
+        RTManager.releaseChannel()
         RtcEngine.destroy()
-        CallApplication.the().callManager.unregisterChannelListener(this)
+        RTManager.unRegisterChannelEvent(this)
     }
 
     fun switchCamera(view: View) {
@@ -296,7 +315,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
     fun hangUp(view: View) {
         if (isCall) {//如果是主叫 需要把呼叫的一些对象取消 否则再次无法呼叫
             localInvitationList?.forEach {
-                rtmCallManager.cancelLocalInvitation(it, null)
+                rtmCallManager?.cancelLocalInvitation(it, null)
             }
         }
         memberAdapter.data.forEach {
@@ -309,7 +328,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
     fun muteAudio(view: View) {
         btnAudio.isSelected = !btnAudio.isSelected
         rtcEngine?.muteLocalAudioStream(btnAudio.isSelected)
-        memberAdapter.getItem(0)?.isOpenAudio=!btnAudio.isSelected
+        memberAdapter.getItem(0)?.isOpenAudio = !btnAudio.isSelected
         memberAdapter.getViewByPosition(rvVideo, 0, R.id.iv_audio)!!.setBackgroundResource(if (btnAudio.isSelected) {
             R.drawable.mic_close
         } else {
@@ -325,7 +344,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
     fun muteVideo(view: View) {
         btnVideo.isSelected = !btnVideo.isSelected
         rtcEngine?.muteLocalVideoStream(btnVideo.isSelected)
-        memberAdapter.getItem(0)?.isOpenVideo=!btnVideo.isSelected
+        memberAdapter.getItem(0)?.isOpenVideo = !btnVideo.isSelected
         memberAdapter.getViewByPosition(rvVideo, 0, R.id.iv_video_close)!!.visibility = (if (btnVideo.isSelected) {
             View.VISIBLE
         } else {
@@ -341,7 +360,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
             }
             remote?.response = param.toString()
             remote?.let {
-                rtmCallManager.refuseRemoteInvitation(it, null)
+                rtmCallManager?.refuseRemoteInvitation(it, null)
             }
         }
     }
@@ -358,32 +377,32 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
         CustomDialog.show(this, R.layout.dialog_invite) { dialog, v ->
             val etId = v.findViewById<org.ar.call.weight.VerificationCodeView>(R.id.et_invite)
             v.findViewById<TextView>(R.id.tv_invite_confirm).setOnClickListener {
-                if (callArray?.contains(etId.inputContent)!!){
+                if (callArray?.contains(etId.inputContent)!!) {
                     toast("用户已在通话中")
                     return@setOnClickListener
                 }
                 mainScope.launch() {
                     val isOnlne = queryOnlineMember(etId.inputContent)
-                        if (!isOnlne){
-                            toast("该用户不在线")
-                        }else{
-                            memberAdapter.addData(RtcMember.Factory.create(etId.inputContent))
-                            callArray?.add(etId.inputContent)
-                            val params = JSONObject()
-                            val arr = JSONArray()
-                            arr.put(mineUserId)
-                            params.put("Mode", 0)
-                            params.put("Conference", true)
-                            params.put("ChanId", channelId)
-                            callArray?.forEach{
-                                arr.put(it)
-                            }
-                            params.put("UserData", arr)
-                            val localInvitation = rtmCallManager.createLocalInvitation(etId.inputContent)
-                            localInvitation?.content = params.toString()
-                            localInvitationList?.add(localInvitation!!)
-                            rtmCallManager.sendLocalInvitation(localInvitation!!, null)
-                            dialog.doDismiss()
+                    if (!isOnlne) {
+                        toast("该用户不在线")
+                    } else {
+                        memberAdapter.addData(RtcMember.Factory.create(etId.inputContent))
+                        callArray?.add(etId.inputContent)
+                        val params = JSONObject()
+                        val arr = JSONArray()
+                        arr.put(mineUserId)
+                        params.put("Mode", 0)
+                        params.put("Conference", true)
+                        params.put("ChanId", channelId)
+                        callArray?.forEach {
+                            arr.put(it)
+                        }
+                        params.put("UserData", arr)
+                        val localInvitation = rtmCallManager?.createLocalInvitation(etId.inputContent)
+                        localInvitation?.content = params.toString()
+                        localInvitationList?.add(localInvitation!!)
+                        rtmCallManager?.sendLocalInvitation(localInvitation!!, null)
+                        dialog.doDismiss()
                     }
 
                 }
@@ -396,9 +415,9 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
         }
     }
 
-    private suspend fun queryOnlineMember(userId: String): Boolean = suspendCoroutine{ continuation ->
+    private suspend fun queryOnlineMember(userId: String): Boolean = suspendCoroutine { continuation ->
         val query = setOf(userId)
-        rtmClient.queryPeersOnlineStatus(query, object : ResultCallback<MutableMap<String, Boolean>> {
+        rtmClient?.queryPeersOnlineStatus(query, object : ResultCallback<MutableMap<String, Boolean>> {
             override fun onSuccess(var1: MutableMap<String, Boolean>?) {
                 var1?.forEach {
                     continuation.resume(it.value)
@@ -410,12 +429,14 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
                 continuation.resume(false)
             }
         })
+
     }
+
     private fun startRing() {
         try {
             if (player == null) {
                 player = MediaPlayer.create(this, R.raw.video_request)
-                player!!.isLooping=true
+                player!!.isLooping = true
                 player!!.start()
             }
         } catch (e: Exception) {
@@ -439,7 +460,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
     }
 
     fun small(view: View) {
-        if (Build.VERSION.SDK_INT<21){
+        if (Build.VERSION.SDK_INT < 21) {
             toast("不支持该设备")
             return
         }
@@ -453,7 +474,8 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
             })
             return
         }
-        moveTaskToBack(true)
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        activityManager.moveTaskToFront(CallApp.callApp.multiMainActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
         EasyFloat.with(this)
                 .setShowPattern(ShowPattern.FOREGROUND)
                 .setDragEnable(true)
@@ -475,11 +497,14 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
                     rlRoot.setOnClickListener {
                         EasyFloat.dismissAppFloat()
                         chr.stop()
-                        if (Build.VERSION.SDK_INT >= 29) {
-                            startActivity(Intent(this, MultiVideosActivity::class.java))
-                        } else {
-                            moveToFront()
+                        if (CallApp.callApp.multiMeetingActivityTaskId == -1) {
+                            return@setOnClickListener
                         }
+                        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+                        activityManager.moveTaskToFront(CallApp.callApp.multiMainActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
+                        activityManager.moveTaskToFront(CallApp.callApp.multiMeetingActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
+
+
                     }
                 }).registerCallbacks(object : OnFloatCallbacks {
                     override fun createdResult(b: Boolean, s: String?, view: View?) {}
@@ -491,16 +516,13 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener {
                     override fun dragEnd(view: View) {}
                 }).show()
     }
-    @TargetApi(11)
-    private fun moveToFront() {
-        // honeycomb
-        val manager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
-        val recentTasks = manager.getRunningTasks(Int.MAX_VALUE)
-        for (i in recentTasks.indices) {
-            // bring to front
-            if (recentTasks[i].baseActivity!!.toShortString().indexOf("org.ar.call.multi.MultiVideosActivity") > -1) {
-                manager.moveTaskToFront(recentTasks[i].id, ActivityManager.MOVE_TASK_WITH_HOME)
-            }
-        }
+
+    override fun openDeNoise(isOpen: Int) {
+        rtcEngine!!.setParameters(JSONObject().apply {
+            put("Cmd", "SetAudioAiNoise")
+            put("Enable", isOpen)
+        }.toString())
     }
+
+
 }

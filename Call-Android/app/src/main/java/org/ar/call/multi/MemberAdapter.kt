@@ -3,9 +3,7 @@ package org.ar.call.multi
 import android.widget.RelativeLayout
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
-import org.ar.call.CallApplication
 import org.ar.call.R
-import org.ar.rtc.RtcEngine
 
 class MemberAdapter :BaseQuickAdapter<RtcMember,BaseViewHolder>(R.layout.item_member) {
 

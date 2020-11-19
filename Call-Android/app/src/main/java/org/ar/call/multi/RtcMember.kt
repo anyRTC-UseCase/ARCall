@@ -37,7 +37,7 @@ class RtcMember private constructor(val userId:String){
             return create(userId, isOpenAudio = true, isOpenVideo = true,isWaiting = true)
         }
 
-        fun create(userId: String, isOpenAudio: Boolean, isOpenVideo: Boolean,isWaiting:Boolean): RtcMember {
+        private fun create(userId: String, isOpenAudio: Boolean, isOpenVideo: Boolean, isWaiting:Boolean): RtcMember {
             val member = RtcMember(userId)
             member.isOpenAudio = isOpenAudio
             member.isOpenVideo = isOpenVideo

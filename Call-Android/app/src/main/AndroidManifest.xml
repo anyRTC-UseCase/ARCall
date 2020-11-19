@@ -3,27 +3,22 @@
     package="org.ar.call">
 
     <application
-        android:name=".CallApplication"
+        android:name=".CallApp"
         android:allowBackup="true"
         android:icon="@mipmap/img_launch"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".multi.MultiVideosActivity"
-            android:launchMode="singleInstance"
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".SettingActivity"
             android:screenOrientation="portrait" />
+        <activity android:name=".p2p.CallActivity"
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".p2p.VideoActivity"
-            android:launchMode="singleInstance"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".p2p.CallActivity"
-            android:launchMode="standard"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustNothing"></activity>
         <activity android:name=".multi.MultiCallActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>

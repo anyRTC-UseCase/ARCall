@@ -2,6 +2,7 @@ package org.ar.call;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -11,19 +12,24 @@ import android.widget.Toast;
 import com.gyf.immersionbar.ImmersionBar;
 import com.kongzue.dialog.interfaces.OnMenuItemClickListener;
 import com.kongzue.dialog.v3.BottomMenu;
+import com.lzf.easyfloat.EasyFloat;
 
 import org.ar.call.p2p.VideoActivity;
 import org.ar.call.multi.MultiCallActivity;
+import org.ar.call.utils.Constans;
 import org.ar.call.utils.SpUtil;
 import org.ar.rtm.RemoteInvitation;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Set;
+
 public class SettingActivity extends BaseActivity  {
 
     private TextView tvXY,tvFrame;
     private Button mBtnCamera,mBtnMicrophone;
-    private boolean isOpenCamera,isOpenMicrophone;
+    private Button mBtnAIDenoise;
+    private boolean isOpenCamera,isOpenMicrophone,isOpenAIDenoise;
     private boolean isP2P;
     private LinearLayout llSettingResolution,llSettingCamera;
     @Override
@@ -41,6 +47,7 @@ public class SettingActivity extends BaseActivity  {
         tvFrame = findViewById(R.id.tv_frame);
         mBtnCamera =findViewById(R.id.setting_camera);
         mBtnMicrophone =findViewById(R.id.setting_microphone);
+        mBtnAIDenoise =findViewById(R.id.ai_denoise);
         llSettingResolution =findViewById(R.id.ll_setting_resolution);
         llSettingCamera =findViewById(R.id.ll_setting_camera);
         if (isP2P){
@@ -63,7 +70,8 @@ public class SettingActivity extends BaseActivity  {
                 mBtnMicrophone.setBackgroundResource(R.drawable.close);
             }
         }
-
+        isOpenAIDenoise = SpUtil.getBoolean(Constans.OPEN_DENOISE);
+        mBtnAIDenoise.setBackgroundResource(isOpenAIDenoise ? R.drawable.open:R.drawable.close);
     }
 
     @Override
@@ -89,6 +97,22 @@ public class SettingActivity extends BaseActivity  {
         }
         isOpenMicrophone =!isOpenMicrophone;
         SpUtil.putBoolean("isOpenMicrophone",isOpenMicrophone);
+    }
+
+    public void openDenoise(View view){
+        if (isOpenAIDenoise){
+            mBtnAIDenoise.setBackgroundResource(R.drawable.close);
+            if (EasyFloat.appFloatIsShow()){
+                AIDenoiseNotify.INSTANCE.openDenoise(0);
+            }
+        }else {
+            mBtnAIDenoise.setBackgroundResource(R.drawable.open);
+            if (EasyFloat.appFloatIsShow()){
+                AIDenoiseNotify.INSTANCE.openDenoise(1);
+            }
+        }
+        isOpenAIDenoise =!isOpenAIDenoise;
+        SpUtil.putBoolean(Constans.OPEN_DENOISE,isOpenAIDenoise);
     }
 
     private void refresh() {
