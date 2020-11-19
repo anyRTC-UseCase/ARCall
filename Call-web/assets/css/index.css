@@ -274,8 +274,8 @@ p {
 
 @media (min-width: 768px) and (max-width: 991.98px) {
 	.meet-view {
-	  width: 600px;
-	  height: 450px;
+	  width: 800px;
+	  height: 600px;
 	}
 	
   .video-preview_little {
@@ -313,9 +313,8 @@ p {
 
 @media (min-width:1200px) and (max-width:1499.98px) {
   .meet-view {
-		width: 800px;
-		height: 600px;
-  
+    width: 900px;
+    height: 675px;
   }
 
   .video-preview_little {
@@ -332,23 +331,6 @@ p {
 
 @media (min-width:1500px) {
   .meet-view {
-    width: 900px;
-    height: 675px;
-  }
-
-  .video-preview_little {
-    user-select: none;
-    margin: 20px;
-    width: 300px;
-    height: 225px;
-    z-index: 8;
-    background: #1c1c1c;
-    border: 1px solid #999999;
-    position: absolute;
-  }
-}
-@media (min-width:1920px) {
-  .meet-view {
     width: 1100px;
     height: 825px;
   }
@@ -364,6 +346,7 @@ p {
     position: absolute;
   }
 }
+
 /* .video-preview_little.audio {
   top: 20%;
   left: 50%;
@@ -605,8 +588,4 @@ p {
 }
 .invite-btn:hover > .icon-request_opacity {
   display: inline-block;
-}
-.disabled {
-	cursor: no-drop !important;
-	opacity: 0.3 !important;
 }
