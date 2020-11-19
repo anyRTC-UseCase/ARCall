@@ -80,6 +80,8 @@
     
     //监听视图
     [self addObserver:self forKeyPath:@"videoArr" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:nil];
+    //监听AI降噪开关配置
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(observerNoise:) name:ARtmCallNoiseNotification object:nil];
 }
 
 - (void)initializeRtcKit {
@@ -130,6 +132,11 @@
     self.audioButton.selected = !userInfo.audio;
     self.localView.titleButton.selected = !userInfo.audio;
     self.localView.placeholderView.hidden = userInfo.video;
+    
+    if (userInfo.aiNoise) {
+        //开启AI降噪
+        [self switchNoise:YES];
+    }
 }
 
 - (void)makeRtmCall {
@@ -224,6 +231,18 @@
         default:
             break;
     }
+}
+
+- (void)observerNoise:(NSNotification *)notification {
+    //监听AI降噪开关配置
+    NSDictionary * infoDic = [notification object];
+    [self switchNoise:[[infoDic objectForKey:@"noise"] boolValue]];
+}
+
+- (void)switchNoise:(BOOL)enable {
+    //开启AI降噪
+    NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:@"SetAudioAiNoise",@"Cmd",[NSNumber numberWithInt:(int)enable],@"Enable",nil];
+    [_rtcKit setParameters:[ARCallCommon returnJSONStringWithDictionary:dic]];
 }
 
 - (void)invitationUser:(NSString *)uid {
@@ -370,18 +389,15 @@
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationReceivedByPeer:(ARtmLocalInvitation * _Nonnull)localInvitation {
     //被叫已收到呼叫邀请
-    NSLog(@"%@",ARtmReceivedInvitationByPeer);
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationAccepted:(ARtmLocalInvitation * _Nonnull)localInvitation withResponse:(NSString * _Nullable) response {
     //被叫已接受呼叫邀请
-    NSLog(@"%@",ARtmAcceptedInvitation);
     [ARCallCommon playMusic:NO];
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationRefused:(ARtmLocalInvitation * _Nonnull)localInvitation withResponse:(NSString * _Nullable) response {
     //被叫已拒绝呼叫邀请
-    NSLog(@"localInvitationRefused");
     [self.videoArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         ARVideoView *videoView = (ARVideoView *)obj;
         if ([videoView.uid isEqualToString:localInvitation.calleeId]) {
@@ -402,12 +418,10 @@
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationCanceled:(ARtmLocalInvitation * _Nonnull)localInvitation {
     //呼叫邀请已被取消
-    NSLog(@"%@",ARtmCanceledInvitation);
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationFailure:(ARtmLocalInvitation * _Nonnull)localInvitation errorCode:(ARtmLocalInvitationErrorCode)errorCode {
     //呼叫邀请发送失败
-    NSLog(@"localInvitationFailure");
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationReceived:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
@@ -424,7 +438,6 @@
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationRefused:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
     //拒绝呼叫邀请成功
-    NSLog(@"%@",ARtmRefusedInvitation);
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationAccepted:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
@@ -433,7 +446,6 @@
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationCanceled:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
     //主叫已取消呼叫邀请
-    NSLog(@"%@",ARtmRemoteCanceledInvitation);
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationFailure:(ARtmRemoteInvitation * _Nonnull)remoteInvitation errorCode:(ARtmRemoteInvitationErrorCode) errorCode {
@@ -444,7 +456,6 @@
 
 - (void)channel:(ARtmChannel * _Nonnull)channel memberJoined:(ARtmMember * _Nonnull)member {
     //远端用户加入频道回调
-    NSLog(@"memberJoined uid == %@",member.uid);
     if (![self.rtmCallArr containsObject:member.uid]) {
         [self.rtmCallArr addObject:member.uid];
         [self createVideoView:member.uid];
@@ -461,7 +472,6 @@
 
 - (void)channel:(ARtmChannel * _Nonnull)channel memberLeft:(ARtmMember * _Nonnull)member {
     //频道成员离开频道回调
-    NSLog(@"memberLeft");
     [self.videoArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         ARVideoView *videoView = (ARVideoView *)obj;
         if ([videoView.uid isEqualToString:member.uid]) {
@@ -486,13 +496,17 @@
     [self.videoArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         ARVideoView *videoView = (ARVideoView *)obj;
         if ([videoView.uid isEqualToString:uid]) {
-            videoView.placeholderView.hidden = YES;
+            if (videoView.videoSetting == 0){
+                videoView.placeholderView.hidden = NO;
+            } else if (videoView.videoSetting == 1) {
+                videoView.placeholderView.hidden = YES;
+            }
             ARtcVideoCanvas *videoCanvas = [[ARtcVideoCanvas alloc] init];
             videoCanvas.uid = uid;
             videoCanvas.view = videoView;
             [self.rtcKit setupRemoteVideo:videoCanvas];
             //设置订阅的视频流类型
-            [self.rtcKit setRemoteVideoStream:uid type:ARVideoStreamTypeLow];
+            [self.rtcKit setRemoteVideoStream:uid type:ARVideoStreamTypeHigh];
             *stop = YES;
         }
     }];
@@ -546,8 +560,10 @@
         ARVideoView *videoView = (ARVideoView *)obj;
         if ([videoView.uid isEqualToString:uid]) {
             if (reason == ARVideoRemoteStateReasonRemoteMuted) {
+                videoView.videoSetting = 0;
                 videoView.placeholderView.hidden = NO;
             } else if (reason == ARVideoRemoteStateReasonRemoteUnmuted) {
+                videoView.videoSetting = 1;
                 videoView.placeholderView.hidden = YES;
             }
         }
@@ -559,7 +575,6 @@
     [ARCallCommon playMusic:NO];
     [self.videoArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         ARVideoView *videoView = (ARVideoView *)obj;
-        NSLog(@"videoView == %@ uid == %@",videoView.uid,uid);
         if ([videoView.uid isEqualToString:uid]) {
             videoView.loadingView.hidden = YES;
             *stop = YES;
@@ -580,17 +595,29 @@
         }
     }];
 }
-
+- (void)rtcEngine:(ARtcEngineKit *)engine connectionChangedToState:(ARConnectionStateType)state reason:(ARConnectionChangedReason)reason {
+    if (state == ARConnectionStateReconnecting) {
+        [SVProgressHUD setContainerView:self.view];
+        
+        [SVProgressHUD showImage:[UIImage imageNamed:@"icon_tip"] status:@"网络连接中断，重连中"];
+        [SVProgressHUD dismissWithDelay:10];
+        
+    } else if (state == ARConnectionStateDisconnected) {
+        [self endCall];
+    }
+}
 //MARK: - other
-
+- (void)viewWillDisappear:(BOOL)animated {
+    [SVProgressHUD setContainerView:nil];
+}
 - (UIStatusBarStyle)preferredStatusBarStyle {
     return UIStatusBarStyleLightContent;
 }
 
 - (void)dealloc {
+    [NSNotificationCenter.defaultCenter removeObserver:self];
     NSLog(@"Meet dealloc");
 }
-
 
 
 @end

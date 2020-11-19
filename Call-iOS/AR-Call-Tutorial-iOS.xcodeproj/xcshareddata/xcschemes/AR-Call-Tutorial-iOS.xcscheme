@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "63CA2EED24C17971003FF0AC"
-               BuildableName = "&#x89c6;&#x9891;&#x901a;&#x8bdd;.app"
+               BuildableName = "anyRTC&#x89c6;&#x9891;&#x901a;&#x8bdd;.app"
                BlueprintName = "AR-Call-Tutorial-iOS"
                ReferencedContainer = "container:AR-Call-Tutorial-iOS.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "63CA2EED24C17971003FF0AC"
-            BuildableName = "&#x89c6;&#x9891;&#x901a;&#x8bdd;.app"
+            BuildableName = "anyRTC&#x89c6;&#x9891;&#x901a;&#x8bdd;.app"
             BlueprintName = "AR-Call-Tutorial-iOS"
             ReferencedContainer = "container:AR-Call-Tutorial-iOS.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "63CA2EED24C17971003FF0AC"
-            BuildableName = "&#x89c6;&#x9891;&#x901a;&#x8bdd;.app"
+            BuildableName = "anyRTC&#x89c6;&#x9891;&#x901a;&#x8bdd;.app"
             BlueprintName = "AR-Call-Tutorial-iOS"
             ReferencedContainer = "container:AR-Call-Tutorial-iOS.xcodeproj">
          </BuildableReference>

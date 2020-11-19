@@ -19,6 +19,11 @@ typedef NS_ENUM(NSInteger, ARVideoState) {
     ARVideoStateinvitationRefused = 3,
     ARVideoStateinvitationCalling = 4
 };
+typedef NS_ENUM(NSInteger, ARVideoSetting) {
+    ARVideoStateinvitationVideoMute = 0,
+    ARVideoStateinvitationVideoUnmute = 1,
+};
+
 
 @interface ARVideoView : UIView
 
@@ -28,6 +33,8 @@ typedef NS_ENUM(NSInteger, ARVideoState) {
 @property (weak, nonatomic) IBOutlet UILabel *stateLabel;
 @property (nonatomic, copy) NSString *uid;
 @property (nonatomic, assign) ARVideoState state;
+@property (nonatomic, assign) ARVideoSetting videoSetting;
+
 
 + (instancetype)loadVideoView:(ARtmVideoRemoveBlock)block;
 - (void)startCountdown;

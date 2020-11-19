@@ -22,7 +22,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    (ARtmManager.getLocalUid.length == 0) ? (self.calleeId = [ARCallCommon randomNumber:4]) : (self.calleeId = ARtmManager.getLocalUid);
+    if (ARtmManager.getLocalUid.length == 0) {
+        self.calleeId = [ARCallCommon randomNumber:4];
+        [ARtmManager setLocalUid:self.calleeId];
+    } else {
+        self.calleeId = ARtmManager.getLocalUid;
+    }
     self.calleeIdLabel.text = [NSString stringWithFormat:@"您的呼叫ID：%@",self.calleeId];
     
     @weakify(self);
@@ -39,7 +44,6 @@
 
 - (IBAction)didClickLoginButton:(UIButton *)sender {
     if (self.isLogin) {
-        [ARtmManager setLocalUid:self.calleeId];
         ARtmMainViewController *mainVc = [[self storyboard] instantiateViewControllerWithIdentifier:@"ARtm_Main"];
         mainVc.type = sender.tag;
         mainVc.modalPresentationStyle = UIModalPresentationCurrentContext;

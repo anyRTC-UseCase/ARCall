@@ -72,6 +72,8 @@
         self.switchVoiceButton.hidden = self.mode;
         self.stateLabel.text = @"接听中...";
     }
+    //监听AI降噪开关配置
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(observerNoise:) name:ARtmCallNoiseNotification object:nil];
 }
 
 - (void)initializeRtcKit:(int)mode {
@@ -110,6 +112,11 @@
         //初始化远程视图
         self.remoteView.frame = CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         [self.view insertSubview:self.remoteView atIndex:0];
+        
+        if (userInfo.aiNoise) {
+            //开启AI降噪
+            [self switchNoise:YES];
+        }
     }
     
     [self.rtcKit joinChannelByToken:nil channelId:self.channelId uid:[ARtmManager getLocalUid] joinSuccess:^(NSString * _Nonnull channel, NSString * _Nonnull uid, NSInteger elapsed) {
@@ -215,6 +222,18 @@
     }
 }
 
+- (void)observerNoise:(NSNotification *)notification {
+    //监听AI降噪开关配置
+    NSDictionary * infoDic = [notification object];
+    [self switchNoise:[[infoDic objectForKey:@"noise"] boolValue]];
+}
+
+- (void)switchNoise:(BOOL)enable {
+    //开启AI降噪
+    NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:@"SetAudioAiNoise",@"Cmd",[NSNumber numberWithInt:(int)enable],@"Enable",nil];
+    [_rtcKit setParameters:[ARCallCommon returnJSONStringWithDictionary:dic]];
+}
+
 - (void)subscribePeersOnline:(NSString *)calleeId {
     //订阅指定单个或多个用户的在线状态
     if (calleeId.length != 0) {
@@ -303,16 +322,15 @@
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationReceivedByPeer:(ARtmLocalInvitation * _Nonnull)localInvitation {
     //被叫已收到呼叫邀请
-    NSLog(@"%@",ARtmReceivedInvitationByPeer);
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationAccepted:(ARtmLocalInvitation * _Nonnull)localInvitation withResponse:(NSString * _Nullable) response {
     //被叫已接受呼叫邀请
-    NSLog(@"%@",ARtmAcceptedInvitation);
     self.callState = YES;
     [ARCallCommon playMusic:NO];
     if (response.length != 0) {
         if (self.callMinimize && self.suspensionView && !self.mode) {
+            ARtmManager.rtmWindow.hidden = NO;
             [self.suspensionView removeFromSuperview];
         }
         
@@ -329,7 +347,6 @@
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationRefused:(ARtmLocalInvitation * _Nonnull)localInvitation withResponse:(NSString * _Nullable) response {
     //被叫已拒绝呼叫邀请
-    NSLog(@"localInvitationRefused");
     NSString *info = ARtmCallStop;
     if (response.length != 0) {
         NSDictionary *dic = [ARCallCommon dictionaryWithJSONString:response];
@@ -343,13 +360,11 @@
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationCanceled:(ARtmLocalInvitation * _Nonnull)localInvitation {
     //呼叫邀请已被取消
-    NSLog(@"%@",ARtmCanceledInvitation);
     [self endCall:ARtmCallStop];
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationFailure:(ARtmLocalInvitation * _Nonnull)localInvitation errorCode:(ARtmLocalInvitationErrorCode)errorCode {
     //呼叫邀请发送失败
-    NSLog(@"localInvitationFailure");
     [self endCall:ARtmCallStop];
 }
 
@@ -368,7 +383,6 @@
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationRefused:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
     //拒绝呼叫邀请成功
-    NSLog(@"%@",ARtmRefusedInvitation);
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationAccepted:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
@@ -378,7 +392,6 @@
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationCanceled:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
     //主叫已取消呼叫邀请
     [ARCallCommon showInfoWithStatus:ARtmRemoteCanceledInvitation];
-    NSLog(@"%@",ARtmRemoteCanceledInvitation);
     if ([self.callerId isEqualToString:remoteInvitation.callerId]) {
         [self endCall:ARtmRemoteCanceledInvitation];
     }
@@ -412,7 +425,9 @@
         }
     }];
 }
-
+- (void)rtcEngineConnectionDidInterrupted:(ARtcEngineKit *)engine {
+      [self endCall:@"网络连接已断开"];
+}
 - (void)rtcEngine:(ARtcEngineKit *)engine didOfflineOfUid:(NSString *)uid reason:(ARUserOfflineReason)reason {
     //远端用户（通信场景）/主播（直播场景）离开当前频道回调
     [self endCall:ARtmCallStop];
@@ -455,7 +470,8 @@
 }
 
 - (void)dealloc {
-    NSLog(@"CallView dealloc");
+    [NSNotificationCenter.defaultCenter removeObserver:self];
+    NSLog(@"CallVc dealloc");
 }
 
 - (WMDragView *)localView {

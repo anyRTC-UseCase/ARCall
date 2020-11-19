@@ -67,7 +67,7 @@
     _state = state;
     switch (state) {
         case ARVideoStateinvitationOffline:
-            self.stateLabel.text = @"对方不在线";
+            self.stateLabel.text = @"等待接听";
             break;
         case ARVideoStateinvitationOnline:
             self.stateLabel.text = @"";
