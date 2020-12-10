@@ -24,6 +24,7 @@ class CallApp : Application(),Application.ActivityLifecycleCallbacks{
     var p2pMeetingActivityTaskId = -1
 
 
+
     companion object{
         var callApp : CallApp by Delegates.notNull()
     }
@@ -47,6 +48,7 @@ class CallApp : Application(),Application.ActivityLifecycleCallbacks{
 
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+
     }
 
     override fun onActivityStarted(activity: Activity) {

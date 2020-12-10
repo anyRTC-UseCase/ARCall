@@ -17,8 +17,10 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -153,8 +155,6 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
         btnHangup = findViewById(R.id.btn_hangup);
         rtmClient =  RTManager.INSTANCE.getRtmClient();
         rtmCallManager =  RTManager.INSTANCE.getRtmCallManager();
-
-
         isCall = !getIntent().getBooleanExtra("RecCall",false);
         if (isCall){
             localInvitation =  RTManager.INSTANCE.getLocalInvitation();
@@ -1209,86 +1209,6 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
 
 
 
-    public void CallWaitSmall(View view) {
-        int version = android.os.Build.VERSION.SDK_INT;
-        if (version < 21) {
-            showLongToast("暂不支持该设备");
-            return;
-        }
-        if (!PermissionUtils.checkPermission(VideoActivity.this)) {
-            PermissionUtils.requestPermission(VideoActivity.this, new OnPermissionResult() {
-                @Override
-                public void permissionResult(boolean b) {
-                    if (!b) {
-                        showLongToast("请打开悬浮窗权限");
-                    }
-                }
-            });
-            return;
-        }
-        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        activityManager.moveTaskToFront(CallApp.Companion.getCallApp().getP2pMainActivityTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
-
-        EasyFloat.with(this)
-                .setShowPattern(ShowPattern.FOREGROUND)
-                .setDragEnable(true)
-                .setGravity(Gravity.RIGHT)
-                .setSidePattern(SidePattern.RESULT_SIDE)
-                .setLayout(R.layout.float_audio_window, new OnInvokeView() {
-                    @Override
-                    public void invoke(View view) {
-                        final RelativeLayout rlRoot = view.findViewById(R.id.rl_root);
-                        rlRoot.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                EasyFloat.dismissAppFloat();
-                                if (CallApp.Companion.getCallApp().getP2pMainActivityTaskId() == -1) {
-                                    return;
-                                }
-                                ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-                                activityManager.moveTaskToFront(CallApp.Companion.getCallApp().getP2pMainActivityTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
-                                activityManager.moveTaskToFront(CallApp.Companion.getCallApp().getP2pMeetingActivityTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
-                            }
-                        });
-
-                    }
-                }).registerCallbacks(new OnFloatCallbacks() {
-            @Override
-            public void createdResult(boolean b, String s, View view) {
-
-            }
-
-            @Override
-            public void show(View view) {
-
-            }
-
-            @Override
-            public void hide(View view) {
-
-            }
-
-            @Override
-            public void dismiss() {
-
-            }
-
-            @Override
-            public void touchEvent(View view, MotionEvent motionEvent) {
-
-            }
-
-            @Override
-            public void drag(View view, MotionEvent motionEvent) {
-
-            }
-
-            @Override
-            public void dragEnd(View view) {
-
-            }
-        }).show();
-    }
 
     @Override
     protected void onStop() {//单独处理这个页面

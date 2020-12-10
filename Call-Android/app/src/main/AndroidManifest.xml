@@ -10,6 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".multi.MultiVideosActivity"
+            android:launchMode="singleInstance"
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".SettingActivity"
@@ -18,7 +19,8 @@
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".p2p.VideoActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:launchMode="singleInstance"/>
         <activity android:name=".multi.MultiCallActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
