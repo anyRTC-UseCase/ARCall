@@ -1338,7 +1338,7 @@ var RTM = {
 	}
 };
 
-// --------main.js
+// -----main.js
 // 检测是否有硬件设备
 (async function () {
 	var [cameras, microhones] = await Promise.all([
