@@ -273,6 +273,9 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener, AIDenoiseNotify.
             removeMember(var1?.userId.toString())
             if (memberAdapter.data.size == 1) {//only self
                 toast("通话已结束")
+                if (EasyFloat.appFloatIsShow()){
+                    EasyFloat.dismissAppFloat()
+                }
                 finish()
             }
         }

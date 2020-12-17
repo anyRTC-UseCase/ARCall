@@ -17,6 +17,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.ar.call.*
+import org.ar.call.multi.MultiCallActivity
 import org.ar.call.multi.MultiVideosActivity
 import org.ar.call.utils.RTManager
 import org.ar.rtm.ErrorInfo
@@ -24,6 +25,9 @@ import org.ar.rtm.LocalInvitation
 import org.ar.rtm.RemoteInvitation
 import org.ar.rtm.ResultCallback
 import org.json.JSONObject
+import java.io.BufferedWriter
+import java.io.FileInputStream
+import java.io.FileWriter
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -60,8 +64,8 @@ class CallActivity :BaseActivity(){
                     btnCall.isSelected = false
                 }
             }
-
         })
+
     }
 
 
@@ -158,12 +162,10 @@ class CallActivity :BaseActivity(){
                     rtmCallManager?.refuseRemoteInvitation(it,null) }
                 return@runOnUiThread
             }
-
-
             val isMultiple = JSONObject(remote?.content).getBoolean("Conference")
             Intent().let {
                 if (isMultiple){
-                    it.setClass(this@CallActivity,MultiVideosActivity::class.java)
+                    it.setClass(this@CallActivity,MultiCallActivity::class.java)
                 }else{
                     it.setClass(this@CallActivity,VideoActivity::class.java)
                 }

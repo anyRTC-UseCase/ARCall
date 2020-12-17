@@ -64,7 +64,7 @@ var Store = {
 	remoteInvitation: null,
 	roomUser: [], // 记录房间内所有邀请或被邀请人员信息
 	invitationUserIds: [], // 邀请或被邀请参会人员用户ID
-	
+
 	// 呼叫时间
 	duration: 0,
 	durationTime: null,
@@ -645,13 +645,13 @@ var RTC = {
 					var userNum = await RTM.rtmChannel.getMembers();
 					//多人 
 					if (userNum.length >= 2) {
-						
+
 						await CustomUI.alertWhole("用户" + user.uid + "离开", "alert-danger");
 						setTimeout(function () {
 							// 移除用户窗口
 							CustomUI.deleteUserView(user.uid);
-						},200)
-						
+						}, 200)
+
 					} else {
 						//退出频道
 						RTM.rtmChannel && RTM.rtmChannel.leave();
@@ -667,7 +667,7 @@ var RTC = {
 					//释放资源
 					Store.oReleaseOpen = true;
 					//取消本地发布
-			        Store.rtcClient && Store.rtcClient.unpublish();
+					Store.rtcClient && Store.rtcClient.unpublish();
 					await CustomUI.Release();
 				}
 			});
@@ -1082,7 +1082,7 @@ var RTM = {
 						var invitationContent = JSON.parse(remoteInvitation.content);
 						var invitationResponse = JSON.parse(remoteInvitation.response);
 						//加入实时通讯频道
-						Store.ownUserId = await Store.rtcClient.join(Config.RTC_APPID, invitationContent.ChanId, null, Store.ownUserId);			
+						Store.ownUserId = await Store.rtcClient.join(Config.RTC_APPID, invitationContent.ChanId, null, Store.ownUserId);
 						//采集并发布媒体流
 						if (invitationResponse.Mode == 1) {
 							$("#audioPage").removeClass("d-none");
@@ -1128,7 +1128,7 @@ var RTM = {
 						if (Store.invitationUserIds.length >= 2) {
 							// 更新用户状态及窗口显示 - 对方已接收
 							CustomUI.updateUserViewStatus(remoteInvitation.callerId, 2);
-						} 
+						}
 
 						CustomUI.alertWhole("已拒绝呼叫邀请", "alert-info");
 						// 隐藏被呼叫页面
@@ -1235,9 +1235,9 @@ var RTM = {
 					CustomUI.alertWhole("用户" + memberId + "离开", "alert-danger");
 					setTimeout(function () {
 						// 移除窗口
-					CustomUI.deleteUserView(memberId);
-					},200)
-					
+						CustomUI.deleteUserView(memberId);
+					}, 200)
+
 				}
 			});
 		}
@@ -1305,7 +1305,7 @@ var RTM = {
 					$("#peerMutiVideoPreview").html(""); //清空大窗口
 					// 返回呼叫邀请页面
 					CustomUI.showCallPage();
-				    //释放资源
+					//释放资源
 					await CustomUI.Release();
 					// 清空标记
 					await CustomUI.closeStamp();
