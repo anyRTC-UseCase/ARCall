@@ -156,4 +156,6 @@ public  abstract class BaseActivity extends AppCompatActivity implements RtmClie
     public void onRemoteInvitationFailure(RemoteInvitation var1, int var2) {
 
     }
+
+
 }
