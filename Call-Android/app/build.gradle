@@ -10,8 +10,8 @@ android {
         applicationId "org.ar.call"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 19
-        versionName "1.1.8"
+        versionCode 20
+        versionName "1.1.9"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -27,12 +27,12 @@ android {
 
     buildTypes {
         release {
-            buildConfigField("String", "APPID", '"YOUR APP ID"')
+            buildConfigField("String", "APPID", '""')
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
-            buildConfigField("String", "APPID", '"YOUR APP ID"')
+            buildConfigField("String", "APPID", '""')
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
