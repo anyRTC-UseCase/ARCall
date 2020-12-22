@@ -65,7 +65,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener, AIDenoiseNotify.
     private var rtmChannel: RtmChannel? = null
     private val rtmClient = RTManager.rtmClient
     private val rtmCallManager = RTManager.rtmCallManager
-    private val localInvitationList: ArrayList<LocalInvitation>? = ArrayList() //主叫需要呼叫的
+    private val localInvitationList: ArrayList<LocalInvitation> = ArrayList() //主叫需要呼叫的
 
     private lateinit var memberAdapter: MemberAdapter
     private val mainScope = MainScope()
@@ -281,6 +281,31 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener, AIDenoiseNotify.
         }
     }
 
+    override fun onLocalInvitationAccepted(var1: LocalInvitation?, var2: String?) {
+        super.onLocalInvitationCanceled(var1)
+        localInvitationList.remove(var1)//意味着呼叫流程结束 挂断的时候不需要再取消了
+    }
+
+    override fun onLocalInvitationCanceled(var1: LocalInvitation?) {
+        super.onLocalInvitationCanceled(var1)
+        localInvitationList.remove(var1)
+    }
+
+    override fun onLocalInvitationFailure(var1: LocalInvitation?, var2: Int) {
+        super.onLocalInvitationFailure(var1, var2)
+        localInvitationList.remove(var1)
+    }
+    override fun onLocalInvitationRefused(var1: LocalInvitation?, var2: String?) {
+        super.onLocalInvitationRefused(var1, var2)
+        runOnUiThread {
+            toast("${var1?.calleeId}拒绝了呼叫邀请")
+            removeMember(var1?.calleeId.toString())
+            localInvitationList.remove(var1)
+        }
+    }
+
+
+
     fun toast(tip: String) {
         Toast.makeText(this, tip, Toast.LENGTH_SHORT).show()
     }
@@ -368,13 +393,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener, AIDenoiseNotify.
         }
     }
 
-    override fun onLocalInvitationRefused(var1: LocalInvitation?, var2: String?) {
-        super.onLocalInvitationRefused(var1, var2)
-        runOnUiThread {
-            toast("${var1?.calleeId}拒绝了呼叫邀请")
-            removeMember(var1?.calleeId.toString())
-        }
-    }
+
 
     fun Invite(view: View) {
         CustomDialog.show(this, R.layout.dialog_invite) { dialog, v ->
