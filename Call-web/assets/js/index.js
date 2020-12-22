@@ -11,8 +11,8 @@ var Utils = {
 
 //配置
 var Config = {
-	RTC_APPID: "", //RTC 应用ID 
-	RTM_APPID: "", //RTM 应用ID 
+	RTC_APPID: "ee0ca1b2bf559ea6823698acb0600e62", //RTC 应用ID 
+	RTM_APPID: "ee0ca1b2bf559ea6823698acb0600e62", //RTM 应用ID 
 	RTC_MODE: "live", //RTC 通信模式
 	RTC_CODEC: "h264", //RTC 视频编码格式
 	SELECT_CAMERA_DEVICE: sessionStorage.getItem("defaultCameraDeviceId") || undefined
@@ -228,8 +228,8 @@ var CustomUI = {
 	closeStamp: function () {
 		RTM.rtmChannel = null;
 		Store.rtcClient && Store.rtcClient.leave();
-		Store.rtcClient = null;
-		Store.rtmClient = null;
+		// Store.rtcClient = null;
+		// Store.rtmClient = null;
 		Store.roomUser = [];
 		Store.invitationUserIds = [];
 		// Store.ownUserId = "";
@@ -1082,7 +1082,7 @@ var RTM = {
 						var invitationContent = JSON.parse(remoteInvitation.content);
 						var invitationResponse = JSON.parse(remoteInvitation.response);
 						//加入实时通讯频道
-						Store.ownUserId = await Store.rtcClient.join(Config.RTC_APPID, invitationContent.ChanId, null, Store.ownUserId);
+						Store.ownUserId = await Store.rtcClient.join(Config.RTC_APPID, invitationContent.ChanId, null, Store.ownUserId);			
 						//采集并发布媒体流
 						if (invitationResponse.Mode == 1) {
 							$("#audioPage").removeClass("d-none");
