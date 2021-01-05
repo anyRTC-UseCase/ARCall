@@ -27,12 +27,12 @@ android {
 
     buildTypes {
         release {
-            buildConfigField("String", "APPID", '"YOUR APP ID"')
+            buildConfigField("String", "APPID", '""')
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
-            buildConfigField("String", "APPID", '"YOUR APP ID"')
+            buildConfigField("String", "APPID", '""')
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
