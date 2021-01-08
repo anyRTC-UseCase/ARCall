@@ -68,6 +68,8 @@ import java.util.Set;
 
 public class VideoActivity extends BaseActivity implements AIDenoiseNotify.DenoiseNotifyCallBack {
 
+    private static final String TAG =VideoActivity.class.getSimpleName();
+
     private FrameLayout flVideoGroup;
     private Button ibtnAudio, ibtnVideo, ibtnSpeak, ibtnSwitch;
 
@@ -777,9 +779,14 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
             return;
         }
 
-
         rl_remote_video.removeViewAt(1);
         rl_local_video.removeViewAt(1);
+        TextureView mLocalView = RtcEngine.CreateRendererView(this);
+        if (videoList.containsKey("local")) {
+            videoList.remove("local");
+        }
+        videoList.put("local", mLocalView);
+        mRtcEngine.setupLocalVideo(new VideoCanvas(mLocalView, Constants.RENDER_MODE_HIDDEN, channelId, userId, Constants.VIDEO_MIRROR_MODE_AUTO));
         if (rlVideo.getLastLeft() != -1) {
             RelativeLayout.MarginLayoutParams marginLayoutParams = (RelativeLayout.MarginLayoutParams) rl_local_video.getLayoutParams();
             marginLayoutParams.leftMargin = rlVideo.getLastLeft();
@@ -795,8 +802,6 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
             rl_local_video.addView(videoList.get("local"), 1);
             rl_local_video.setTag("local");
         }
-
-
     }
 
     public void RemoteViewOnclick(View view) {
