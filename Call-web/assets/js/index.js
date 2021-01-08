@@ -11,8 +11,8 @@ var Utils = {
 
 //配置
 var Config = {
-	RTC_APPID: "ee0ca1b2bf559ea6823698acb0600e62", //RTC 应用ID 
-	RTM_APPID: "ee0ca1b2bf559ea6823698acb0600e62", //RTM 应用ID 
+	RTC_APPID: "", //RTC 应用ID 
+	RTM_APPID: "", //RTM 应用ID 
 	RTC_MODE: "live", //RTC 通信模式
 	RTC_CODEC: "h264", //RTC 视频编码格式
 	SELECT_CAMERA_DEVICE: sessionStorage.getItem("defaultCameraDeviceId") || undefined
