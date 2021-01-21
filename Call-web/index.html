@@ -1,414 +1,821 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="google" content="notranslate" />
-		<title>anyrtc 呼叫邀请DEMO - anyRTC</title>
-		<!-- CSS only -->
-		<link rel="stylesheet" href="./assets/css/bootstrap.min.css">
-		<link rel="stylesheet" type="text/css" href="assets/font/iconfont.css" />
-		<!-- JS, Popper.js, and jQuery -->
-		<!-- <script src="./assets/js/jquery.slim.min.js"></script> -->
-		<script src="./assets/js/jquery-3.5.1.min.js"></script>
-		<script src="./assets/js/bootstrap.min.js"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="google" content="notranslate" />
+    <title>anyrtc 呼叫邀请DEMO - anyRTC</title>
+    <!-- CSS only -->
+    <link rel="stylesheet" href="./assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="assets/font/iconfont.css" />
+    <!-- JS, Popper.js, and jQuery -->
+    <!-- <script src="./assets/js/jquery.slim.min.js"></script> -->
+    <script src="./assets/js/jquery-3.5.1.min.js"></script>
+    <script src="./assets/js/bootstrap.min.js"></script>
 
-		<!-- 覆盖bootstrap样式 -->
-		<link rel="stylesheet" href="./assets/css/index.css">
+    <!-- 覆盖bootstrap样式 -->
+    <link rel="stylesheet" href="./assets/css/index.css" />
+  </head>
+  <body class="notranslate">
+    <!-- 全局警告框 -->
+    <div class="warning_box warning_whole" id="warningWholeBox"></div>
 
-	</head>
-	<body class="notranslate">
-		<!-- 全局警告框 -->
-		<div class="warning_box warning_whole" id="warningWholeBox"></div>
+    <!-- 首页 -->
+    <div
+      class="page d-flex flex-col justify-content-center align-items-center"
+      id="homePage"
+    >
+      <!--  -->
+      <div class="login d-flex flex-row align-items-stretch">
+        <!-- 警告框 -->
+        <div class="warning_box" id="warningBox"></div>
+        <!--  -->
+        <div class="flex-fill flex-basis-0 login-left">
+          <img
+            draggable="false"
+            class="img-responsive"
+            src="assets/images/BG.png"
+          />
+        </div>
+        <!--  -->
+        <div class="flex-fill flex-basis-0 login-right">
+          <!-- 邀请(首页) -->
+          <div class="home-login-flex flex-column full-wrap" id="loginHome">
+            <div class="flex-fill">
+              <div
+                class="d-flex flex-column align-items-center justify-content-center full-wrap"
+              >
+                <a
+                  type="button"
+                  class="container-fluid btn btn-primary"
+                  disabled
+                  id="openP2PInvite"
+                >
+                  <img src="assets/images/Dcall.png" />点对点呼叫邀请
+                </a>
+                <a
+                  type="button"
+                  class="container-fluid btn btn-primary"
+                  disabled
+                  id="openMultiInvite"
+                  style="margin-top: 45px"
+                >
+                  <img src="assets/images/Mcalls.png" />多人呼叫邀请
+                </a>
+              </div>
+            </div>
+            <div class="login-form_ownid">
+              您的用户ID：<span class="own-user-id-view">未登录</span>
+            </div>
+          </div>
+          <!-- 点对点呼叫 -->
+          <div
+            class="home-login-flex flex-column full-wrap d-none"
+            id="loginForm"
+          >
+            <div class="flex-fill">
+              <div
+                class="d-flex align-items-center login-form_hd justify-content-between"
+              >
+                <div class="align-self-start">
+                  <a type="button" class="icon-btn" onclick="backToHome()">
+                    <svg
+                      width="2em"
+                      style="color: #ddd"
+                      height="2em"
+                      viewBox="0 0 16 16"
+                      class="bi bi-chevron-left"
+                      fill="currentColor"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
+                      />
+                    </svg>
+                  </a>
+                </div>
+                <div class="login-form_bt">点对点呼叫邀请</div>
+                <div class="align-self-end">
+                  <span class="icon-btn" id="openSettingBtn">
+                    <svg
+                      width="2em"
+                      style="color: #40a3fc"
+                      height="2em"
+                      viewBox="0 0 16 16"
+                      class="bi bi-gear"
+                      fill="currentColor"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M8.837 1.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 0 1 4.377 3.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 0 1-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 0 1 1.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 0 1 2.692 1.116l.094.318c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 0 1 2.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 0 1 1.116-2.693l.318-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 0 1-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159A1.873 1.873 0 0 1 8.93 1.945l-.094-.319zm-2.633-.283c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 0 0 1.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 0 0 .52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 0 0-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 0 0-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 0 0-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 0 0-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 0 0 .52-1.255l-.16-.292c-.892-1.64.902-3.433 2.541-2.54l.292.159a.873.873 0 0 0 1.255-.52l.094-.319z"
+                      />
+                      <path
+                        fill-rule="evenodd"
+                        d="M8 5.754a2.246 2.246 0 1 0 0 4.492 2.246 2.246 0 0 0 0-4.492zM4.754 8a3.246 3.246 0 1 1 6.492 0 3.246 3.246 0 0 1-6.492 0z"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+              <div class="login-form_bd">
+                <div class="login-form_bt mb-2">输入您朋友的用户ID</div>
+                <div
+                  class="f-flex justify-content-between input-group userid-inputs"
+                  id="userInputs"
+                >
+                  <input
+                    autocomplete="off"
+                    type="tel"
+                    maxlength="1"
+                    name="code"
+                    pattern="[0-9]*"
+                  />
+                  <input
+                    autocomplete="off"
+                    type="tel"
+                    maxlength="1"
+                    name="code"
+                    pattern="[0-9]*"
+                  />
+                  <input
+                    autocomplete="off"
+                    type="tel"
+                    maxlength="1"
+                    name="code"
+                    pattern="[0-9]*"
+                  />
+                  <input
+                    autocomplete="off"
+                    type="tel"
+                    maxlength="1"
+                    name="code"
+                    pattern="[0-9]*"
+                  />
+                </div>
+              </div>
+              <div class="login-form_bt">
+                <div
+                  class="login-form_submit d-flex justify-content-around align-items-center"
+                >
+                  <button
+                    type="button"
+                    class="container-fluid btn btn-primary disabled"
+                    id="p2pAudioMakeCall"
+                  >
+                    语音呼叫
+                  </button>
+                  <button
+                    type="button"
+                    class="container-fluid btn btn-primary disabled"
+                    id="p2pVideoMakeCall"
+                  >
+                    视频呼叫
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="login-form_ownid">
+              您的用户ID：<span class="own-user-id-view">未登录</span>
+            </div>
+          </div>
+          <!-- 点对点设置 -->
+          <div
+            class="home-login-flex flex-column login-form login-setting"
+            id="loginSetting"
+          >
+            <div class="extend-height d-flex flex-column">
+              <div class="setting-hd d-flex">
+                <div>
+                  <span class="icon-btn" id="closeSettingBtn">
+                    <svg
+                      width="2em"
+                      style="color: #ddd"
+                      height="2em"
+                      viewBox="0 0 16 16"
+                      class="bi bi-chevron-left"
+                      fill="currentColor"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
+                      />
+                    </svg>
+                  </span>
+                </div>
+                <div style="text-align: center; width: 100%">
+                  <span>设置</span>
+                </div>
+              </div>
+              <div class="setting-bd">
+                <div class="setting-option_title">分辨率</div>
+                <select name="" id="settingVideoResolution">
+                  <option value="640*360">360P</option>
+                  <option value="640*480">480P</option>
+                  <option value="1280*720">720P</option>
+                </select>
+                <!--  -->
+                <div class="setting-option_title">音频设备</div>
+                <select name="" id="audioInputSelect"></select>
+                <!--  -->
+                <div class="setting-option_title">视频设备</div>
+                <select name="" id="videoInputSelect"></select>
+                <!--  -->
+                <div
+                  class="d-flex justify-content-center setting-video_preview"
+                >
+                  <img
+                    draggable="false"
+                    class="img-responsive setting-video_preview_bg"
+                    src="assets/images/chart.png"
+                  />
+                  <div
+                    id="settingVideoPreview"
+                    style="width: 100%; height: 100%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 多人呼叫 -->
+          <div
+            class="home-login-flex d-none flex-column full-wrap"
+            id="loginMutiFprm"
+          >
+            <!-- 多人呼叫邀请 -->
+            <div class="flex-fill">
+              <div
+                class="d-flex align-items-center login-form_hd justify-content-between"
+              >
+                <div class="align-self-start">
+                  <a type="button" class="icon-btn" onclick="backToHome()">
+                    <svg
+                      width="2em"
+                      style="color: #ddd"
+                      height="2em"
+                      viewBox="0 0 16 16"
+                      class="bi bi-chevron-left"
+                      fill="currentColor"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
+                      />
+                    </svg>
+                  </a>
+                </div>
+                <div class="login-form_bt">多人呼叫邀请</div>
+                <div class="align-self-end">
+                  <span class="icon-btn" id="multiOpenSettingBtn">
+                    <svg
+                      width="2em"
+                      style="color: #40a3fc"
+                      height="2em"
+                      viewBox="0 0 16 16"
+                      class="bi bi-gear"
+                      fill="currentColor"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M8.837 1.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 0 1 4.377 3.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 0 1-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 0 1 1.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 0 1 2.692 1.116l.094.318c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 0 1 2.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 0 1 1.116-2.693l.318-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 0 1-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159A1.873 1.873 0 0 1 8.93 1.945l-.094-.319zm-2.633-.283c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 0 0 1.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 0 0 .52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 0 0-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 0 0-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 0 0-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 0 0-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 0 0 .52-1.255l-.16-.292c-.892-1.64.902-3.433 2.541-2.54l.292.159a.873.873 0 0 0 1.255-.52l.094-.319z"
+                      />
+                      <path
+                        fill-rule="evenodd"
+                        d="M8 5.754a2.246 2.246 0 1 0 0 4.492 2.246 2.246 0 0 0 0-4.492zM4.754 8a3.246 3.246 0 1 1 6.492 0 3.246 3.246 0 0 1-6.492 0z"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+              <div class="login-form_bd">
+                <div class="login-form_bt">输入您朋友的用户ID</div>
+                <div
+                  class="f-flex justify-content-between input-group userid-inputs"
+                  id="multiUserInputs"
+                >
+                  <input
+                    autocomplete="off"
+                    type="tel"
+                    maxlength="1"
+                    name="code"
+                    pattern="[0-9]*"
+                  />
+                  <input
+                    autocomplete="off"
+                    type="tel"
+                    maxlength="1"
+                    name="code"
+                    pattern="[0-9]*"
+                  />
+                  <input
+                    autocomplete="off"
+                    type="tel"
+                    maxlength="1"
+                    name="code"
+                    pattern="[0-9]*"
+                  />
+                  <input
+                    autocomplete="off"
+                    type="tel"
+                    maxlength="1"
+                    name="code"
+                    pattern="[0-9]*"
+                  />
+                </div>
+              </div>
+              <div class="login-form_us" id="multiUserBtn"></div>
+              <div class="login-form_bt">
+                <div class="login-form_submit">
+                  <button
+                    type="button"
+                    style="border-radius: 30px; margin: 0"
+                    class="container-fluid btn btn-primary disabled"
+                    id="MultipleCalls"
+                  >
+                    发起邀请
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="login-form_ownid">
+              您的用户ID：<span class="own-user-id-view">未登录</span>
+            </div>
+          </div>
+          <!-- 多人设置 -->
+          <div
+            class="home-login-flex flex-column login-form login-setting"
+            id="loginMutiSetting"
+          >
+            <div class="extend-height d-flex flex-column">
+              <div class="setting-hd d-flex">
+                <div>
+                  <span class="icon-btn" id="closeMutiSettingBtn">
+                    <svg
+                      width="2em"
+                      style="color: #ddd"
+                      height="2em"
+                      viewBox="0 0 16 16"
+                      class="bi bi-chevron-left"
+                      fill="currentColor"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
+                      />
+                    </svg>
+                  </span>
+                </div>
+                <div style="text-align: center; width: 100%">
+                  <span>设置</span>
+                </div>
+              </div>
+              <div class="setting-bd">
+                <div
+                  class="d-flex justify-content-between align-items-end seting-mutil_height"
+                >
+                  <span>开启摄像头</span>
+                  <div class="custom-control custom-switch">
+                    <input
+                      autocomplete="off"
+                      type="checkbox"
+                      class="custom-control-input"
+                      id="userVideoCameraSetting"
+                    />
+                    <label
+                      class="custom-control-label"
+                      for="userVideoCameraSetting"
+                    ></label>
+                  </div>
+                </div>
+                <div
+                  class="d-flex justify-content-between align-items-end seting-mutil_height"
+                >
+                  <span>开启麦克风</span>
+                  <div class="custom-control custom-switch">
+                    <input
+                      autocomplete="off"
+                      type="checkbox"
+                      class="custom-control-input"
+                      id="userMicrophoneSetting"
+                    />
+                    <label
+                      class="custom-control-label"
+                      for="userMicrophoneSetting"
+                    ></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-		<!-- 首页 -->
-		<div class="page d-flex flex-col justify-content-center align-items-center" id="homePage">
-			<!--  -->
-			<div class="login d-flex flex-row align-items-stretch">
-				<!-- 警告框 -->
-				<div class="warning_box" id="warningBox"></div>
-				<!--  -->
-				<div class="flex-fill flex-basis-0 login-left">
-					<img draggable="false" class="img-responsive" src="assets/images/BG.png" />
-				</div>
-				<!--  -->
-				<div class="flex-fill flex-basis-0 login-right">
-					<!-- 邀请(首页) -->
-					<div class="home-login-flex flex-column full-wrap" id="loginHome">
-						<div class="flex-fill">
-							<div class="d-flex flex-column align-items-center justify-content-center full-wrap">
-								<a type="button" class="container-fluid btn btn-primary" disabled id="openP2PInvite">
-									<img src="assets/images/Dcall.png">点对点呼叫邀请
-								</a>
-								<a type="button" class="container-fluid btn btn-primary" disabled id="openMultiInvite"
-								 style="margin-top: 45px;">
-									<img src="assets/images/Mcalls.png">多人呼叫邀请
-								</a>
-							</div>
-						</div>
-						<div class="login-form_ownid">您的用户ID：<span class="own-user-id-view">未登录</span></div>
-					</div>
-					<!-- 点对点呼叫 -->
-					<div class="home-login-flex flex-column full-wrap d-none" id="loginForm">
-						<div class="flex-fill">
-							<div class="d-flex align-items-center login-form_hd justify-content-between">
-								<div class="align-self-start">
-									<a type="button" class="icon-btn" onclick="backToHome()">
-										<svg width="2em" style="color: #ddd;" height="2em" viewBox="0 0 16 16" class="bi bi-chevron-left" fill="currentColor"
-										 xmlns="http://www.w3.org/2000/svg">
-											<path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
-										</svg>
-									</a>
-								</div>
-								<div class="login-form_bt">
-									点对点呼叫邀请
-								</div>
-								<div class="align-self-end">
-									<span class="icon-btn" id="openSettingBtn">
-										<svg width="2em" style="color: #40a3fc;" height="2em" viewBox="0 0 16 16" class="bi bi-gear" fill="currentColor"
-										 xmlns="http://www.w3.org/2000/svg">
-											<path fill-rule="evenodd" d="M8.837 1.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 0 1 4.377 3.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 0 1-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 0 1 1.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 0 1 2.692 1.116l.094.318c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 0 1 2.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 0 1 1.116-2.693l.318-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 0 1-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159A1.873 1.873 0 0 1 8.93 1.945l-.094-.319zm-2.633-.283c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 0 0 1.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 0 0 .52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 0 0-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 0 0-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 0 0-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 0 0-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 0 0 .52-1.255l-.16-.292c-.892-1.64.902-3.433 2.541-2.54l.292.159a.873.873 0 0 0 1.255-.52l.094-.319z" />
-											<path fill-rule="evenodd" d="M8 5.754a2.246 2.246 0 1 0 0 4.492 2.246 2.246 0 0 0 0-4.492zM4.754 8a3.246 3.246 0 1 1 6.492 0 3.246 3.246 0 0 1-6.492 0z" />
-										</svg>
-									</span>
-								</div>
+    <!-- p2p页面 -->
 
-							</div>
-							<div class="login-form_bd">
-								<div class="login-form_bt mb-2">输入您朋友的用户ID</div>
-								<div class="f-flex justify-content-between input-group userid-inputs" id="userInputs">
-									<input autocomplete="off" type="tel" maxlength="1" name="code" pattern="[0-9]*" />
-									<input autocomplete="off" type="tel" maxlength="1" name="code" pattern="[0-9]*" />
-									<input autocomplete="off" type="tel" maxlength="1" name="code" pattern="[0-9]*" />
-									<input autocomplete="off" type="tel" maxlength="1" name="code" pattern="[0-9]*" />
-								</div>
-							</div>
-							<div class="login-form_bt">
+    <!-- 邀请 -->
+    <div
+      class="page d-flex justify-content-center align-items-center allheight d-none"
+      id="makeCallPage"
+    >
+      <div class="invitation bd-highlight">
+        <div class="d-flex justify-content-center">
+          <div class="head_portrait">
+            <img draggable="false" src="assets/images/head.png" />
+          </div>
+        </div>
+        <div
+          class="d-flex flex-wrap justify-content-center text-white mt-2 mb-2 user_characteristic"
+          id="calleeIdView"
+          style="font-size: 2em; letter-spacing: 12px"
+        >
+          ----
+        </div>
+        <div
+          class="d-flex justify-content-center text-white"
+          style="z-index: 8"
+        >
+          呼叫中...
+        </div>
 
-								<div class="login-form_submit d-flex justify-content-around align-items-center">
-									<button type="button" class="container-fluid btn btn-primary disabled" id="p2pAudioMakeCall">语音呼叫</button>
-									<button type="button" class="container-fluid btn btn-primary disabled" id="p2pVideoMakeCall">视频呼叫</button>
-								</div>
-							</div>
-						</div>
-						<div class="login-form_ownid">您的用户ID：<span class="own-user-id-view">未登录</span></div>
-					</div>
-					<!-- 点对点设置 -->
-					<div class="home-login-flex flex-column login-form login-setting " id="loginSetting">
-						<div class="extend-height d-flex flex-column">
-							<div class="setting-hd d-flex">
-								<div>
-									<span class="icon-btn" id="closeSettingBtn">
-										<svg width="2em" style="color: #ddd;" height="2em" viewBox="0 0 16 16" class="bi bi-chevron-left" fill="currentColor"
-										 xmlns="http://www.w3.org/2000/svg">
-											<path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
-										</svg>
-									</span>
-								</div>
-								<div style="text-align: center;width: 100%;">
-									<span>设置</span>
-								</div>
+        <div
+          class="page d-flex flex-col justify-content-center align-items-centermar"
+          style="margin: 130px auto 30px"
+        >
+          <img
+            draggable="false"
+            class="img-responsive"
+            style="cursor: pointer"
+            src="assets/images/hangup.png"
+            id="cancelCallBtn"
+          />
+          <!-- <button type="button" class="btn btn-danger" >取消</button> -->
+        </div>
+      </div>
+    </div>
+    <!-- 被呼-->
+    <div
+      class="page d-flex justify-content-center align-items-center allheight d-none"
+      id="reciveCallPage"
+    >
+      <div class="invitation bd-highlight">
+        <div class="d-flex justify-content-center">
+          <div class="head_portrait">
+            <img draggable="false" src="assets/images/head.png" />
+          </div>
+        </div>
+        <div
+          class="text-white mt-2 mb-2"
+          id="callerIdView"
+          style="
+            font-size: 2em;
+            letter-spacing: 12px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
+          "
+        >
+          ----
+        </div>
+        <div class="d-flex justify-content-center text-white">待接听...</div>
 
-							</div>
-							<div class="setting-bd">
-								<div class="setting-option_title">分辨率</div>
-								<select name="" id="settingVideoResolution">
-									<option value="640*360">360P</option>
-									<option value="640*480">480P</option>
-									<option value="1280*720">720P</option>
-								</select>
-								<!--  -->
-								<div class="setting-option_title">音频设备</div>
-								<select name="" id="audioInputSelect"></select>
-								<!--  -->
-								<div class="setting-option_title">视频设备</div>
-								<select name="" id="videoInputSelect"></select>
-								<!--  -->
-								<div class="d-flex justify-content-center setting-video_preview">
-									<img draggable="false" class="img-responsive setting-video_preview_bg" src="assets/images/chart.png" />
-									<div id="settingVideoPreview" style="width: 100%; height: 100%;"></div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- 多人呼叫 -->
-					<div class="home-login-flex d-none flex-column full-wrap " id="loginMutiFprm">
-						<!-- 多人呼叫邀请 -->
-						<div class="flex-fill">
-							<div class="d-flex align-items-center login-form_hd justify-content-between">
-								<div class="align-self-start">
-									<a type="button" class="icon-btn" onclick="backToHome()">
-										<svg width="2em" style="color: #ddd;" height="2em" viewBox="0 0 16 16" class="bi bi-chevron-left" fill="currentColor"
-										 xmlns="http://www.w3.org/2000/svg">
-											<path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
-										</svg>
-									</a>
-								</div>
-								<div class="login-form_bt">
-									多人呼叫邀请
-								</div>
-								<div class="align-self-end">
-									<span class="icon-btn" id="multiOpenSettingBtn">
-										<svg width="2em" style="color: #40a3fc;" height="2em" viewBox="0 0 16 16" class="bi bi-gear" fill="currentColor"
-										 xmlns="http://www.w3.org/2000/svg">
-											<path fill-rule="evenodd" d="M8.837 1.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 0 1 4.377 3.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 0 1-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 0 1 1.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 0 1 2.692 1.116l.094.318c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 0 1 2.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 0 1 1.116-2.693l.318-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 0 1-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159A1.873 1.873 0 0 1 8.93 1.945l-.094-.319zm-2.633-.283c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 0 0 1.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 0 0 .52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 0 0-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 0 0-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 0 0-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 0 0-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 0 0 .52-1.255l-.16-.292c-.892-1.64.902-3.433 2.541-2.54l.292.159a.873.873 0 0 0 1.255-.52l.094-.319z" />
-											<path fill-rule="evenodd" d="M8 5.754a2.246 2.246 0 1 0 0 4.492 2.246 2.246 0 0 0 0-4.492zM4.754 8a3.246 3.246 0 1 1 6.492 0 3.246 3.246 0 0 1-6.492 0z" />
-										</svg>
-									</span>
-								</div>
-
-							</div>
-							<div class="login-form_bd">
-								<div class="login-form_bt">输入您朋友的用户ID</div>
-								<div class="f-flex justify-content-between input-group userid-inputs" id="multiUserInputs">
-									<input autocomplete="off" type="tel" maxlength="1" name="code" pattern="[0-9]*" />
-									<input autocomplete="off" type="tel" maxlength="1" name="code" pattern="[0-9]*" />
-									<input autocomplete="off" type="tel" maxlength="1" name="code" pattern="[0-9]*" />
-									<input autocomplete="off" type="tel" maxlength="1" name="code" pattern="[0-9]*" />
-								</div>
-							</div>
-							<div class="login-form_us" id="multiUserBtn">
-
-							</div>
-							<div class="login-form_bt">
-
-								<div class="login-form_submit">
-									<button type="button" style="border-radius: 30px;margin: 0;" class="container-fluid btn btn-primary disabled" id="MultipleCalls">发起邀请</button>
-								</div>
-							</div>
-						</div>
-						<div class="login-form_ownid">您的用户ID：<span class="own-user-id-view">未登录</span></div>
-					</div>
-					<!-- 多人设置 -->
-					<div class="home-login-flex flex-column login-form login-setting " id="loginMutiSetting">
-						<div class="extend-height d-flex flex-column">
-							<div class="setting-hd d-flex">
-								<div>
-									<span class="icon-btn" id="closeMutiSettingBtn">
-										<svg width="2em" style="color: #ddd;" height="2em" viewBox="0 0 16 16" class="bi bi-chevron-left" fill="currentColor"
-										 xmlns="http://www.w3.org/2000/svg">
-											<path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
-										</svg>
-									</span>
-								</div>
-								<div style="text-align: center;width: 100%;">
-									<span>设置</span>
-								</div>
-
-							</div>
-							<div class="setting-bd">
-								<div class="d-flex justify-content-between align-items-end seting-mutil_height">
-									<span>开启摄像头</span>
-									<div class="custom-control custom-switch">
-										<input autocomplete="off" type="checkbox" class="custom-control-input" id="userVideoCameraSetting">
-										<label class="custom-control-label" for="userVideoCameraSetting"></label>
-									</div>
-								</div>
-								<div class="d-flex justify-content-between align-items-end seting-mutil_height">
-									<span>开启麦克风</span>
-									<div class="custom-control custom-switch">
-										<input autocomplete="off" type="checkbox" class="custom-control-input" id="userMicrophoneSetting">
-										<label class="custom-control-label" for="userMicrophoneSetting"></label>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-
-				</div>
-			</div>
-		</div>
-
-		<!-- p2p页面 -->
-
-		<!-- 邀请 -->
-		<div class="page d-flex justify-content-center align-items-center allheight d-none" id="makeCallPage">
-			<div class="invitation bd-highlight">
-				<div class="d-flex justify-content-center">
-					<div class="head_portrait">
-						<img draggable="false" src="assets/images/head.png" />
-					</div>
-				</div>
-				<div class="d-flex flex-wrap justify-content-center text-white mt-2 mb-2 user_characteristic" id="calleeIdView"
-				 style="font-size: 2em;letter-spacing: 12px;">----</div>
-				<div class="d-flex justify-content-center text-white" style="z-index: 8;">呼叫中...</div>
-
-				<div class="page d-flex flex-col justify-content-center align-items-centermar" style="margin:130px auto 30px">
-					<img draggable="false" class="img-responsive" style="cursor: pointer;" src="assets/images/hangup.png" id="cancelCallBtn" />
-					<!-- <button type="button" class="btn btn-danger" >取消</button> -->
-				</div>
-			</div>
-		</div>
-		<!-- 被呼-->
-		<div class="page d-flex justify-content-center align-items-center allheight d-none" id="reciveCallPage">
-			<div class="invitation bd-highlight">
-				<div class="d-flex justify-content-center">
-					<div class="head_portrait">
-						<img draggable="false" src="assets/images/head.png" />
-					</div>
-				</div>
-				<div class="text-white mt-2 mb-2" id="callerIdView" style="font-size: 2em;letter-spacing: 12px;overflow: hidden;text-overflow:ellipsis;text-align: center;">----</div>
-				<div class="d-flex justify-content-center text-white">待接听...</div>
-
-				<div class="page d-flex flex-col justify-content-around align-items-centermar" style="margin:130px auto 30px">
-					<img draggable="false" class="img-responsive" style="cursor: pointer;" src="assets/images/changaudio-hover.png" id="changAudioBtn" />
-					<img draggable="false" class="img-responsive" style="cursor: pointer;" src="assets/images/answer.png" id="acceptCallBtn" />
-					<img draggable="false" class="img-responsive" style="cursor: pointer;" src="assets/images/hangup.png" id="refuseCallBtn" />
-					<!-- 多人 -->
-					<!-- <img draggable="false" class="img-responsive" style="cursor: pointer;" src="assets/images/answer.png" id="acceptCallBtn" /> -->
-					<!-- <img draggable="false" class="img-responsive" style="cursor: pointer;" src="assets/images/hangup.png" id="refuseCallBtn" /> -->
-				</div>
-			</div>
-		</div>
-		<!-- 音频通讯 -->
-		<div class="page d-flex flex-col justify-content-center align-items-center d-none" id="audioPage">
-			<div class="container d-flex flex-column justify-content-around align-items-center" style="position: relative;">
-				<div class="audio_main d-flex flex-column justify-content-around align-items-center">
-					<div class="">
-						<img draggable="false" class="img-responsive" src="assets/images/head.png">
-					</div>
-					<div class="">
-						<div class="audio_time" id="audioDuration">
-							00:00
-						</div>
-						<div class="audio_option d-flex">
-							<button type="button" id="audioSwitchBtn" class="d-flex flex-column align-items-center"><i class="iconfont icon-audio_open meet-control_icon"></i>音频</button>
-							<button type="button" id="hangupAudioBtn" class="d-flex flex-column align-items-center"><i class="iconfont icon-hangup meet-control_icon"
-								 style="color: #f97171;"></i>挂断</button>
-						</div>
-					</div>
-				</div>
-				<div class="audio_bg">
-					<img draggable="false" style="width: 100%;" class="img-responsive" src="assets/images/audio_bg.png">
-				</div>
-			</div>
-		</div>
-		<!--p2p 视频通讯-->
-		<div class="page d-none d-flex flex-col justify-content-center align-items-center" id="meetPage">
-			<div class="meet-view" style="position: relative;">
-				<!-- 小屏 -->
-				<div class="video-preview_little">
-					<div class="d-flex justify-content-center align-items-center" style="margin: 0;width: 100%;height: 100%;" id="mineVideoPreview">
-						<img id="mineVideoPreview_bg" draggable="false" style="position: absolute;width: 50%;" class="img-responsive" src="assets/images/logo_title.png" />
-					</div>
-					<div class="prompt_little d-flex">
-						<!-- <div class="" id="titleAudio">
+        <div
+          class="page d-flex flex-col justify-content-around align-items-centermar"
+          style="margin: 130px auto 30px"
+        >
+          <img
+            draggable="false"
+            class="img-responsive"
+            style="cursor: pointer"
+            src="assets/images/changaudio-hover.png"
+            id="changAudioBtn"
+          />
+          <img
+            draggable="false"
+            class="img-responsive"
+            style="cursor: pointer"
+            src="assets/images/answer.png"
+            id="acceptCallBtn"
+          />
+          <img
+            draggable="false"
+            class="img-responsive"
+            style="cursor: pointer"
+            src="assets/images/hangup.png"
+            id="refuseCallBtn"
+          />
+          <!-- 多人 -->
+          <!-- <img draggable="false" class="img-responsive" style="cursor: pointer;" src="assets/images/answer.png" id="acceptCallBtn" /> -->
+          <!-- <img draggable="false" class="img-responsive" style="cursor: pointer;" src="assets/images/hangup.png" id="refuseCallBtn" /> -->
+        </div>
+      </div>
+    </div>
+    <!-- 音频通讯 -->
+    <div
+      class="page d-flex flex-col justify-content-center align-items-center d-none"
+      id="audioPage"
+    >
+      <div
+        class="container d-flex flex-column justify-content-around align-items-center"
+        style="position: relative"
+      >
+        <div
+          class="audio_main d-flex flex-column justify-content-around align-items-center"
+        >
+          <div class="">
+            <img
+              draggable="false"
+              class="img-responsive"
+              src="assets/images/head.png"
+            />
+          </div>
+          <div class="">
+            <div class="audio_time" id="audioDuration">00:00</div>
+            <div class="audio_option d-flex">
+              <button
+                type="button"
+                id="audioSwitchBtn"
+                class="d-flex flex-column align-items-center"
+              >
+                <i class="iconfont icon-audio_open meet-control_icon"></i>音频
+              </button>
+              <button
+                type="button"
+                id="hangupAudioBtn"
+                class="d-flex flex-column align-items-center"
+              >
+                <i
+                  class="iconfont icon-hangup meet-control_icon"
+                  style="color: #f97171"
+                ></i
+                >挂断
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="audio_bg">
+          <img
+            draggable="false"
+            style="width: 100%"
+            class="img-responsive"
+            src="assets/images/audio_bg.png"
+          />
+        </div>
+      </div>
+    </div>
+    <!--p2p 视频通讯-->
+    <div
+      class="page d-none d-flex flex-col justify-content-center align-items-center"
+      id="meetPage"
+    >
+      <div class="meet-view" style="position: relative">
+        <!-- 小屏 -->
+        <div class="video-preview_little">
+          <div
+            class="d-flex justify-content-center align-items-center"
+            style="margin: 0; width: 100%; height: 100%"
+            id="mineVideoPreview"
+          >
+            <img
+              id="mineVideoPreview_bg"
+              draggable="false"
+              style="position: absolute; width: 50%"
+              class="img-responsive"
+              src="assets/images/logo_title.png"
+            />
+          </div>
+          <div class="prompt_little d-flex">
+            <!-- <div class="" id="titleAudio">
 		          <i class="iconfont icon-_yinpinkaiqizhong icon_color_blue"></i>
 		        </div> -->
-						<div id="UserIdChanel">
-							用户
-						</div>
-					</div>
-				</div>
+            <div id="UserIdChanel">用户</div>
+          </div>
+        </div>
 
-				<!-- 大屏 -->
-				<div class="video-preview_big">
-					<div class="video-preview_big d-flex justify-content-center align-items-center" id="peerVideoPreview">
-						<img draggable="false" style="position: absolute;width: 40%;" class="img-responsive" src="assets/images/logo_big.png" />
-					</div>
-					<div class="prompt_big meet-control_icon m-3" id="videoDuration">
-						00:00
-					</div>
-				</div>
+        <!-- 大屏 -->
+        <div class="video-preview_big">
+          <div
+            class="video-preview_big d-flex justify-content-center align-items-center"
+            id="peerVideoPreview"
+          >
+            <img
+              draggable="false"
+              style="position: absolute; width: 40%"
+              class="img-responsive"
+              src="assets/images/logo_big.png"
+            />
+          </div>
+          <div class="prompt_big meet-control_icon m-3" id="videoDuration">
+            00:00
+          </div>
+        </div>
 
-				<!--  -->
-				<div class="video-operate d-flex justify-content-center">
-					<div class="d-flex">
-						<div class="audio_option d-flex" style="width: 200px;">
-							<button id="switchToAudioCall" type="button" class="d-flex flex-column align-items-center"><i class="iconfont icon-switch-audio meet-control_icon icon_color_blue"></i>转到语音</button>
-							<!-- <button id="audioSwitchBtn" type="button" class="d-flex flex-column align-items-center"><i class="iconfont icon-_yinpinkaiqizhong audio_icon icon_color_blue"></i>音频</button> -->
-							<button id="hangupBtn" type="button" class="d-flex flex-column align-items-center"><i class="iconfont icon-hangup meet-control_icon icon_color_red"></i>挂断</button>
-							<!-- <button id="videoSwitchBtn" type="button" class="d-flex flex-column align-items-center"><i class="iconfont icon-_shipinkaiqizhong audio_icon icon_color_blue"></i>视频</button> -->
-						</div>
+        <!--  -->
+        <div class="video-operate d-flex justify-content-center">
+          <div class="d-flex">
+            <div class="audio_option d-flex" style="width: 200px">
+              <button
+                id="switchToAudioCall"
+                type="button"
+                class="d-flex flex-column align-items-center"
+              >
+                <i
+                  class="iconfont icon-switch-audio meet-control_icon icon_color_blue"
+                ></i
+                >转到语音
+              </button>
+              <!-- <button id="audioSwitchBtn" type="button" class="d-flex flex-column align-items-center"><i class="iconfont icon-_yinpinkaiqizhong audio_icon icon_color_blue"></i>音频</button> -->
+              <button
+                id="hangupBtn"
+                type="button"
+                class="d-flex flex-column align-items-center"
+              >
+                <i
+                  class="iconfont icon-hangup meet-control_icon icon_color_red"
+                ></i
+                >挂断
+              </button>
+              <!-- <button id="videoSwitchBtn" type="button" class="d-flex flex-column align-items-center"><i class="iconfont icon-_shipinkaiqizhong audio_icon icon_color_blue"></i>视频</button> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-					</div>
-				</div>
-			</div>
-		</div>
+    <!-- 多人呼叫 -->
 
-		<!-- 多人呼叫 -->
-
-		<!-- 多人 视频通讯页 -->
-		<div class="page d-flex flex-col justify-content-center align-items-center d-none" id="meetMutiPage">
-			<div class="meet-view" style="position: relative; padding: 0; border-radius: 10px; overflow: hidden;">
-				<div class="video-preview_small">
-					<div class="d-flex" id="mineMutiTitleVideoPreview">
-						<!-- 小屏用户窗口 -->
-					</div>
-				</div>
-				<!-- 大屏 -->
-				<div class="video-preview_big">
-					<div class="video-preview_big d-flex justify-content-center align-items-center" id="peerMutiVideoPreview">
-						<img draggable="false" style="position: absolute;" class="img-responsive" src="assets/images/logo_big.png" />
-					</div>
-					<!-- <div class="prompt_big meet-control_icon m-3">
+    <!-- 多人 视频通讯页 -->
+    <div
+      class="page d-flex flex-col justify-content-center align-items-center d-none"
+      id="meetMutiPage"
+    >
+      <div
+        class="meet-view"
+        style="
+          position: relative;
+          padding: 0;
+          border-radius: 10px;
+          overflow: hidden;
+        "
+      >
+        <div class="video-preview_small">
+          <div class="d-flex" id="mineMutiTitleVideoPreview">
+            <!-- 小屏用户窗口 -->
+          </div>
+        </div>
+        <!-- 大屏 -->
+        <div class="video-preview_big">
+          <div
+            class="video-preview_big d-flex justify-content-center align-items-center"
+            id="peerMutiVideoPreview"
+          >
+            <img
+              draggable="false"
+              style="position: absolute"
+              class="img-responsive"
+              src="assets/images/logo_big.png"
+            />
+          </div>
+          <!-- <div class="prompt_big meet-control_icon m-3">
 		        20:00
 		      </div> -->
-				</div>
+        </div>
 
-				<!--  -->
-				<div class="video-operate d-flex justify-content-center">
-					<div class="d-flex">
+        <!--  -->
+        <div class="video-operate d-flex justify-content-center">
+          <div class="d-flex">
+            <div class="audio_option d-flex" style="width: 310px">
+              <button id="setAudioEnableBtn" type="button" class="">
+                <i
+                  class="iconfont meet-control_icon icon-audio_open icon_color_blue"
+                  id="localAudioEnableIcon"
+                ></i>
+                <p>音频</p>
+              </button>
+              <button id="hangupMutiBtn" type="button" class="">
+                <i
+                  class="iconfont icon-hangup meet-control_icon icon_color_red"
+                ></i>
+                <p>挂断</p>
+              </button>
+              <button id="setVideoEnableBtn" type="button" class="">
+                <i
+                  class="iconfont meet-control_icon icon-video_open icon_color_blue"
+                  id="localVideoEnableIcon"
+                ></i>
+                <p>视频</p>
+              </button>
+              <button
+                class="invite-btn"
+                id="videoInviteMutiBtn"
+                type="button"
+                data-toggle="modal"
+                data-target="#invitationModal"
+                class=""
+              >
+                <i
+                  class="iconfont icon-request_transparent meet-control_icon"
+                ></i>
+                <i
+                  class="iconfont icon-request_opacity meet-control_icon icon_color_blue"
+                ></i>
+                <p>邀请</p>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-						<div class="audio_option d-flex" style="width: 310px;">
-							<button id="setAudioEnableBtn" type="button" class="">
-								<i class="iconfont meet-control_icon icon-audio_open icon_color_blue" id="localAudioEnableIcon"></i>
-								<p>音频</p>
-							</button>
-							<button id="hangupMutiBtn" type="button" class="">
-								<i class="iconfont icon-hangup meet-control_icon icon_color_red"></i>
-								<p>挂断</p>
-							</button>
-							<button id="setVideoEnableBtn" type="button" class="">
-								<i class="iconfont meet-control_icon icon-video_open icon_color_blue" id="localVideoEnableIcon"></i>
-								<p>视频</p>
-							</button>
-							<button class="invite-btn" id="videoInviteMutiBtn" type="button" data-toggle="modal" data-target="#invitationModal"
-							 class="">
-								<i class="iconfont icon-request_transparent meet-control_icon"></i>
-								<i class="iconfont icon-request_opacity meet-control_icon icon_color_blue"></i>
-								<p>邀请</p>
-							</button>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- 多人邀请模态框 -->
-		<div class="modal fade" id="invitationModal" tabindex="-1" role="dialog" aria-labelledby="invitationModalLabel"
-		 aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content">
-					<div class="modal-header">
-
-						<h4 class="modal-title" id="invitationModalLabel">
-							邀请用户
-						</h4>
-						<button type="button" id="modalClose" class="close" data-dismiss="modal" aria-hidden="true">
-							&times;
-						</button>
-					</div>
-					<div class="modal-body">
-						<div class="login-form_bd modal-form_bd">
-							<div class="login-form_bt">输入您朋友的用户ID</div>
-							<div class="f-flex justify-content-between input-group userid-inputs" id="userMutiModalInputs">
-								<input autocomplete="off" autofocus type="tel" maxlength="1" name="code" pattern="[0-9]*" />
-								<input autocomplete="off" type="tel" maxlength="1" name="code" pattern="[0-9]*" />
-								<input autocomplete="off" type="tel" maxlength="1" name="code" pattern="[0-9]*" />
-								<input autocomplete="off" type="tel" maxlength="1" name="code" pattern="[0-9]*" />
-							</div>
-							<div class="login-form_bt" id="invitaionErrorView"></div>
-						</div>
-					</div>
-					<div class="modal-footer justify-content-center">
-						<button id="mutiModalBtn" type="button" class="btn btn-primary" style="width: 96px;">确定</button>
-					</div>
-				</div><!-- /.modal-content -->
-			</div><!-- /.modal -->
-		</div>
-		<script src="https://ardw.anyrtc.io/sdk/web/ArRTC@latest.js"></script>
-		<script src="https://ardw.anyrtc.io/sdk/web/ArRTM@latest.js"></script>
-		<script src="assets/js/index.js" type="text/javascript" charset="utf-8"></script>
-	</body>
+    <!-- 多人邀请模态框 -->
+    <div
+      class="modal fade"
+      id="invitationModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="invitationModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="invitationModalLabel">邀请用户</h4>
+            <button
+              type="button"
+              id="modalClose"
+              class="close"
+              data-dismiss="modal"
+              aria-hidden="true"
+            >
+              &times;
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="login-form_bd modal-form_bd">
+              <div class="login-form_bt">输入您朋友的用户ID</div>
+              <div
+                class="f-flex justify-content-between input-group userid-inputs"
+                id="userMutiModalInputs"
+              >
+                <input
+                  autocomplete="off"
+                  autofocus
+                  type="tel"
+                  maxlength="1"
+                  name="code"
+                  pattern="[0-9]*"
+                />
+                <input
+                  autocomplete="off"
+                  type="tel"
+                  maxlength="1"
+                  name="code"
+                  pattern="[0-9]*"
+                />
+                <input
+                  autocomplete="off"
+                  type="tel"
+                  maxlength="1"
+                  name="code"
+                  pattern="[0-9]*"
+                />
+                <input
+                  autocomplete="off"
+                  type="tel"
+                  maxlength="1"
+                  name="code"
+                  pattern="[0-9]*"
+                />
+              </div>
+              <div class="login-form_bt" id="invitaionErrorView"></div>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-center">
+            <button
+              id="mutiModalBtn"
+              type="button"
+              class="btn btn-primary"
+              style="width: 96px"
+            >
+              确定
+            </button>
+          </div>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal -->
+    </div>
+    <script src="https://ardw.anyrtc.io/sdk/web/ArRTC@latest.js"></script>
+    <script src="https://ardw.anyrtc.io/sdk/web/ArRTM@latest.js"></script>
+    <script
+      src="assets/js/index.js"
+      type="text/javascript"
+      charset="utf-8"
+    ></script>
+  </body>
 </html>

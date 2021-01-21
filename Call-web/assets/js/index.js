@@ -1353,11 +1353,11 @@ var RTM = {
 	} else {
 		if (cameras.length === 0) {
 			Store.setting.enableVideo = false;
-			$("#userVideoCameraSetting").porp("disabled", true);
+			$("#userVideoCameraSetting").prop("disabled", true);
 		}
 		if (microhones.length === 0) {
 			Store.setting.enableAudio = false;
-			$("#userMicrophoneSetting").porp("disabled", true);
+			$("#userMicrophoneSetting").prop("disabled", true);
 		}
 	}
 	// 初始化RTC
