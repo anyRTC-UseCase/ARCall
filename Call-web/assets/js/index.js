@@ -697,7 +697,7 @@ var RTC = {
 		}
 		if (cameras.length > 0 && microhones.length > 0 && callMode === 0) { //仅视频呼叫才打开摄像头
 			[Store.localTracks.audioTrack, Store.localTracks.videoTrack] = await ArRTC.createMicrophoneAndCameraTracks(
-				null, {
+				{}, {
 				// encoderConfig: {
 				// 	bitrateMax: 1130,
 				// 	// bitrateMin: ,
@@ -761,7 +761,7 @@ var RTC = {
 		]);
 		if (cameras.length > 0 && microhones.length > 0) {
 			[Store.localTracks.audioTrack, Store.localTracks.videoTrack] = await ArRTC.createMicrophoneAndCameraTracks(
-				null, {
+				{}, {
 				encoderConfig: {
 					bitrateMax: 1130,
 					// bitrateMin: ,
@@ -1345,7 +1345,6 @@ var RTM = {
 		ArRTC.getCameras(),
 		ArRTC.getMicrophones(),
 	]);
-
 	if (cameras.length === 0 && microhones.length === 0) {
 		CustomUI.alertWhole("缺少麦克风和摄像头设备", "alert-danger");
 		$("#MultipleCalls").prop("disabled", true);
