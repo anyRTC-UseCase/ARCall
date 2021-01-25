@@ -68,7 +68,7 @@ import java.util.Set;
 
 public class VideoActivity extends BaseActivity implements AIDenoiseNotify.DenoiseNotifyCallBack {
 
-    private static final String TAG =VideoActivity.class.getSimpleName();
+    private static final String TAG = VideoActivity.class.getSimpleName();
 
     private FrameLayout flVideoGroup;
     private Button ibtnAudio, ibtnVideo, ibtnSpeak, ibtnSwitch;
@@ -83,7 +83,7 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
 
     //语音模式
     private FrameLayout flAudioGroup;
-    private Button a_btnAudio,  a_btnSpeak;
+    private Button a_btnAudio, a_btnSpeak;
     private TextView tv_remote_audio_user;
     private Chronometer chronometer;
 
@@ -104,13 +104,12 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
     private HashMap<String, TextureView> videoList = new HashMap<>();
 
 
-
     //呼叫等待页面
-    private Button btnHangup, btnAccept, btnCall,btnSwitchAudio;
+    private Button btnHangup, btnAccept, btnCall, btnSwitchAudio;
     private MediaPlayer player;
     private TextView tvUserPre;
     private TextView tvState;
-    private RelativeLayout rlCall,rl_video_preview;
+    private RelativeLayout rlCall, rl_video_preview;
     private LocalInvitation localInvitation;
     private RemoteInvitation remoteInvitation;
     private boolean isCall = false; //true 主动呼叫 false 被呼叫
@@ -118,9 +117,6 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
 
     private boolean isWaiting = false;
     private boolean isCalling = false;
-
-
-
 
 
     @Override
@@ -155,11 +151,11 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
         tvState = findViewById(R.id.tv_state);
         btnAccept = findViewById(R.id.btn_accept);
         btnHangup = findViewById(R.id.btn_hangup);
-        rtmClient =  RTManager.INSTANCE.getRtmClient();
-        rtmCallManager =  RTManager.INSTANCE.getRtmCallManager();
-        isCall = !getIntent().getBooleanExtra("RecCall",false);
-        if (isCall){
-            localInvitation =  RTManager.INSTANCE.getLocalInvitation();
+        rtmClient = RTManager.INSTANCE.getRtmClient();
+        rtmCallManager = RTManager.INSTANCE.getRtmCallManager();
+        isCall = !getIntent().getBooleanExtra("RecCall", false);
+        if (isCall) {
+            localInvitation = RTManager.INSTANCE.getLocalInvitation();
             try {
                 JSONObject jsonObject = new JSONObject(localInvitation.getContent());
                 callMode = jsonObject.getInt("Mode");
@@ -169,9 +165,9 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            tvState.setText(callMode ==Constans.AUDIO_MODE ? "语音呼叫中" :"视频呼叫中");
+            tvState.setText(callMode == Constans.AUDIO_MODE ? "语音呼叫中" : "视频呼叫中");
             Subscribe(localInvitation.getCalleeId());
-            showCallLayout(false,localInvitation.getCalleeId());
+            showCallLayout(false, localInvitation.getCalleeId());
             rtmCallManager.sendLocalInvitation(localInvitation, new ResultCallback<Void>() {
                 @Override
                 public void onSuccess(Void var1) {
@@ -185,10 +181,8 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
             });
 
 
-
-
-        }else {
-            remoteInvitation =  RTManager.INSTANCE.getRemoteInvitation();
+        } else {
+            remoteInvitation = RTManager.INSTANCE.getRemoteInvitation();
             try {
                 JSONObject jsonObject = new JSONObject(remoteInvitation.getContent());
                 callMode = jsonObject.getInt("Mode");
@@ -198,17 +192,17 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            tvState.setText(callMode ==Constans.AUDIO_MODE ? "收到语音呼叫邀请" :"收到视频呼叫邀请");
+            tvState.setText(callMode == Constans.AUDIO_MODE ? "收到语音呼叫邀请" : "收到视频呼叫邀请");
             Subscribe(remoteInvitation.getCallerId());
-            showCallLayout(true,remoteInvitation.getCallerId());
+            showCallLayout(true, remoteInvitation.getCallerId());
         }
 
-        if (callMode == Constans.VIDEO_MODE){
+        if (callMode == Constans.VIDEO_MODE) {
             rl_video_preview.setVisibility(View.VISIBLE);
             initializeEngine();
             mRtcEngine.enableVideo();
             TextureView mLocalView = RtcEngine.CreateRendererView(this);
-            rl_video_preview.addView(mLocalView,0);
+            rl_video_preview.addView(mLocalView, 0);
             mRtcEngine.setupLocalVideo(new VideoCanvas(mLocalView, Constants.RENDER_MODE_HIDDEN, channelId, userId, Constants.VIDEO_MIRROR_MODE_AUTO));
             mRtcEngine.startPreview();
         }
@@ -227,27 +221,27 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
             e.printStackTrace();
         }
     }
+
     /**
-     *
      * @param isCalled 是否是被叫
      * @param callId
      */
-    private void showCallLayout(boolean isCalled,String callId) {
+    private void showCallLayout(boolean isCalled, String callId) {
         tvUserPre.setText(callId);
         btnHangup.setVisibility(View.VISIBLE);
-        btnAccept.setVisibility(isCalled ? View.VISIBLE :View.GONE);
-        if (isCalled){//被叫
-            if (callMode == Constans.VIDEO_MODE){//如果是视频呼叫
+        btnAccept.setVisibility(isCalled ? View.VISIBLE : View.GONE);
+        if (isCalled) {//被叫
+            if (callMode == Constans.VIDEO_MODE) {//如果是视频呼叫
                 btnSwitchAudio.setVisibility(View.VISIBLE);//则显示语音接听按钮
-            }else {
+            } else {
                 btnSwitchAudio.setVisibility(View.GONE);
             }
             RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) btnHangup.getLayoutParams();
             layoutParams.removeRule(RelativeLayout.CENTER_HORIZONTAL);
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-            layoutParams.setMargins(DensityUtil.dip2px(this,35),0,0,0);
+            layoutParams.setMargins(DensityUtil.dip2px(this, 35), 0, 0, 0);
             btnHangup.setLayoutParams(layoutParams);
-        }else {
+        } else {
             RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) btnHangup.getLayoutParams();
             layoutParams.removeRule(RelativeLayout.ALIGN_PARENT_LEFT);
             layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
@@ -271,14 +265,14 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
 
     private void initEngineAndJoinChannel() {
         isWaiting = false;
-        isCalling =true;
+        isCalling = true;
         stopRing();
-        if (callMode == Constans.AUDIO_MODE){
+        if (callMode == Constans.AUDIO_MODE) {
             initializeEngine();
             flVideoGroup.setVisibility(View.GONE);
             flAudioGroup.setVisibility(View.VISIBLE);
             tv_remote_audio_user.setText(remoteUserId);
-        }else {
+        } else {
             flVideoGroup.setVisibility(View.VISIBLE);
             flAudioGroup.setVisibility(View.GONE);
             DisplayMetrics outMetrics = new DisplayMetrics();
@@ -291,17 +285,17 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
         }
         if (callMode == Constans.VIDEO_MODE) {
             rl_video_preview.removeAllViews();
-            Toast.makeText(VideoActivity.this,"声音将通过扬声器播放",Toast.LENGTH_SHORT).show();
+            Toast.makeText(VideoActivity.this, "声音将通过扬声器播放", Toast.LENGTH_SHORT).show();
             setupVideoConfig();
             rl_local_video.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     setupLocalVideo();
                 }
-            },1000);
+            }, 1000);
             mRtcEngine.setEnableSpeakerphone(true);
-        }else {
-            Toast.makeText(VideoActivity.this,"声音将通过听筒播放",Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(VideoActivity.this, "声音将通过听筒播放", Toast.LENGTH_SHORT).show();
             mRtcEngine.setEnableSpeakerphone(false);
         }
         joinChannel();
@@ -311,16 +305,17 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
         mRtcEngine = RtcEngine.create(this, BuildConfig.APPID, mRtcEventHandler);
         //AI智能降噪
         boolean isOpen = SpUtil.getBoolean(Constans.OPEN_DENOISE);
-        if (isOpen){
+        if (isOpen) {
             JSONObject jsonObject = new JSONObject();
             try {
-                jsonObject.put("Cmd","SetAudioAiNoise");
-                jsonObject.put("Enable",1);
+                jsonObject.put("Cmd", "SetAudioAiNoise");
+                jsonObject.put("Enable", 1);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             mRtcEngine.setParameters(jsonObject.toString());
         }
+
 
     }
 
@@ -345,11 +340,11 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
         }
         videoEncoderConfiguration.bitrate = 1000;
         mRtcEngine.setVideoEncoderConfiguration(videoEncoderConfiguration);
-        mRtcEngine.setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY , Constants.AUDIO_SCENARIO_GAME_STREAMING);
+        mRtcEngine.setAudioProfile(Constants.AUDIO_PROFILE_MUSIC_HIGH_QUALITY, Constants.AUDIO_SCENARIO_GAME_STREAMING);
     }
 
     private void joinChannel() {
-        mRtcEngine.joinChannel("",channelId,"",userId);
+        mRtcEngine.joinChannel("", channelId, "", userId);
 
     }
 
@@ -401,7 +396,7 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (chronometer!=null) {
+                    if (chronometer != null) {
                         chronometer.start();
                     }
                 }
@@ -449,7 +444,7 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
                 @Override
                 public void run() {
                     if (reason == 5 || reason == 6) {
-                        if (rl_local_video.getTag()==null){
+                        if (rl_local_video.getTag() == null) {
                             return;
                         }
                         if (rl_local_video.getTag().equals("remote")) {
@@ -498,9 +493,9 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
                 @Override
                 public void run() {
                     Log.d("RtcStats",
-                            "RTT:"+stats.gatewayRtt+"\n"
-                                    +"txPacketLossRate:"+stats.txPacketLossRate+"\n"
-                                    +"rxPacketLossRate:"+stats.rxPacketLossRate);
+                            "RTT:" + stats.gatewayRtt + "\n"
+                                    + "txPacketLossRate:" + stats.txPacketLossRate + "\n"
+                                    + "rxPacketLossRate:" + stats.rxPacketLossRate);
                 }
             });
         }
@@ -536,18 +531,18 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
             EasyFloat.dismissAppFloat();
             isSmall = false;
         }
-        if (callMode ==Constans.VIDEO_MODE){
+        if (callMode == Constans.VIDEO_MODE) {
             rlVideo.removeAllViews();
         }
         mRtcEngine.leaveChannel();
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("Cmd","EndCall");
+            jsonObject.put("Cmd", "EndCall");
         } catch (JSONException e) {
             e.printStackTrace();
         }
         RtmMessage message = rtmClient.createMessage(jsonObject.toString());
-        rtmClient.sendMessageToPeer(remoteUserId,message,new SendMessageOptions(),null);
+        rtmClient.sendMessageToPeer(remoteUserId, message, new SendMessageOptions(), null);
         finish();
     }
 
@@ -581,7 +576,6 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
     }
 
 
-
     public void showFloatWindow() {
         EasyFloat.with(this)
                 .setShowPattern(ShowPattern.FOREGROUND)
@@ -602,7 +596,7 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
                                 EasyFloat.dismissAppFloat();
                                 isSmall = false;
                                 if (CallApp.Companion.getCallApp().getP2pMeetingActivityTaskId() == -1) {
-                                   return;
+                                    return;
                                 }
                                 ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
                                 activityManager.moveTaskToFront(CallApp.Companion.getCallApp().getP2pMainActivityTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
@@ -659,9 +653,9 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (rlCall.getVisibility()==View.VISIBLE){
+            if (rlCall.getVisibility() == View.VISIBLE) {
                 Back();
-            }else {
+            } else {
                 release();
             }
 
@@ -686,7 +680,7 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
         AIDenoiseNotify.INSTANCE.setCallBack(null);
         RTManager.INSTANCE.unRegisterCallListener(this);
         RTManager.INSTANCE.unRegisterRtmEvent(this);
-        if (callMode==Constans.AUDIO_MODE&&chronometer!=null){
+        if (callMode == Constans.AUDIO_MODE && chronometer != null) {
             chronometer.stop();
         }
         UnSubscribe(remoteUserId);
@@ -732,12 +726,12 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (state==4){
+                if (state == 4) {
                     release();
-                    Toast.makeText(VideoActivity.this,"网络异常",Toast.LENGTH_SHORT).show();
-                }else if (state==5){
+                    Toast.makeText(VideoActivity.this, "网络异常", Toast.LENGTH_SHORT).show();
+                } else if (state == 5) {
                     release();
-                    Toast.makeText(VideoActivity.this,"已在其他设备登录",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(VideoActivity.this, "已在其他设备登录", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -752,10 +746,10 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
                 try {
                     JSONObject jsonObject = new JSONObject(rtmMessage.getText());
                     String cmd = jsonObject.getString("Cmd");
-                    if (cmd.equals("EndCall")){
-                        Toast.makeText(VideoActivity.this,"对方已挂断",Toast.LENGTH_SHORT).show();
+                    if (cmd.equals("EndCall")) {
+                        Toast.makeText(VideoActivity.this, "对方已挂断", Toast.LENGTH_SHORT).show();
                         release();
-                    }else  if (cmd.equals("SwitchAudio")){
+                    } else if (cmd.equals("SwitchAudio")) {
                         showAudioMode();
 
                     }
@@ -772,7 +766,6 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
     }
 
 
-
     //切换大小视图
     public void SwitchVideo(View view) {
         if (videoList.size() < 2) {
@@ -781,12 +774,14 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
 
         rl_remote_video.removeViewAt(1);
         rl_local_video.removeViewAt(1);
+
         TextureView mLocalView = RtcEngine.CreateRendererView(this);
         if (videoList.containsKey("local")) {
             videoList.remove("local");
         }
         videoList.put("local", mLocalView);
         mRtcEngine.setupLocalVideo(new VideoCanvas(mLocalView, Constants.RENDER_MODE_HIDDEN, channelId, userId, Constants.VIDEO_MIRROR_MODE_AUTO));
+
         if (rlVideo.getLastLeft() != -1) {
             RelativeLayout.MarginLayoutParams marginLayoutParams = (RelativeLayout.MarginLayoutParams) rl_local_video.getLayoutParams();
             marginLayoutParams.leftMargin = rlVideo.getLastLeft();
@@ -812,24 +807,23 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
         }
     }
 
-    private void Subscribe(String peerId){
+    private void Subscribe(String peerId) {
         Set<String> list = new ArraySet<>();
         list.add(peerId);
-        rtmClient.subscribePeersOnlineStatus(list,null);
+        rtmClient.subscribePeersOnlineStatus(list, null);
     }
 
-    public void UnSubscribe(String peerId){
+    public void UnSubscribe(String peerId) {
         Set<String> list = new ArraySet<>();
         list.add(peerId);
-        rtmClient.unsubscribePeersOnlineStatus(list,null);
+        rtmClient.unsubscribePeersOnlineStatus(list, null);
     }
 
     public void AudioLeave(View view) {
-       release();
+        release();
     }
 
-    public void AudioSwitchSpeak(View view)
-    {
+    public void AudioSwitchSpeak(View view) {
         a_btnSpeak.setSelected(!a_btnSpeak.isSelected());
         mRtcEngine.setEnableSpeakerphone(a_btnSpeak.isSelected());
     }
@@ -838,6 +832,7 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
         a_btnAudio.setSelected(!a_btnAudio.isSelected());
         mRtcEngine.muteLocalAudioStream(a_btnAudio.isSelected());
     }
+
     public void showTipDialog(String tips) {
         MessageDialog.show(this, "提示", tips, "确定");
     }
@@ -857,20 +852,20 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (!TextUtils.isEmpty(s)){
+                if (!TextUtils.isEmpty(s)) {
                     try {
                         JSONObject jsonObject = new JSONObject(s);
-                        if (jsonObject.has("Cmd")){
+                        if (jsonObject.has("Cmd")) {
                             String reason = jsonObject.getString("Cmd");
-                            if (reason.equals("Calling")){
-                                Toast.makeText(VideoActivity.this,"对方正忙",Toast.LENGTH_SHORT).show();
+                            if (reason.equals("Calling")) {
+                                Toast.makeText(VideoActivity.this, "对方正忙", Toast.LENGTH_SHORT).show();
                             }
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }else {
-                    Toast.makeText(VideoActivity.this,"对方拒绝通话",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(VideoActivity.this, "对方拒绝通话", Toast.LENGTH_SHORT).show();
                 }
                 finish();
             }
@@ -905,25 +900,26 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(VideoActivity.this,"对方未能接通呼叫",Toast.LENGTH_SHORT).show();
+                Toast.makeText(VideoActivity.this, "对方未能接通呼叫", Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
     }
+
     @Override
     public void onRemoteInvitationReceived(RemoteInvitation var1) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (isWaiting||isCalling){
+                if (isWaiting || isCalling) {
                     JSONObject params = new JSONObject();
                     try {
-                        params.put("Cmd","Calling");
+                        params.put("Cmd", "Calling");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     var1.setResponse(params.toString());
-                    rtmCallManager.refuseRemoteInvitation(var1,null);
+                    rtmCallManager.refuseRemoteInvitation(var1, null);
                 }
             }
         });
@@ -935,7 +931,7 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
             @Override
             public void run() {//接受呼叫邀请成
                 rlCall.setVisibility(View.GONE);
-               initEngineAndJoinChannel();
+                initEngineAndJoinChannel();
             }
         });
     }
@@ -946,9 +942,9 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
         runOnUiThread(new Runnable() {
             @Override
             public void run() {//你拒绝了对方
-                if (isCalling){//正在通话中
+                if (isCalling) {//正在通话中
                     return;
-                }else {
+                } else {
                     UnSubscribe(remoteInvitation.getCallerId());
                     finish();
                 }
@@ -961,12 +957,13 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                    Toast.makeText(VideoActivity.this,"对方已取消呼叫",Toast.LENGTH_SHORT).show();
-                    UnSubscribe(remoteInvitation.getCallerId());
-                    finish();
+                Toast.makeText(VideoActivity.this, "对方已取消呼叫", Toast.LENGTH_SHORT).show();
+                UnSubscribe(remoteInvitation.getCallerId());
+                finish();
             }
         });
     }
+
     @Override
     public void onRemoteInvitationFailure(RemoteInvitation var1, int var2) {
 
@@ -978,14 +975,14 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                for(Map.Entry<String, Integer> entry : map.entrySet()){
+                for (Map.Entry<String, Integer> entry : map.entrySet()) {
                     String mapKey = entry.getKey();
                     Integer mapValue = entry.getValue();
-                    Log.d("订阅","订阅的人："+mapKey+"状态改变回调"+(mapValue==0?"在线":"不在线"));
+                    Log.d("订阅", "订阅的人：" + mapKey + "状态改变回调" + (mapValue == 0 ? "在线" : "不在线"));
                 }
-                if (map.containsKey(remoteUserId)){
-                    if (map.get(remoteUserId)!=0){//离线了
-                            //如果正在呼叫界面
+                if (map.containsKey(remoteUserId)) {
+                    if (map.get(remoteUserId) != 0) {//离线了
+                        //如果正在呼叫界面
                         if (isWaiting) {
                             if (isCall) {//如果是主动呼叫
                                 rtmCallManager.cancelLocalInvitation(localInvitation, null);
@@ -993,9 +990,9 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
                                 rtmCallManager.refuseRemoteInvitation(remoteInvitation, null);
                             }
                         }
-                            UnSubscribe(remoteUserId);
-                            Toast.makeText(VideoActivity.this,"对方已离线",Toast.LENGTH_SHORT).show();
-                            finish();
+                        UnSubscribe(remoteUserId);
+                        Toast.makeText(VideoActivity.this, "对方已离线", Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                 }
             }
@@ -1022,76 +1019,76 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
         ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         activityManager.moveTaskToFront(CallApp.Companion.getCallApp().getP2pMainActivityTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
         isSmall = true;
-            EasyFloat.with(this)
-                    .setShowPattern(ShowPattern.FOREGROUND)
-                    .setDragEnable(true)
-                    .setGravity(Gravity.RIGHT)
-                    .setSidePattern(SidePattern.RESULT_SIDE)
-                    .setLayout(R.layout.float_audio_window, new OnInvokeView() {
-                        @Override
-                        public void invoke(View view) {
-                            final RelativeLayout rlRoot = view.findViewById(R.id.rl_root);
-                            Chronometer chr = view.findViewById(R.id.chr_time);
-                            chr.setBase(chronometer.getBase());
-                            chr.start();
-                            rlRoot.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    EasyFloat.dismissAppFloat();
-                                    isSmall = false;
-                                    chr.stop();
-                                    if (CallApp.Companion.getCallApp().getP2pMeetingActivityTaskId() == -1) {
-                                        return;
-                                    }
-                                    ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-                                    activityManager.moveTaskToFront(CallApp.Companion.getCallApp().getP2pMainActivityTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
-                                    activityManager.moveTaskToFront(CallApp.Companion.getCallApp().getP2pMeetingActivityTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
+        EasyFloat.with(this)
+                .setShowPattern(ShowPattern.FOREGROUND)
+                .setDragEnable(true)
+                .setGravity(Gravity.RIGHT)
+                .setSidePattern(SidePattern.RESULT_SIDE)
+                .setLayout(R.layout.float_audio_window, new OnInvokeView() {
+                    @Override
+                    public void invoke(View view) {
+                        final RelativeLayout rlRoot = view.findViewById(R.id.rl_root);
+                        Chronometer chr = view.findViewById(R.id.chr_time);
+                        chr.setBase(chronometer.getBase());
+                        chr.start();
+                        rlRoot.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                EasyFloat.dismissAppFloat();
+                                isSmall = false;
+                                chr.stop();
+                                if (CallApp.Companion.getCallApp().getP2pMeetingActivityTaskId() == -1) {
+                                    return;
                                 }
-                            });
+                                ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+                                activityManager.moveTaskToFront(CallApp.Companion.getCallApp().getP2pMainActivityTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
+                                activityManager.moveTaskToFront(CallApp.Companion.getCallApp().getP2pMeetingActivityTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
+                            }
+                        });
 
-                        }
-                    }).registerCallbacks(new OnFloatCallbacks() {
-                @Override
-                public void createdResult(boolean b, String s, View view) {
+                    }
+                }).registerCallbacks(new OnFloatCallbacks() {
+            @Override
+            public void createdResult(boolean b, String s, View view) {
 
-                }
+            }
 
-                @Override
-                public void show(View view) {
+            @Override
+            public void show(View view) {
 
-                }
+            }
 
-                @Override
-                public void hide(View view) {
+            @Override
+            public void hide(View view) {
 
-                }
+            }
 
-                @Override
-                public void dismiss() {
+            @Override
+            public void dismiss() {
 
-                }
+            }
 
-                @Override
-                public void touchEvent(View view, MotionEvent motionEvent) {
+            @Override
+            public void touchEvent(View view, MotionEvent motionEvent) {
 
-                }
+            }
 
-                @Override
-                public void drag(View view, MotionEvent motionEvent) {
+            @Override
+            public void drag(View view, MotionEvent motionEvent) {
 
-                }
+            }
 
-                @Override
-                public void dragEnd(View view) {
+            @Override
+            public void dragEnd(View view) {
 
-                }
-            }).show();
+            }
+        }).show();
     }
 
     public void SwitchAudioInVideo(View view) {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("Cmd","SwitchAudio");
+            jsonObject.put("Cmd", "SwitchAudio");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -1102,7 +1099,7 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                       showAudioMode();
+                        showAudioMode();
                     }
                 });
             }
@@ -1112,7 +1109,7 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(VideoActivity.this,"切换失败",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(VideoActivity.this, "切换失败", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -1120,8 +1117,8 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
     }
 
     //切到语音模式
-    public void showAudioMode(){
-        if (flAudioGroup.getVisibility()==View.GONE) {//防止2个人一起切换的时候 重复走
+    public void showAudioMode() {
+        if (flAudioGroup.getVisibility() == View.GONE) {//防止2个人一起切换的时候 重复走
             flVideoGroup.setVisibility(View.GONE);
             flAudioGroup.setVisibility(View.VISIBLE);
             tv_remote_audio_user.setText(remoteUserId);
@@ -1133,7 +1130,7 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
             }
             rlVideo.removeAllViews();
             callMode = Constans.AUDIO_MODE;
-            Toast.makeText(VideoActivity.this,"声音将通过听筒播放",Toast.LENGTH_SHORT).show();
+            Toast.makeText(VideoActivity.this, "声音将通过听筒播放", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -1149,10 +1146,10 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
     public void Accept(View view) {//视频模式下的同意按钮
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("Mode",callMode);//收到的是什么类型就回什么类型
-            jsonObject.put("Conference",false);
-            jsonObject.put("UserData","");
-            jsonObject.put("SipData","");
+            jsonObject.put("Mode", callMode);//收到的是什么类型就回什么类型
+            jsonObject.put("Conference", false);
+            jsonObject.put("UserData", "");
+            jsonObject.put("SipData", "");
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -1188,8 +1185,7 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
                     }
                 });
             }
-        }
-        else {
+        } else {
             finish();
         }
     }
@@ -1198,10 +1194,10 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
         callMode = Constans.AUDIO_MODE;
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("Mode",callMode);//收到的是什么类型就回什么类型
-            jsonObject.put("Conference",false);
-            jsonObject.put("UserData","");
-            jsonObject.put("SipData","");
+            jsonObject.put("Mode", callMode);//收到的是什么类型就回什么类型
+            jsonObject.put("Conference", false);
+            jsonObject.put("UserData", "");
+            jsonObject.put("SipData", "");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -1213,8 +1209,6 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
     }
 
 
-
-
     @Override
     protected void onStop() {//单独处理这个页面
         super.onStop();
@@ -1224,8 +1218,8 @@ public class VideoActivity extends BaseActivity implements AIDenoiseNotify.Denoi
     public void openDeNoise(int isOpen) {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("Cmd","SetAudioAiNoise");
-            jsonObject.put("Enable",isOpen);
+            jsonObject.put("Cmd", "SetAudioAiNoise");
+            jsonObject.put("Enable", isOpen);
         } catch (JSONException e) {
             e.printStackTrace();
         }
