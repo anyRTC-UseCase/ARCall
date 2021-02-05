@@ -1,32 +1,24 @@
 PODS:
-  - ARtcKit_iOS (4.1.1.0)
-  - ARtmKit_iOS (1.0.1.2)
   - Bugly (2.5.71)
   - Masonry (1.1.0)
   - SVProgressHUD (2.2.5)
 
 DEPENDENCIES:
-  - ARtcKit_iOS (~> 4.1.1.0)
-  - ARtmKit_iOS (~> 1.0.1.2)
   - Bugly (~> 2.5.2)
   - Masonry
   - SVProgressHUD (~> 2.2.5)
 
 SPEC REPOS:
   trunk:
-    - ARtcKit_iOS
-    - ARtmKit_iOS
     - Bugly
     - Masonry
     - SVProgressHUD
 
 SPEC CHECKSUMS:
-  ARtcKit_iOS: 1a0cc6bb604997d651d375474616f6fc6c316d38
-  ARtmKit_iOS: 242a1246297971f241e21082ac0b6b0be8f444fc
   Bugly: fd066c75c4a0eca1440f9b6a84bd37d51bfc85ac
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
 
-PODFILE CHECKSUM: f25c551a9c12248913702bfb5d8b6a49dafeb93b
+PODFILE CHECKSUM: 7abd622e9d6ff4f2aca4a73e6e0e0aad79082ba6
 
 COCOAPODS: 1.9.3

@@ -1,6 +1,0 @@
-framework module ARtmKit {
-  umbrella header "ARtmKit.h"
-
-  export *
-  module * { export * }
-}
