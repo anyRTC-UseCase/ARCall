@@ -26,15 +26,14 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.ar.call.*
-import org.ar.call.AIDenoiseNotify.callBack
-import org.ar.call.BuildConfig
 import org.ar.call.R
+import org.ar.call.RtcManager.Companion.instance
+import org.ar.call.databinding.ActivityMultiVideosBinding
 import org.ar.call.utils.Constans
-import org.ar.call.utils.RTManager
+import org.ar.call.utils.KeepAliveService
 import org.ar.call.utils.SpUtil
 import org.ar.rtc.Constants
 import org.ar.rtc.IRtcEngineEventHandler
-import org.ar.rtc.RtcEngine
 import org.ar.rtm.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -42,29 +41,19 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 
-class MultiVideosActivity : BaseActivity(), RtmChannelListener, AIDenoiseNotify.DenoiseNotifyCallBack {
+class MultiVideosActivity : BaseActivity(), RtmChannelListener{
 
     private var player: MediaPlayer? = null
-    private lateinit var rvVideo: RecyclerView
-    private lateinit var tvWaiting: TextView
-    private lateinit var btnInvite: ImageView
-    private lateinit var btnAudio: Button
-    private lateinit var btnVideo: Button
-    private lateinit var btnSpeak: Button
-    private lateinit var btnHangUp: Button
-    private lateinit var btnSwitch: Button
-    private lateinit var chronometer: Chronometer
-
+    private lateinit var binding: ActivityMultiVideosBinding
 
     private val mineUserId =CallApp.callApp.userId
     private var callArray: ArrayList<String>? = null
     private var channelId: String = ""
     private var isCall: Boolean = false
 
-    private var rtcEngine: RtcEngine? = null
     private var rtmChannel: RtmChannel? = null
-    private val rtmClient = RTManager.rtmClient
-    private val rtmCallManager = RTManager.rtmCallManager
+    private val rtmClient = RtmManager.instance.getRtmClient()
+    private val rtmCallManager = RtmManager.instance.getCallManager()
     private val localInvitationList: ArrayList<LocalInvitation> = ArrayList() //主叫需要呼叫的
 
     private lateinit var memberAdapter: MemberAdapter
@@ -74,30 +63,23 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener, AIDenoiseNotify.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        setContentView(R.layout.activity_multi_videos)
+        binding = ActivityMultiVideosBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
         ImmersionBar.with(this).statusBarColor(R.color.video_title).statusBarDarkFont(false, 0.2f).keyboardEnable(true).init()
-        AIDenoiseNotify.callBack = this
-        rvVideo = findViewById(R.id.rv_video)
-        btnInvite = findViewById(R.id.btn_invite)
-        btnAudio = findViewById(R.id.btn_audio)
-        btnSpeak = findViewById(R.id.btn_speak)
-        btnVideo = findViewById(R.id.btn_video)
-        btnHangUp = findViewById(R.id.btn_hang_up)
-        btnSwitch = findViewById(R.id.btn_switch)
-        tvWaiting = findViewById(R.id.tv_waiting)
-        chronometer = findViewById(R.id.chronometer)
+      
 
         callArray = intent.getStringArrayListExtra("callArray")
         channelId = intent.getStringExtra("channelId")
         isCall = intent.getBooleanExtra("isCall", false)
         joinRTMChannel(channelId)
-        RTManager.registerChannelEvent(this)
+        RtmManager.instance.registerChannelEvent(this)
         initRTC()
 
         memberAdapter = MemberAdapter()
-        rvVideo.layoutManager = GridLayoutManager(this, 3)
+        binding.rvVideo.layoutManager = GridLayoutManager(this, 3)
 
-        rvVideo.adapter = memberAdapter
+        binding.rvVideo.adapter = memberAdapter
 
         memberAdapter.addData(RtcMember.Factory.create(mineUserId).also {
             it.isWaiting = false
@@ -119,23 +101,13 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener, AIDenoiseNotify.
     }
 
     fun initRTC() {//初始化RTC
-        rtcEngine = RtcEngine.create(this, BuildConfig.APPID, rtcEvent)
-        //AI智能降噪
-        var isOpen = SpUtil.getBoolean(Constans.OPEN_DENOISE)
-        if (isOpen){
-            rtcEngine!!.setParameters(JSONObject().apply {
-                put("Cmd", "SetAudioAiNoise")
-                put("Enable", 1)
-            }.toString())
-        }
-        rtcEngine?.enableVideo()
-        rtcEngine?.joinChannel("", channelId, "", mineUserId)
-        btnSpeak.isSelected = !btnSpeak.isSelected
-        rtcEngine?.setEnableSpeakerphone(btnSpeak.isSelected)
+        RtcManager.instance.getRtcEngine()?.joinChannel("", channelId, "", mineUserId)
+        binding.btnSpeak.isSelected = !binding.btnSpeak.isSelected
+        RtcManager.instance.getRtcEngine()?.setEnableSpeakerphone(binding.btnSpeak.isSelected)
     }
 
     private fun joinRTMChannel(channelId: String) {//初始化RTM
-        rtmChannel = RTManager.createChannel(channelId)
+        rtmChannel = RtmManager.instance.createChannel(channelId)
         rtmChannel?.join(null)
     }
 
@@ -145,24 +117,26 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener, AIDenoiseNotify.
         override fun onJoinChannelSuccess(channel: String?, uid: String?, elapsed: Int) {
             super.onJoinChannelSuccess(channel, uid, elapsed)
             runOnUiThread {
-                rtcEngine?.setupLocalVideo(memberAdapter.getItem(0)?.canvas)
-                val isOpenCamera = SpUtil.getBoolean("isOpenCamera", true)
-                val isOpenAudio = SpUtil.getBoolean("isOpenMicrophone", true)
+                RtcManager.instance.inMeeting = true
+                RtcManager.instance.callMode = Constans.MEETING_MODE
+                memberAdapter.getItem(0)?.canvas?.let { RtcManager.instance.setupLocalVideo(it) }
+                val isOpenCamera = SpUtil.getBoolean(Constans.KEY_OPEN_CAMERA, true)
+                val isOpenAudio = SpUtil.getBoolean(Constans.KEY_OPEN_MIC, true)
                 if (!isOpenCamera) {
-                    rtcEngine?.muteLocalVideoStream(true)
-                    btnVideo.isSelected = true
+                    RtcManager.instance.getRtcEngine()?.muteLocalVideoStream(true)
+                    binding.btnVideo.isSelected = true
                     memberAdapter.getItem(0)?.isOpenVideo = true
-                    memberAdapter.getViewByPosition(rvVideo, 0, R.id.iv_video_close)!!.visibility = (if (btnVideo.isSelected) {
+                    memberAdapter.getViewByPosition(binding.rvVideo, 0, R.id.iv_video_close)!!.visibility = (if (binding.btnVideo.isSelected) {
                         View.VISIBLE
                     } else {
                         View.GONE
                     })
                 }
                 if (!isOpenAudio) {
-                    rtcEngine?.muteLocalAudioStream(true)
-                    btnAudio.isSelected = true
+                    RtcManager.instance.getRtcEngine()?.muteLocalAudioStream(true)
+                    binding.btnAudio.isSelected = true
                     memberAdapter.getItem(0)?.isOpenAudio = false
-                    memberAdapter.getViewByPosition(rvVideo, 0, R.id.iv_audio)!!.setBackgroundResource(if (btnAudio.isSelected) {
+                    memberAdapter.getViewByPosition(binding.rvVideo, 0, R.id.iv_audio)!!.setBackgroundResource(if (binding.btnAudio.isSelected) {
                         R.drawable.mic_close
                     } else {
                         R.drawable.mic_open
@@ -173,35 +147,37 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener, AIDenoiseNotify.
 
         }
 
-        override fun onUserJoined(uid: String?, elapsed: Int) {
-            super.onUserJoined(uid, elapsed)
-            runOnUiThread {
-
-            }
-        }
-
 
         override fun onFirstRemoteVideoDecoded(uid: String?, width: Int, height: Int, elapsed: Int) {
             super.onFirstRemoteVideoDecoded(uid, width, height, elapsed)
             runOnUiThread {
-                stopRing()
-                tvWaiting.visibility = View.GONE
-                chronometer.visibility = View.VISIBLE
-                chronometer.start()
                 memberAdapter.data.forEachIndexed { index, rtcMember ->
                     if (rtcMember.userId == uid) {
-                        rtcEngine?.setupRemoteVideo(rtcMember.canvas)
-                        memberAdapter.getItem(index)?.isWaiting = false
+                        rtcMember.canvas?.let { RtcManager.instance.setupRemoteVideo(it) }
                         memberAdapter.getItem(index)?.isOpenAudio = true
-
-                        if (memberAdapter.getViewByPosition(rvVideo, index, R.id.rl_wait) != null) {
-                            memberAdapter.getViewByPosition(rvVideo, index, R.id.rl_wait)!!.visibility = View.GONE
-                            memberAdapter.getViewByPosition(rvVideo, index, R.id.iv_audio)!!.visibility = View.VISIBLE
-                        }
+                        memberAdapter.getViewByPosition(binding.rvVideo, index, R.id.iv_audio)!!.visibility = View.VISIBLE
                         return@forEachIndexed
                     }
                 }
 
+            }
+        }
+
+        override fun onUserJoined(uid: String?, elapsed: Int) {
+            super.onUserJoined(uid, elapsed)
+            runOnUiThread {
+                stopRing()
+                binding.tvWaiting.visibility = View.GONE
+                binding.chronometer.visibility = View.VISIBLE
+                binding.chronometer.start()
+                memberAdapter.data.forEachIndexed { index, rtcMember ->
+                    if (rtcMember.userId == uid) {
+                        if (memberAdapter.getViewByPosition(binding.rvVideo, index, R.id.rl_wait) != null) {
+                            memberAdapter.getViewByPosition(binding.rvVideo, index, R.id.rl_wait)!!.visibility = View.GONE
+                        }
+                        return@forEachIndexed
+                    }
+                }
             }
         }
 
@@ -214,10 +190,10 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener, AIDenoiseNotify.
                         if (rtcMember.userId == uid) {
                             if (reason == Constants.REMOTE_AUDIO_REASON_REMOTE_MUTED) {
                                 memberAdapter.getItem(index)?.isOpenAudio = false
-                                memberAdapter.getViewByPosition(rvVideo, index, R.id.iv_audio)!!.setBackgroundResource(R.drawable.mic_close)
+                                memberAdapter.getViewByPosition(binding.rvVideo, index, R.id.iv_audio)!!.setBackgroundResource(R.drawable.mic_close)
                             } else if (reason == Constants.REMOTE_AUDIO_REASON_REMOTE_UNMUTED) {
                                 memberAdapter.getItem(index)?.isOpenAudio = true
-                                memberAdapter.getViewByPosition(rvVideo, index, R.id.iv_audio)!!.setBackgroundResource(R.drawable.mic_open)
+                                memberAdapter.getViewByPosition(binding.rvVideo, index, R.id.iv_audio)!!.setBackgroundResource(R.drawable.mic_open)
                             }
                             return@forEachIndexed
                         }
@@ -234,10 +210,10 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener, AIDenoiseNotify.
                         if (rtcMember.userId == uid) {
                             if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_MUTED) {
                                 memberAdapter.getItem(index)?.isOpenVideo = false
-                                memberAdapter.getViewByPosition(rvVideo, index, R.id.iv_video_close)!!.visibility = View.VISIBLE
+                                memberAdapter.getViewByPosition(binding.rvVideo, index, R.id.iv_video_close)!!.visibility = View.VISIBLE
                             } else if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED) {
                                 memberAdapter.getItem(index)?.isOpenVideo = true
-                                memberAdapter.getViewByPosition(rvVideo, index, R.id.iv_video_close)!!.visibility = View.GONE
+                                memberAdapter.getViewByPosition(binding.rvVideo, index, R.id.iv_video_close)!!.visibility = View.GONE
                             }
                             return@forEachIndexed
                         }
@@ -272,30 +248,29 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener, AIDenoiseNotify.
         runOnUiThread {
             removeMember(var1?.userId.toString())
             if (memberAdapter.data.size == 1) {//only self
+                RtcManager.instance.inMeeting = false
                 toast("通话已结束")
-                if (EasyFloat.appFloatIsShow()){
-                    EasyFloat.dismissAppFloat()
-                }
+                dismissFloatWindow()
                 finish()
             }
         }
     }
 
-    override fun onLocalInvitationAccepted(var1: LocalInvitation?, var2: String?) {
+    override fun onLocalInvitationAccepted(var1: LocalInvitation, var2: String) {
         super.onLocalInvitationCanceled(var1)
         localInvitationList.remove(var1)//意味着呼叫流程结束 挂断的时候不需要再取消了
     }
 
-    override fun onLocalInvitationCanceled(var1: LocalInvitation?) {
+    override fun onLocalInvitationCanceled(var1: LocalInvitation) {
         super.onLocalInvitationCanceled(var1)
         localInvitationList.remove(var1)
     }
 
-    override fun onLocalInvitationFailure(var1: LocalInvitation?, var2: Int) {
+    override fun onLocalInvitationFailure(var1: LocalInvitation, var2: Int) {
         super.onLocalInvitationFailure(var1, var2)
         localInvitationList.remove(var1)
     }
-    override fun onLocalInvitationRefused(var1: LocalInvitation?, var2: String?) {
+    override fun onLocalInvitationRefused(var1: LocalInvitation, var2: String) {
         super.onLocalInvitationRefused(var1, var2)
         runOnUiThread {
             toast("${var1?.calleeId}拒绝了呼叫邀请")
@@ -328,16 +303,25 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener, AIDenoiseNotify.
 
     override fun onDestroy() {
         super.onDestroy()
+        KeepAliveService.stop(this)
         stopRing()
-        AIDenoiseNotify.callBack = null
         mainScope.cancel()
-        RTManager.releaseChannel()
-        RtcEngine.destroy()
-        RTManager.unRegisterChannelEvent(this)
+        RtcManager.instance.inMeeting = false
+        RtcManager.instance.callMode = -1
+        RtcManager.instance.unRegisterRtcEvent(rtcEvent)
+        RtcManager.instance.getRtcEngine()?.leaveChannel()
+        RtmManager.instance.releaseChannel()
+        RtmManager.instance.unRegisterChannelEvent(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        KeepAliveService.stop(this)
+        RtcManager.instance.registerRtcEvent(rtcEvent)
     }
 
     fun switchCamera(view: View) {
-        rtcEngine?.switchCamera()
+        RtcManager.instance.getRtcEngine()?.switchCamera()
     }
 
     fun hangUp(view: View) {
@@ -349,15 +333,15 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener, AIDenoiseNotify.
         memberAdapter.data.forEach {
             it.release()
         }
-        rtcEngine?.leaveChannel()
+        RtcManager.instance.inMeeting = false
         finish()
     }
 
     fun muteAudio(view: View) {
-        btnAudio.isSelected = !btnAudio.isSelected
-        rtcEngine?.muteLocalAudioStream(btnAudio.isSelected)
-        memberAdapter.getItem(0)?.isOpenAudio = !btnAudio.isSelected
-        memberAdapter.getViewByPosition(rvVideo, 0, R.id.iv_audio)!!.setBackgroundResource(if (btnAudio.isSelected) {
+        binding.btnAudio.isSelected = !binding.btnAudio.isSelected
+        RtcManager.instance.getRtcEngine()?.muteLocalAudioStream(binding.btnAudio.isSelected)
+        memberAdapter.getItem(0)?.isOpenAudio = !binding.btnAudio.isSelected
+        memberAdapter.getViewByPosition(binding.rvVideo, 0, R.id.iv_audio)!!.setBackgroundResource(if (binding.btnAudio.isSelected) {
             R.drawable.mic_close
         } else {
             R.drawable.mic_open
@@ -365,22 +349,22 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener, AIDenoiseNotify.
     }
 
     fun openSpeak(view: View) {
-        btnSpeak.isSelected = !btnSpeak.isSelected
-        rtcEngine?.setEnableSpeakerphone(btnSpeak.isSelected)
+        binding.btnSpeak.isSelected = !binding.btnSpeak.isSelected
+        RtcManager.instance.getRtcEngine()?.setEnableSpeakerphone(binding.btnSpeak.isSelected)
     }
 
     fun muteVideo(view: View) {
-        btnVideo.isSelected = !btnVideo.isSelected
-        rtcEngine?.muteLocalVideoStream(btnVideo.isSelected)
-        memberAdapter.getItem(0)?.isOpenVideo = !btnVideo.isSelected
-        memberAdapter.getViewByPosition(rvVideo, 0, R.id.iv_video_close)!!.visibility = (if (btnVideo.isSelected) {
+        binding.btnVideo.isSelected = !binding.btnVideo.isSelected
+        RtcManager.instance.getRtcEngine()?.muteLocalVideoStream(binding.btnVideo.isSelected)
+        memberAdapter.getItem(0)?.isOpenVideo = !binding.btnVideo.isSelected
+        memberAdapter.getViewByPosition(binding.rvVideo, 0, R.id.iv_video_close)!!.visibility = (if (binding.btnVideo.isSelected) {
             View.VISIBLE
         } else {
             View.GONE
         })
     }
 
-    override fun onRemoteInvitationReceived(remote: RemoteInvitation?) {
+    override fun onRemoteInvitationReceived(remote: RemoteInvitation) {
         super.onRemoteInvitationReceived(remote)
         runOnUiThread {
             val param = JSONObject().apply {
@@ -496,6 +480,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener, AIDenoiseNotify.
             })
             return
         }
+        instance.windowMode = true
         val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         activityManager.moveTaskToFront(CallApp.callApp.multiMainActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
         EasyFloat.with(this)
@@ -507,17 +492,17 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener, AIDenoiseNotify.
                     val rlRoot = view.findViewById<RelativeLayout>(R.id.rl_multi_root)
                     val textView = view.findViewById<TextView>(R.id.text_multi_wait)
                     val chr = view.findViewById<Chronometer>(R.id.chr_multi_time)
-                    if (chronometer.visibility == View.VISIBLE) {
+                    if (binding.chronometer.visibility == View.VISIBLE) {
                         textView.visibility = View.GONE
                         chr.visibility = View.VISIBLE
-                        chr.base = chronometer.base
+                        chr.base = binding.chronometer.base
                         chr.start()
                     } else {
                         textView.visibility = View.VISIBLE
                         chr.visibility = View.GONE
                     }
                     rlRoot.setOnClickListener {
-                        EasyFloat.dismissAppFloat()
+                        dismissFloatWindow()
                         chr.stop()
                         if (CallApp.callApp.multiMeetingActivityTaskId == -1) {
                             return@setOnClickListener
@@ -530,21 +515,29 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener, AIDenoiseNotify.
                     }
                 }).registerCallbacks(object : OnFloatCallbacks {
                     override fun createdResult(b: Boolean, s: String?, view: View?) {}
-                    override fun show(view: View) {}
+                    override fun show(view: View) {
+
+                    }
                     override fun hide(view: View) {}
-                    override fun dismiss() {}
+                    override fun dismiss() {
+                    }
                     override fun touchEvent(view: View, motionEvent: MotionEvent) {}
                     override fun drag(view: View, motionEvent: MotionEvent) {}
                     override fun dragEnd(view: View) {}
                 }).show()
     }
 
-    override fun openDeNoise(isOpen: Int) {
-        rtcEngine!!.setParameters(JSONObject().apply {
-            put("Cmd", "SetAudioAiNoise")
-            put("Enable", isOpen)
-        }.toString())
+    private fun dismissFloatWindow(){
+        instance.windowMode = false
+        if (EasyFloat.appFloatIsShow()){
+            EasyFloat.dismissAppFloat()
+        }
     }
+    override fun onStop() {
+        super.onStop()
+        KeepAliveService.start(this)
+    }
+
 
 
 }

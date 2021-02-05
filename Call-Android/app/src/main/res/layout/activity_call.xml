@@ -95,7 +95,7 @@
                 android:text="开始呼叫"
                 android:layout_gravity="center"
                 android:textColor="#40A3FB"
-                android:onClick="callClick"
+                android:onClick="call"
                 android:background="@drawable/select_btn"
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="@dimen/dp_45"></Button>

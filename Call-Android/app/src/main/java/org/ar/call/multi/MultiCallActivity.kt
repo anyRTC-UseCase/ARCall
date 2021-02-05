@@ -18,14 +18,15 @@ import com.kongzue.dialog.v3.MessageDialog
 import com.lzf.easyfloat.EasyFloat
 import com.tuo.customview.VerificationCodeView
 import com.tuo.customview.VerificationCodeView.InputCompleteListener
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.ar.call.*
 import org.ar.call.R
+import org.ar.call.databinding.ActivityMultiVideosBinding
+import org.ar.call.databinding.ActivityMulticallBinding
 import org.ar.call.p2p.VideoActivity
-import org.ar.call.utils.RTManager
+import org.ar.call.utils.Constans
 import org.ar.rtm.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -35,13 +36,7 @@ import kotlin.coroutines.suspendCoroutine
 class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListener,RtmChannelListener{
 
     private var player:MediaPlayer? =null
-
-    private lateinit var rlInputLayout : RelativeLayout
-    private lateinit var etUser : VerificationCodeView
-    private lateinit var rvTag : RecyclerView
-    private lateinit var tvUserId : TextView
-    private lateinit var tvDelTip :TextView
-    private lateinit var btnCall : Button
+    private lateinit var binding: ActivityMulticallBinding
     private lateinit var tagAdapter:TagAdapter
     private val tagList:ArrayList<String> =ArrayList()
 
@@ -54,9 +49,9 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
     private val mineUserId = CallApp.callApp.userId
 
     private val mainScope = MainScope()
-    private val rtmClient = RTManager.rtmClient
+    private val rtmClient = RtmManager.instance.getRtmClient()
     private var rtmChannel: RtmChannel? = null
-    private val rtmCallManager = RTManager.rtmCallManager
+    private val rtmCallManager = RtmManager.instance.getCallManager()
 
     private var isWaiting = false//是否在呼叫响铃页面
     private var remoteInvitation:RemoteInvitation? =null//主叫的相关对象
@@ -64,32 +59,27 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
     private var channelId = ""//主叫带过来的频道ID
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_multicall)
+        binding = ActivityMulticallBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
         ImmersionBar.with(this).statusBarDarkFont(false, 0.2f).keyboardEnable(false).init()
-        RTManager.registerChannelEvent(this)
+        RtmManager.instance.registerChannelEvent(this)
         tagAdapter = TagAdapter()
         tagAdapter.setNewData(tagList)
         tagAdapter.onItemChildClickListener = this
-
-        rlInputLayout = findViewById(R.id.rl_input_layout)
-        etUser = findViewById(R.id.et_user)
-        rvTag = findViewById(R.id.rv_tag)
-        tvDelTip = findViewById(R.id.text_tip)
-        tvUserId = findViewById(R.id.tv_user)
-        btnCall = findViewById(R.id.btn_call)
-        tvUserId.text = "您的呼叫ID:$mineUserId"
+        binding.tvUser.text = "您的呼叫ID:$mineUserId"
 
 
         rlWaitLayout = findViewById(R.id.rl_wait_layout)
         tvCallUserArr = findViewById(R.id.tv_call_user_arr)
         tvCallState =findViewById(R.id.tv_state)
 
-        rvTag.layoutManager = StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
-        rvTag.adapter = tagAdapter
+        binding.rvTag.layoutManager = StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
+        binding.rvTag.adapter = tagAdapter
 
-        etUser.setInputCompleteListener(object : InputCompleteListener {
+        binding.etUser.setInputCompleteListener(object : InputCompleteListener {
             override fun inputComplete() {
-                if (etUser.inputContent.length == 4) {
+                if (binding.etUser.inputContent.length == 4) {
                     addTag()
                 }
             }
@@ -100,7 +90,7 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
         //从其他页面跳过来的
         val isRecCall = intent.getBooleanExtra("RecCall", false)
         if (isRecCall) {
-            remoteInvitation = RTManager.remoteInvitation
+            remoteInvitation = RtmManager.instance.getRemoteInvitation()
             val remoteBean = Gson().fromJson(remoteInvitation?.content, MultiUserBean::class.java)
             calledArray = remoteBean.userData as ArrayList<String>
             calledArray.remove(mineUserId)
@@ -110,33 +100,33 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
         }
     }
     fun addTag(){
-        if (etUser.inputContent == mineUserId){
-            etUser.clearInputContent()
+        if (binding.etUser.inputContent == mineUserId){
+            binding.etUser.clearInputContent()
             showTipDialog("不能呼叫自己")
             return
         }
 
-        if (etUser.inputContent in tagList){
+        if (binding.etUser.inputContent in tagList){
             showTipDialog("用户ID已存在")
             return
         }
 
         if (tagList.size>=6){
-            etUser.clearInputContent()
+            binding.etUser.clearInputContent()
             showTipDialog("最多能呼叫6人")
             return
         }
-        tvDelTip.visibility=View.VISIBLE
-        tagList.add(etUser.inputContent)
+        binding.textTip.visibility=View.VISIBLE
+        tagList.add(binding.etUser.inputContent)
         tagAdapter.notifyDataSetChanged()
-        etUser.clearInputContent()
-        btnCall.isSelected = true
-        btnCall.isEnabled = true
+        binding.etUser.clearInputContent()
+        binding.btnCall.isSelected = true
+        binding.btnCall.isEnabled = true
     }
 
     fun Setting(view: View) {
         startActivity(Intent(this, SettingActivity::class.java).apply {
-            putExtra("ARCall", false)
+            putExtra(Constans.KEY_SINGLE_CALL, false)
         })
     }
     fun Back(view: View) {
@@ -223,7 +213,7 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
     }
 
     private fun joinRTMChannel(channelId: String){
-        rtmChannel = RTManager.createChannel(channelId)
+        rtmChannel = RtmManager.instance.createChannel(channelId)
         rtmChannel?.join(null)
     }
 
@@ -233,7 +223,7 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
     private fun showWaitingLayout(){
         startRing()
         isWaiting = true;
-        rlInputLayout.visibility = View.GONE
+        binding.rlInputLayout.visibility = View.GONE
         tvCallState.text ="收到呼叫"
         tvCallUserArr.text = calledArray.joinToString(",")
         rlWaitLayout.visibility = View.VISIBLE
@@ -245,12 +235,12 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
     private fun showInputLayout(needReleaseChannel: Boolean){
         stopRing()
         isWaiting = false
-        rlInputLayout.visibility = View.VISIBLE
+        binding.rlInputLayout.visibility = View.VISIBLE
         tvCallState.text =""
         tvCallUserArr.text = ""
         rlWaitLayout.visibility = View.GONE
         if (needReleaseChannel) {
-            RTManager.releaseChannel()
+            RtmManager.instance.releaseChannel()
         }
 
     }
@@ -259,18 +249,20 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
         tagList.removeAt(position)
         tagAdapter.notifyItemRemoved(position)
         if (tagList.size == 0){
-            tvDelTip.visibility = View.GONE
-            btnCall.isSelected = false
-            btnCall.isEnabled = false
+            binding.textTip.visibility = View.GONE
+            binding.btnCall.isSelected = false
+            binding.btnCall.isEnabled = false
         }
     }
 
-    fun toast(tip: String){
+    private fun toast(tip: String){
         Toast.makeText(this, tip, Toast.LENGTH_SHORT).show()
     }
 
+
+
     //返回给被叫：收到呼叫
-    override fun onRemoteInvitationReceived(remote: RemoteInvitation?) {
+    override fun onRemoteInvitationReceived(remote: RemoteInvitation) {
         super.onRemoteInvitationReceived(remote)
         runOnUiThread {
             if (isWaiting){
@@ -300,7 +292,7 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
         }
     }
 
-    override fun onRemoteInvitationCanceled(var1: RemoteInvitation?) {
+    override fun onRemoteInvitationCanceled(var1: RemoteInvitation) {
         super.onRemoteInvitationCanceled(var1)
         runOnUiThread {
                 calledArray.remove(var1?.callerId)
@@ -314,7 +306,7 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
 
     override fun onDestroy() {
         super.onDestroy()
-        RTManager.unRegisterChannelEvent(this)
+        RtmManager.instance.unRegisterChannelEvent(this)
         mainScope.cancel()
     }
 

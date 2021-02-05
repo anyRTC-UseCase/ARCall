@@ -24,6 +24,7 @@ class RtcMember private constructor(val userId:String){
     fun release(){
         canvas?.let {
             if (it.view != null && it.view.parent != null) {
+                it.getView().release()
                 (it.view.parent as ViewGroup).removeView(it.view)
             }
             canvas = null

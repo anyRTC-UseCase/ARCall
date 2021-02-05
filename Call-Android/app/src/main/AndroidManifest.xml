@@ -9,20 +9,24 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <service android:name=".utils.KeepAliveService"></service>
         <activity android:name=".multi.MultiVideosActivity"
-            android:launchMode="singleInstance"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"
+            android:launchMode="singleInstance"></activity>
         <activity
             android:name=".SettingActivity"
             android:screenOrientation="portrait" />
+
         <activity android:name=".p2p.CallActivity"
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".p2p.VideoActivity"
             android:screenOrientation="portrait"
             android:launchMode="singleInstance"/>
+
         <activity android:name=".multi.MultiCallActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+           >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -36,7 +40,8 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.REORDER_TASKS" />
-
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"></uses-permission>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
 </manifest>
