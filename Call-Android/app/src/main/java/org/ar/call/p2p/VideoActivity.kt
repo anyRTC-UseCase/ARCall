@@ -3,6 +3,7 @@ package org.ar.call.p2p
 import android.Manifest
 import android.app.ActivityManager
 import android.content.Context
+import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
@@ -23,11 +24,9 @@ import com.lzf.easyfloat.interfaces.OnInvokeView
 import com.lzf.easyfloat.interfaces.OnPermissionResult
 import com.lzf.easyfloat.permission.PermissionUtils.checkPermission
 import com.lzf.easyfloat.permission.PermissionUtils.requestPermission
-import org.ar.call.BaseActivity
+import org.ar.call.*
 import org.ar.call.CallApp.Companion.callApp
 import org.ar.call.R
-import org.ar.call.RtcManager
-import org.ar.call.RtmManager
 import org.ar.call.databinding.ActivityMulticallBinding
 import org.ar.call.databinding.ActivityVideoBinding
 import org.ar.call.p2p.VideoActivity
@@ -354,12 +353,15 @@ class VideoActivity : BaseActivity() {
                     RtcManager.instance.getRtcEngine()?.setupRemoteVideo(VideoCanvas(mRemoteView, VideoCanvas.RENDER_MODE_HIDDEN, channelId, remoteVideoId, Constants.VIDEO_MIRROR_MODE_DISABLED))
                     rl_float_video.setOnClickListener(View.OnClickListener {
                         dismissFloatWindow()
+                        RtcManager.instance.windowMode = false
                         if (callApp.p2pMeetingActivityTaskId == -1) {
                             return@OnClickListener
                         }
-                        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-                        activityManager.moveTaskToFront(callApp.p2pMainActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
-                        activityManager.moveTaskToFront(callApp.p2pMeetingActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
+                        val intent = Intent(CallApp.callApp.curActivity,VideoActivity::class.java)
+                        CallApp.callApp.curActivity?.startActivity(intent)
+//                        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+//                        activityManager.moveTaskToFront(callApp.p2pMainActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
+//                        activityManager.moveTaskToFront(callApp.p2pMeetingActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
 
                         if (binding.rlVideo.lastLeft != -1) {
                             val marginLayoutParams = binding.rlLocalVideo.layoutParams as MarginLayoutParams

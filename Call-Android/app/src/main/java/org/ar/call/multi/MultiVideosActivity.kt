@@ -2,6 +2,7 @@ package org.ar.call.multi
 
 import android.app.ActivityManager
 import android.content.Context
+import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
@@ -29,6 +30,7 @@ import org.ar.call.*
 import org.ar.call.R
 import org.ar.call.RtcManager.Companion.instance
 import org.ar.call.databinding.ActivityMultiVideosBinding
+import org.ar.call.p2p.VideoActivity
 import org.ar.call.utils.Constans
 import org.ar.call.utils.KeepAliveService
 import org.ar.call.utils.SpUtil
@@ -507,9 +509,11 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
                         if (CallApp.callApp.multiMeetingActivityTaskId == -1) {
                             return@setOnClickListener
                         }
-                        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-                        activityManager.moveTaskToFront(CallApp.callApp.multiMainActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
-                        activityManager.moveTaskToFront(CallApp.callApp.multiMeetingActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
+                        val intent = Intent(CallApp.callApp.curActivity, MultiVideosActivity::class.java)
+                        CallApp.callApp.curActivity?.startActivity(intent)
+//                        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+//                        activityManager.moveTaskToFront(CallApp.callApp.multiMainActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
+//                        activityManager.moveTaskToFront(CallApp.callApp.multiMeetingActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
 
 
                     }
