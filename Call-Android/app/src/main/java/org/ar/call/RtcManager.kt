@@ -22,7 +22,7 @@ class RtcManager private constructor(){
         return  rtcEngine
     }
 
-    //  <是否在视频中>
+    //  <是否在通话中>
     public var inMeeting = false
 
     //  <是否是悬浮窗模式>

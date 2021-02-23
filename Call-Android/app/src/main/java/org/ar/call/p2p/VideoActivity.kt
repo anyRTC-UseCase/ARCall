@@ -388,7 +388,7 @@ class VideoActivity : BaseActivity() {
     }
 
     fun dismissFloatWindow() {
-        RtcManager.instance.windowMode = true
+        RtcManager.instance.windowMode = false
         if (EasyFloat.appFloatIsShow()) {
             EasyFloat.dismissAppFloat()
             isSmall = false
@@ -693,9 +693,11 @@ class VideoActivity : BaseActivity() {
             })
             return
         }
+
         val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        activityManager.moveTaskToFront(callApp.p2pMainActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
+        activityManager.moveTaskToFront(if (callApp.p2pMainActivityTaskId == -1) callApp.indexActivityTaskId else callApp.p2pMainActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
         isSmall = true
+        RtcManager.instance.windowMode = true
         EasyFloat.with(this)
                 .setShowPattern(ShowPattern.FOREGROUND)
                 .setDragEnable(true)
@@ -712,9 +714,11 @@ class VideoActivity : BaseActivity() {
                         if (callApp.p2pMeetingActivityTaskId == -1) {
                             return@OnClickListener
                         }
-                        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-                        activityManager.moveTaskToFront(callApp.p2pMainActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
-                        activityManager.moveTaskToFront(callApp.p2pMeetingActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
+                        val intent = Intent(CallApp.callApp.curActivity,VideoActivity::class.java)
+                        CallApp.callApp.curActivity?.startActivity(intent)
+//                        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+//                        activityManager.moveTaskToFront(callApp.p2pMainActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
+//                        activityManager.moveTaskToFront(callApp.p2pMeetingActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
                     })
                 }).registerCallbacks(object : OnFloatCallbacks {
                     override fun createdResult(b: Boolean, s: String?, view: View?) {}
