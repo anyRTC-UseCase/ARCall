@@ -113,6 +113,7 @@ class VideoActivity : BaseActivity() {
 //        RtcManager.instance.getRtcEngine()?.setAudioProfile(Constants.AUDIO_PROFILE_SPEECH_STANDARD, Constants.AUDIO_SCENARIO_GAME_STREAMING)
         RtcManager.instance.getRtcEngine()!!.setClientRole(Constants.CLIENT_ROLE_AUDIENCE)
         if (callMode == Constans.VIDEO_MODE) {
+            RtcManager.instance.enableVideo()
             binding.rlVideoPreview.visibility = View.VISIBLE
             RtcManager.instance.getRtcEngine()?.muteLocalVideoStream(false)
             val mLocalView = RtcEngine.CreateRendererView(this)
@@ -295,6 +296,7 @@ class VideoActivity : BaseActivity() {
         RtcManager.instance.inMeeting = false
         dismissFloatWindow()
         if (callMode == Constans.VIDEO_MODE) {
+            RtcManager.instance.disableVideo()
             binding.rlVideo.removeAllViews()
         }
         RtcManager.instance.getRtcEngine()?.leaveChannel()
@@ -341,7 +343,7 @@ class VideoActivity : BaseActivity() {
     fun showFloatWindow() {
         RtcManager.instance.windowMode = true
         EasyFloat.with(this)
-                .setShowPattern(ShowPattern.FOREGROUND)
+                .setShowPattern(ShowPattern.ALL_TIME)
                 .setDragEnable(true)
                 .setGravity(Gravity.RIGHT)
                 .setSidePattern(SidePattern.RESULT_SIDE)
@@ -699,7 +701,7 @@ class VideoActivity : BaseActivity() {
         isSmall = true
         RtcManager.instance.windowMode = true
         EasyFloat.with(this)
-                .setShowPattern(ShowPattern.FOREGROUND)
+                .setShowPattern(ShowPattern.ALL_TIME)
                 .setDragEnable(true)
                 .setGravity(Gravity.RIGHT)
                 .setSidePattern(SidePattern.RESULT_SIDE)
@@ -758,7 +760,15 @@ class VideoActivity : BaseActivity() {
             binding.tvRemoteAudioUser.text = remoteUserId
             RtcManager.instance.getRtcEngine()!!.muteLocalVideoStream(true)
             RtcManager.instance.getRtcEngine()!!.setEnableSpeakerphone(false)
-            dismissFloatWindow()
+            if (EasyFloat.appFloatIsShow()){
+                dismissFloatWindow()
+                if (callApp.p2pMeetingActivityTaskId == -1) {
+                    return
+                }
+                val intent = Intent(CallApp.callApp.curActivity,VideoActivity::class.java)
+                CallApp.callApp.curActivity?.startActivity(intent)
+            }
+
             binding.rlVideo.removeAllViews()
             callMode = Constans.AUDIO_MODE
             Toast.makeText(this@VideoActivity, "声音将通过听筒播放", Toast.LENGTH_SHORT).show()

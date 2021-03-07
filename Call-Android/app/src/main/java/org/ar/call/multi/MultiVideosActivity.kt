@@ -103,6 +103,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
     }
 
     fun initRTC() {//初始化RTC
+        RtcManager.instance.enableVideo()
         RtcManager.instance.getRtcEngine()?.joinChannel("", channelId, "", mineUserId)
         binding.btnSpeak.isSelected = !binding.btnSpeak.isSelected
         RtcManager.instance.getRtcEngine()?.setEnableSpeakerphone(binding.btnSpeak.isSelected)
@@ -156,6 +157,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
                 memberAdapter.data.forEachIndexed { index, rtcMember ->
                     if (rtcMember.userId == uid) {
                         rtcMember.canvas?.let { RtcManager.instance.setupRemoteVideo(it) }
+                        memberAdapter.getItem(index)?.isWaiting = false
                         memberAdapter.getItem(index)?.isOpenAudio = true
                         memberAdapter.getViewByPosition(binding.rvVideo, index, R.id.iv_audio)!!.visibility = View.VISIBLE
                         return@forEachIndexed
@@ -249,12 +251,6 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
     override fun onMemberLeft(var1: RtmChannelMember?) {
         runOnUiThread {
             removeMember(var1?.userId.toString())
-            if (memberAdapter.data.size == 1) {//only self
-                RtcManager.instance.inMeeting = false
-                toast("通话已结束")
-                dismissFloatWindow()
-                finish()
-            }
         }
     }
 
@@ -287,7 +283,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
         Toast.makeText(this, tip, Toast.LENGTH_SHORT).show()
     }
 
-    fun removeMember(userId: String) {
+    private fun removeMember(userId: String) {
         var leftIndex = -1
         memberAdapter.data.forEachIndexed { index, rtcMember ->
             if (userId == rtcMember.userId) {
@@ -301,6 +297,12 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
         if (callArray?.contains(userId)!!) {
             callArray?.remove(userId)
         }
+        if (memberAdapter.data.size == 1) {//only self
+            RtcManager.instance.inMeeting = false
+            toast("通话已结束")
+            dismissFloatWindow()
+            finish()
+        }
     }
 
     override fun onDestroy() {
@@ -312,6 +314,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
         RtcManager.instance.callMode = -1
         RtcManager.instance.unRegisterRtcEvent(rtcEvent)
         RtcManager.instance.getRtcEngine()?.leaveChannel()
+        RtcManager.instance.disableVideo()
         RtmManager.instance.releaseChannel()
         RtmManager.instance.unRegisterChannelEvent(this)
     }

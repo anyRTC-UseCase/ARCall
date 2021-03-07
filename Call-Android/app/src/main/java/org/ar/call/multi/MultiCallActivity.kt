@@ -217,6 +217,7 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
         rtmChannel?.join(null)
     }
 
+
     /**
      * 被叫收到呼叫 展示等待的界面 并响铃
      */
@@ -294,12 +295,10 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
 
     override fun onRemoteInvitationCanceled(var1: RemoteInvitation) {
         super.onRemoteInvitationCanceled(var1)
-        runOnUiThread {
-                calledArray.remove(var1?.callerId)
-                if (calledArray.size==0){
-                    toast("主叫已取消呼叫")
-                    showInputLayout(true)
-                }
+        runOnUiThread {//收到主叫取消 可能是主动取消 可能是自己长时间未接听 SDK自动取消
+                calledArray.clear()//清空呼叫队列
+                showInputLayout(true)
+                toast("主叫已取消呼叫")
         }
     }
 
@@ -335,11 +334,9 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
                 if (var1?.userId in calledArray){
                     calledArray.remove(var1?.userId)
                 }
-                if (isWaiting){
-                    if (calledArray.size==0){//only self
-                        toast("呼叫已结束")
-                        showInputLayout(true)
-                    }
+                if (calledArray.size==0){
+                    toast("呼叫已结束")
+                    showInputLayout(true)
                 }
             }
         }

@@ -43,7 +43,7 @@ class RtcManager private constructor(){
         }
     }
 
-    private fun enableVideo(){
+     fun enableVideo(){
         val videoEncoderConfiguration = VideoEncoderConfiguration()
         when (SpUtil.getInt("frame")) {
             1 -> {
@@ -71,6 +71,7 @@ class RtcManager private constructor(){
         rtcEngine?.setVideoEncoderConfiguration(videoEncoderConfiguration)
         rtcEngine?.enableVideo()
     }
+
 
     fun setupLocalVideo(textureView: TextureView){
         rtcEngine?.setupLocalVideo(VideoCanvas(textureView,Constants.RENDER_MODE_HIDDEN,"","",Constants.VIDEO_MIRROR_MODE_ENABLED))
