@@ -20,6 +20,7 @@ import org.ar.call.*
 import org.ar.call.databinding.ActivityCallBinding
 import org.ar.call.multi.MultiCallActivity
 import org.ar.call.utils.Constans
+import org.ar.call.utils.toast
 import org.ar.rtm.ErrorInfo
 import org.ar.rtm.LocalInvitation
 import org.ar.rtm.RemoteInvitation
@@ -139,9 +140,6 @@ class CallActivity :BaseActivity(){
     }
 
 
-    fun Activity.toast(text: String){
-            android.widget.Toast.makeText(this, text, android.widget.Toast.LENGTH_SHORT).show()
-    }
 
     //==========callback========
 

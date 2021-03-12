@@ -24,6 +24,7 @@ import com.lzf.easyfloat.interfaces.OnInvokeView
 import com.lzf.easyfloat.interfaces.OnPermissionResult
 import com.lzf.easyfloat.permission.PermissionUtils.checkPermission
 import com.lzf.easyfloat.permission.PermissionUtils.requestPermission
+import kotlinx.coroutines.delay
 import org.ar.call.*
 import org.ar.call.CallApp.Companion.callApp
 import org.ar.call.R
@@ -33,6 +34,7 @@ import org.ar.call.p2p.VideoActivity
 import org.ar.call.utils.Constans
 import org.ar.call.utils.DensityUtil
 import org.ar.call.utils.KeepAliveService
+import org.ar.call.utils.launch
 import org.ar.call.weight.DragViewLayout
 import org.ar.rtc.Constants
 import org.ar.rtc.IRtcEngineEventHandler
@@ -113,13 +115,17 @@ class VideoActivity : BaseActivity() {
 //        RtcManager.instance.getRtcEngine()?.setAudioProfile(Constants.AUDIO_PROFILE_SPEECH_STANDARD, Constants.AUDIO_SCENARIO_GAME_STREAMING)
         RtcManager.instance.getRtcEngine()!!.setClientRole(Constants.CLIENT_ROLE_AUDIENCE)
         if (callMode == Constans.VIDEO_MODE) {
-            RtcManager.instance.enableVideo()
-            binding.rlVideoPreview.visibility = View.VISIBLE
-            RtcManager.instance.getRtcEngine()?.muteLocalVideoStream(false)
-            val mLocalView = RtcEngine.CreateRendererView(this)
-            binding.rlVideoPreview.addView(mLocalView,0)
-            RtcManager.instance.setupLocalVideo(mLocalView)
-            RtcManager.instance.getRtcEngine()?.startPreview()
+            launch({
+                RtcManager.instance.enableVideo()
+                delay(500)
+                binding.rlVideoPreview.visibility = View.VISIBLE
+                RtcManager.instance.getRtcEngine()?.muteLocalVideoStream(false)
+                val mLocalView = RtcEngine.CreateRendererView(this)
+                binding.rlVideoPreview.addView(mLocalView,0)
+                RtcManager.instance.setupLocalVideo(mLocalView)
+                RtcManager.instance.getRtcEngine()?.startPreview()
+            })
+
         }
         joinChannel()
         startRing()
@@ -296,9 +302,9 @@ class VideoActivity : BaseActivity() {
         RtcManager.instance.inMeeting = false
         dismissFloatWindow()
         if (callMode == Constans.VIDEO_MODE) {
-            RtcManager.instance.disableVideo()
             binding.rlVideo.removeAllViews()
         }
+        RtcManager.instance.disableVideo()
         RtcManager.instance.getRtcEngine()?.leaveChannel()
         if (needSendMeg) {
             val jsonObject = JSONObject()
@@ -635,8 +641,8 @@ class VideoActivity : BaseActivity() {
     override fun onRemoteInvitationRefused(remoteInvitation: RemoteInvitation) {
         runOnUiThread(Runnable {
             //你拒绝了对方
-            if (isCalling) { //正在通话中
-                return@Runnable
+            if (isCalling||isWaiting) { //正在通话中
+
             } else {
                 RtcManager.instance.inMeeting = false
                 UnSubscribe(remoteInvitation.callerId)
@@ -777,6 +783,8 @@ class VideoActivity : BaseActivity() {
 
     fun HangUp(view: View?) {
         RtcManager.instance.inMeeting = false
+        isWaiting = false
+        isCalling = false
         if (isCall) {
             rtmCallManager!!.cancelLocalInvitation(localInvitation!!, null)
         } else {

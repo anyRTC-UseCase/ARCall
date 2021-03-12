@@ -10,6 +10,7 @@ import com.kongzue.dialog.interfaces.OnDialogButtonClickListener
 import com.kongzue.dialog.util.BaseDialog
 import com.kongzue.dialog.v3.MessageDialog
 import com.kongzue.dialog.v3.TipDialog
+import com.lzf.easyfloat.EasyFloat
 import com.yanzhenjie.permission.AndPermission
 import com.yanzhenjie.permission.runtime.Permission
 import kotlinx.coroutines.MainScope
@@ -151,6 +152,9 @@ class MainActivity : BaseActivity() {
     override fun onRemoteInvitationReceived(remoteInvitation: RemoteInvitation) {
         super.onRemoteInvitationReceived(remoteInvitation)
         runOnUiThread {
+            if (EasyFloat.appFloatIsShow()){
+                return@runOnUiThread
+            }
                 val jsonObject = JSONObject(remoteInvitation.content)
                 val isConference = jsonObject.getBoolean("Conference")
                 Intent().apply {

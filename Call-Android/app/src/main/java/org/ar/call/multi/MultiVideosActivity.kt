@@ -31,9 +31,7 @@ import org.ar.call.R
 import org.ar.call.RtcManager.Companion.instance
 import org.ar.call.databinding.ActivityMultiVideosBinding
 import org.ar.call.p2p.VideoActivity
-import org.ar.call.utils.Constans
-import org.ar.call.utils.KeepAliveService
-import org.ar.call.utils.SpUtil
+import org.ar.call.utils.*
 import org.ar.rtc.Constants
 import org.ar.rtc.IRtcEngineEventHandler
 import org.ar.rtm.*
@@ -83,10 +81,10 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
 
         binding.rvVideo.adapter = memberAdapter
 
-        memberAdapter.addData(RtcMember.Factory.create(mineUserId).also {
-            it.isWaiting = false
-            it.isOpenAudio = true
-            it.isOpenVideo = true
+        memberAdapter.addData(RtcMember.Factory.create(mineUserId).apply {
+                isWaiting = false
+                isOpenAudio = true
+                isOpenVideo = true
         })
         callArray?.forEach {
             memberAdapter.addData(RtcMember.Factory.create(it))//将所有人的视图添加
@@ -128,22 +126,14 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
                 if (!isOpenCamera) {
                     RtcManager.instance.getRtcEngine()?.muteLocalVideoStream(true)
                     binding.btnVideo.isSelected = true
-                    memberAdapter.getItem(0)?.isOpenVideo = true
-                    memberAdapter.getViewByPosition(binding.rvVideo, 0, R.id.iv_video_close)!!.visibility = (if (binding.btnVideo.isSelected) {
-                        View.VISIBLE
-                    } else {
-                        View.GONE
-                    })
+                    memberAdapter.getItem(0)?.isOpenVideo = false
+                    memberAdapter.notifyItemChanged(0,MemberAVStatus.VIDEO(false))
                 }
                 if (!isOpenAudio) {
                     RtcManager.instance.getRtcEngine()?.muteLocalAudioStream(true)
                     binding.btnAudio.isSelected = true
                     memberAdapter.getItem(0)?.isOpenAudio = false
-                    memberAdapter.getViewByPosition(binding.rvVideo, 0, R.id.iv_audio)!!.setBackgroundResource(if (binding.btnAudio.isSelected) {
-                        R.drawable.mic_close
-                    } else {
-                        R.drawable.mic_open
-                    })
+                    memberAdapter.notifyItemChanged(0,MemberAVStatus.AUDIO(false))
                 }
 
             }
@@ -156,10 +146,12 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
             runOnUiThread {
                 memberAdapter.data.forEachIndexed { index, rtcMember ->
                     if (rtcMember.userId == uid) {
-                        rtcMember.canvas?.let { RtcManager.instance.setupRemoteVideo(it) }
+                        if (rtcMember.canvas == null){
+                            rtcMember.getVideoCanvas(this@MultiVideosActivity)
+                        }
+                        RtcManager.instance.setupRemoteVideo(rtcMember.canvas!!)
                         memberAdapter.getItem(index)?.isWaiting = false
-                        memberAdapter.getItem(index)?.isOpenAudio = true
-                        memberAdapter.getViewByPosition(binding.rvVideo, index, R.id.iv_audio)!!.visibility = View.VISIBLE
+                        memberAdapter.notifyItemChanged(index,MemberAVStatus.WAITING(false))
                         return@forEachIndexed
                     }
                 }
@@ -176,9 +168,8 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
                 binding.chronometer.start()
                 memberAdapter.data.forEachIndexed { index, rtcMember ->
                     if (rtcMember.userId == uid) {
-                        if (memberAdapter.getViewByPosition(binding.rvVideo, index, R.id.rl_wait) != null) {
-                            memberAdapter.getViewByPosition(binding.rvVideo, index, R.id.rl_wait)!!.visibility = View.GONE
-                        }
+                        rtcMember.isWaiting = false
+                        memberAdapter.notifyItemChanged(index,MemberAVStatus.WAITING(false))
                         return@forEachIndexed
                     }
                 }
@@ -194,10 +185,10 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
                         if (rtcMember.userId == uid) {
                             if (reason == Constants.REMOTE_AUDIO_REASON_REMOTE_MUTED) {
                                 memberAdapter.getItem(index)?.isOpenAudio = false
-                                memberAdapter.getViewByPosition(binding.rvVideo, index, R.id.iv_audio)!!.setBackgroundResource(R.drawable.mic_close)
+                                memberAdapter.notifyItemChanged(index,MemberAVStatus.AUDIO(false))
                             } else if (reason == Constants.REMOTE_AUDIO_REASON_REMOTE_UNMUTED) {
                                 memberAdapter.getItem(index)?.isOpenAudio = true
-                                memberAdapter.getViewByPosition(binding.rvVideo, index, R.id.iv_audio)!!.setBackgroundResource(R.drawable.mic_open)
+                                memberAdapter.notifyItemChanged(index,MemberAVStatus.AUDIO(true))
                             }
                             return@forEachIndexed
                         }
@@ -214,10 +205,10 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
                         if (rtcMember.userId == uid) {
                             if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_MUTED) {
                                 memberAdapter.getItem(index)?.isOpenVideo = false
-                                memberAdapter.getViewByPosition(binding.rvVideo, index, R.id.iv_video_close)!!.visibility = View.VISIBLE
+                                memberAdapter.notifyItemChanged(index,MemberAVStatus.VIDEO(false))
                             } else if (reason == Constants.REMOTE_VIDEO_STATE_REASON_REMOTE_UNMUTED) {
                                 memberAdapter.getItem(index)?.isOpenVideo = true
-                                memberAdapter.getViewByPosition(binding.rvVideo, index, R.id.iv_video_close)!!.visibility = View.GONE
+                                memberAdapter.notifyItemChanged(index,MemberAVStatus.VIDEO(true))
                             }
                             return@forEachIndexed
                         }
@@ -346,11 +337,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
         binding.btnAudio.isSelected = !binding.btnAudio.isSelected
         RtcManager.instance.getRtcEngine()?.muteLocalAudioStream(binding.btnAudio.isSelected)
         memberAdapter.getItem(0)?.isOpenAudio = !binding.btnAudio.isSelected
-        memberAdapter.getViewByPosition(binding.rvVideo, 0, R.id.iv_audio)!!.setBackgroundResource(if (binding.btnAudio.isSelected) {
-            R.drawable.mic_close
-        } else {
-            R.drawable.mic_open
-        })
+        memberAdapter.notifyItemChanged(0,MemberAVStatus.AUDIO(!binding.btnAudio.isSelected))
     }
 
     fun openSpeak(view: View) {
@@ -362,11 +349,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
         binding.btnVideo.isSelected = !binding.btnVideo.isSelected
         RtcManager.instance.getRtcEngine()?.muteLocalVideoStream(binding.btnVideo.isSelected)
         memberAdapter.getItem(0)?.isOpenVideo = !binding.btnVideo.isSelected
-        memberAdapter.getViewByPosition(binding.rvVideo, 0, R.id.iv_video_close)!!.visibility = (if (binding.btnVideo.isSelected) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        })
+        memberAdapter.notifyItemChanged(0,MemberAVStatus.VIDEO(!binding.btnVideo.isSelected))
     }
 
     override fun onRemoteInvitationReceived(remote: RemoteInvitation) {

@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.chad.library.adapter.base.BaseQuickAdapter
+import com.chad.library.adapter.base.listener.OnItemChildClickListener
 import com.google.gson.Gson
 import com.gyf.immersionbar.ImmersionBar
 import com.kongzue.dialog.v3.MessageDialog
@@ -33,7 +34,7 @@ import org.json.JSONObject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListener,RtmChannelListener{
+class MultiCallActivity : BaseActivity() ,OnItemChildClickListener,RtmChannelListener{
 
     private var player:MediaPlayer? =null
     private lateinit var binding: ActivityMulticallBinding
@@ -65,8 +66,9 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
         ImmersionBar.with(this).statusBarDarkFont(false, 0.2f).keyboardEnable(false).init()
         RtmManager.instance.registerChannelEvent(this)
         tagAdapter = TagAdapter()
-        tagAdapter.setNewData(tagList)
-        tagAdapter.onItemChildClickListener = this
+        tagAdapter.setNewInstance(tagList)
+        tagAdapter.addChildClickViewIds(R.id.iv_delete_tag)
+        tagAdapter.setOnItemChildClickListener(this)
         binding.tvUser.text = "您的呼叫ID:$mineUserId"
 
 
@@ -246,15 +248,6 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
 
     }
 
-    override fun onItemChildClick(adapter: BaseQuickAdapter<*, *>?, view: View?, position: Int) {
-        tagList.removeAt(position)
-        tagAdapter.notifyItemRemoved(position)
-        if (tagList.size == 0){
-            binding.textTip.visibility = View.GONE
-            binding.btnCall.isSelected = false
-            binding.btnCall.isEnabled = false
-        }
-    }
 
     private fun toast(tip: String){
         Toast.makeText(this, tip, Toast.LENGTH_SHORT).show()
@@ -270,11 +263,21 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
                 val param = JSONObject().apply {
                     put("Cmd", "Calling")
                 }
-                remote?.response = param as String
+                remote?.response = param.toString()
                 remote?.let {
                     rtmCallManager?.refuseRemoteInvitation(it, null)
                 }
             }else{
+                if (EasyFloat.appFloatIsShow()){
+                    val param = JSONObject().apply {
+                        put("Cmd", "Calling")
+                    }
+                    remote?.response = param.toString()
+                    remote?.let {
+                        rtmCallManager?.refuseRemoteInvitation(it, null)
+                    }
+                    return@runOnUiThread
+                }
                 if(JSONObject(remote?.content).getBoolean("Conference")){
                     remoteInvitation = remote
                     val remoteBean = Gson().fromJson(remote?.content, MultiUserBean::class.java)
@@ -379,6 +382,16 @@ class MultiCallActivity : BaseActivity() ,BaseQuickAdapter.OnItemChildClickListe
             }
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }
+
+    override fun onItemChildClick(adapter: BaseQuickAdapter<*, *>, view: View, position: Int) {
+        tagList.removeAt(position)
+        tagAdapter.notifyItemRemoved(position)
+        if (tagList.size == 0){
+            binding.textTip.visibility = View.GONE
+            binding.btnCall.isSelected = false
+            binding.btnCall.isEnabled = false
         }
     }
 }
