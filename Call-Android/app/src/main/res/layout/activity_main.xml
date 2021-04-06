@@ -61,17 +61,19 @@
                 android:layout_weight="1"
                 android:layout_marginLeft="@dimen/dp_28"
                 android:layout_height="@dimen/dp_147"
+                android:onClick="single"
                 app:cardCornerRadius="@dimen/dp_5">
 
                 <Button
                     android:id="@+id/btn_p2p"
                     android:layout_width="@dimen/dp_301"
                     android:layout_height="wrap_content"
-                    android:onClick="P2P"
+
                     android:background="@null"
                     android:layout_gravity="center"
                     android:drawableTop="@drawable/img_ptp"
                     android:textSize="@dimen/sp_14"
+                    android:clickable="false"
                     android:text="点对点呼叫邀请"
                     android:textColor="@color/colorAccent" />
 
@@ -79,6 +81,7 @@
 
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
+                android:onClick="multiple"
                 android:layout_weight="1"
                 android:layout_marginRight="@dimen/dp_28"
                 android:layout_marginLeft="@dimen/dp_10"
@@ -89,8 +92,9 @@
                     android:layout_width="@dimen/dp_301"
                     android:layout_height="wrap_content"
                     android:background="@null"
+                    android:clickable="false"
                     android:drawableTop="@drawable/img_multiple"
-                    android:onClick="Multiple"
+
                     android:layout_gravity="center"
                     android:layout_centerHorizontal="true"
                     android:textSize="@dimen/sp_14"

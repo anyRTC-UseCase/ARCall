@@ -14,7 +14,7 @@
         android:layout_height="@dimen/dp_44">
 
         <ImageView
-            android:onClick="Back"
+            android:onClick="back"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:src="@drawable/back"
@@ -31,8 +31,9 @@
     </RelativeLayout>
 
     <LinearLayout
-    android:id="@+id/ll_setting_resolution"
+    android:id="@+id/ll_video_config"
     android:layout_width="match_parent"
+        android:visibility="gone"
     android:layout_height="wrap_content"
     android:orientation="vertical">
         <TextView
@@ -49,7 +50,7 @@
 
         <TextView
             android:id="@+id/tv_xy"
-            android:onClick="FenBianLv"
+            android:onClick="videoDimensions"
             android:layout_width="match_parent"
             android:text="480*640"
             android:paddingLeft="@dimen/dp_18"
@@ -77,7 +78,7 @@
 
         <TextView
             android:id="@+id/tv_frame"
-            android:onClick="Frame"
+            android:onClick="frameSetting"
             android:layout_width="match_parent"
             android:text="15"
             android:background="@color/white"
@@ -92,87 +93,56 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/ll_setting_camera"
+        android:id="@+id/ll_video_setting"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         android:orientation="vertical">
-        <RelativeLayout
-            android:layout_marginTop="@dimen/dp_11"
-            android:layout_width="match_parent"
-            android:background="@color/white"
-            android:layout_height="47dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:paddingLeft="@dimen/dp_18"
-                android:textColor="#333333"
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/sw_camera"
+                android:layout_width="match_parent"
+                android:layout_marginTop="@dimen/dp_11"
                 android:layout_centerVertical="true"
-                android:text="开启摄像头"/>
-
-            <Button
-                android:id="@+id/setting_camera"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:onClick="openCamera"
-                android:layout_marginRight="10dp"
-                android:layout_alignParentRight="true"
-                android:background="@drawable/close"/>
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_marginTop="@dimen/dp_11"
-            android:layout_width="match_parent"
-            android:background="@color/white"
-            android:layout_height="47dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:paddingLeft="@dimen/dp_18"
+                android:layout_height="@dimen/dp_47"
+                android:background="@color/white"
                 android:textColor="#333333"
-                android:layout_centerVertical="true"
-                android:text="开启麦克风"/>
+                android:paddingLeft="@dimen/dp_15"
+                android:paddingRight="@dimen/dp_15"
+                android:textSize="15sp"
+                android:text="开启摄像头">
 
-            <Button
-                android:id="@+id/setting_microphone"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:onClick="closeMicrophone"
-                android:layout_marginRight="10dp"
-                android:layout_alignParentRight="true"
-                android:background="@drawable/open"/>
-        </RelativeLayout>
+            </androidx.appcompat.widget.SwitchCompat>
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/sw_mic"
+            android:layout_width="match_parent"
+            android:layout_marginTop="@dimen/dp_11"
+            android:layout_centerVertical="true"
+            android:layout_height="@dimen/dp_47"
+            android:background="@color/white"
+            android:textColor="#333333"
+            android:paddingLeft="@dimen/dp_15"
+            android:paddingRight="@dimen/dp_15"
+            android:textSize="15sp"
+            android:text="开启麦克风">
+
+        </androidx.appcompat.widget.SwitchCompat>
 
     </LinearLayout>
-
-    <RelativeLayout
-        android:layout_marginTop="@dimen/dp_11"
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/sw_denoise"
         android:layout_width="match_parent"
+        android:layout_marginTop="@dimen/dp_11"
+        android:layout_centerVertical="true"
+        android:layout_height="@dimen/dp_47"
         android:background="@color/white"
-        android:layout_height="47dp">
+        android:textColor="#333333"
+        android:paddingLeft="@dimen/dp_15"
+        android:paddingRight="@dimen/dp_15"
+        android:textSize="15sp"
+        android:text="AI智能降噪"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:paddingLeft="@dimen/dp_18"
-            android:textColor="#333333"
-            android:layout_centerVertical="true"
-            android:text="AI降噪"/>
-
-        <Button
-            android:id="@+id/ai_denoise"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:onClick="openDenoise"
-            android:layout_marginRight="10dp"
-            android:layout_alignParentRight="true"
-            android:background="@drawable/close"/>
-    </RelativeLayout>
 
 
 </LinearLayout>

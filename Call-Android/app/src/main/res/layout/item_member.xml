@@ -64,8 +64,7 @@
             android:layout_height="@dimen/dp_15"
             android:layout_marginLeft="@dimen/dp_6"
             android:layout_gravity="center"
-            android:visibility="gone"
-            android:background="@drawable/mic_open"/>
+            android:background="@drawable/mic_close"/>
 
         <TextView
             android:id="@+id/tv_uid"

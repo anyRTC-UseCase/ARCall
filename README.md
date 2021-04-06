@@ -106,5 +106,9 @@ ARCall技术交流群：597181019
 
 技术问题：[开发者论坛](https://bbs.anyrtc.io)
 
+加微信入技术群交流：
+
+<img src="https://img-blog.csdnimg.cn/20210324215941588.png" style="zoom:50%;" />
+
 获取更多帮助前往：[www.anyrtc.io](http://www.anyrtc.io)
 

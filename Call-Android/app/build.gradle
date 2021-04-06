@@ -10,8 +10,8 @@ android {
         applicationId "org.ar.call"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 20
-        versionName "1.1.9"
+        versionCode 24
+        versionName "1.2.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -36,17 +36,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    sourceSets{
-        main{
-            jniLibs.srcDir(['libs'])
-        }
-    }
-
-    repositories {
-        flatDir {
-            dirs 'libs'
-        }
-    }
     packagingOptions {
 
         pickFirst 'lib/arm64-v8a/libc++_shared.so'
@@ -55,17 +44,16 @@ android {
 
     }
     compileOptions {
-
         sourceCompatibility JavaVersion.VERSION_1_8
-
         targetCompatibility JavaVersion.VERSION_1_8
-
     }
-
+    viewBinding {
+        enabled = true
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.aar"])
+    implementation fileTree(dir: "libs", include: ["*.jar"])
 
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.google.android.material:material:1.1.0'
@@ -76,8 +64,12 @@ dependencies {
     implementation 'com.gyf.immersionbar:immersionbar-components:3.0.0'
     implementation 'com.github.princekin-f:EasyFloat:1.3.3'
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'org.ar:rtc:4.1.2.0'
-    implementation 'org.ar:rtm:1.0.1.7'
+    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.4'
+
+//    implementation 'org.ar:rtc:4.1.2.3'
+    implementation 'org.ar_alpha:rtc:1.0.3.6'
+    implementation 'org.ar:rtm:1.0.1.8'
+    implementation 'cn.yc:notificationLib:1.0.2'
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.7'
@@ -87,10 +79,10 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.6.2'
 
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.22'
     implementation 'com.kongzue.dialog_v3x:dialog:3.2.1'
     implementation 'com.yanzhenjie:permission:2.0.3'
     implementation 'com.jacktuotuo.customview:verificationcodeview:1.0.5'
 
     implementation 'com.readystatesoftware.systembartint:systembartint:1.0.3'
+
 }
