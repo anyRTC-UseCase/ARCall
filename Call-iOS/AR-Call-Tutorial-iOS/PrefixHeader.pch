@@ -39,12 +39,12 @@ static NSString *appID = <#T##NSString#>;
 
 #import "ARtmManager.h"
 #import "ARCallCommon.h"
-#import "ARtmUserManager.h"
+#import "ARUserManager.h"
 #import "ARtmTimer.h"
 #import "WMDragView.h"
-#import "ARtmSuspensionView.h"
-#import "ARtmCallViewController.h"
-#import "ARtmMeetViewController.h"
+#import "ARSuspensionView.h"
+#import "ARCallViewController.h"
+#import "ARMeetViewController.h"
 
 //MARK: - Macro
 

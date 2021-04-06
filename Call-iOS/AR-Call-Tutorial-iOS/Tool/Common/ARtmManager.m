@@ -7,7 +7,7 @@
 //
 
 #import "ARtmManager.h"
-#import "ARtmUserManager.h"
+#import "ARUserManager.h"
 
 static ARtmKit *rtmKit_ = nil;
 static NSString *localUid = nil;
@@ -28,21 +28,21 @@ static UIWindow *rtmWindow_ = nil;
 + (void)setLocalUid:(NSString *)uid {
     localUid = uid;
     if (uid.length != 0) {
-        ARtmUserInfo *userInfo = [[ARtmUserInfo alloc] init];
+        ARUserInfo *userInfo = [[ARUserInfo alloc] init];
         userInfo.uid = uid;
         userInfo.frameRate = 15;
         userInfo.dimensions = @"480*640";
         userInfo.audio = YES;
         userInfo.video = YES;
         userInfo.aiNoise = NO;
-        [ARtmUserManager saveAccountInformation:userInfo];
+        [ARUserManager saveAccountInformation:userInfo];
     } else {
-        [ARtmUserManager deleteAccountInformation];
+        [ARUserManager deleteAccountInformation];
     }
 }
 
 + (NSString *)getLocalUid {
-    return ARtmUserManager.fetchUserInfo.uid;
+    return ARUserManager.getUserInfo.uid;
 }
 
 + (void)addOfflineMessage:(ARtmMessage * _Nonnull)message fromUser:(NSString * _Nonnull)uid {

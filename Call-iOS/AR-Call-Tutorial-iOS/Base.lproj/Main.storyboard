@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -11,10 +11,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Rtm Home View Controller-->
+        <!--Home View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ARtmHomeViewController" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="ARHomeViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -116,10 +116,10 @@
             </objects>
             <point key="canvasLocation" x="-775" y="-720"/>
         </scene>
-        <!--Rtm Main View Controller-->
+        <!--Main View Controller-->
         <scene sceneID="ZVp-yM-NAL">
             <objects>
-                <viewController storyboardIdentifier="ARtm_Main" id="epQ-aK-2RW" customClass="ARtmMainViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ARtm_Main" id="epQ-aK-2RW" customClass="ARMainViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="9ch-Z4-vWP">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -260,7 +260,7 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="点对点呼叫邀请" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mLH-vM-zHl">
-                                <rect key="frame" x="144" y="66.333333333333329" width="126.33333333333331" height="25.333333333333329"/>
+                                <rect key="frame" x="144" y="66.333333333333329" width="126" height="25.333333333333329"/>
                                 <fontDescription key="fontDescription" name="PingFangSC-Regular" family="PingFang SC" pointSize="18"/>
                                 <color key="textColor" red="0.99989169840000003" green="1" blue="0.99988096950000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
@@ -274,14 +274,9 @@
                             <collectionView hidden="YES" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" bounces="NO" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="tU1-sl-ptm">
                                 <rect key="frame" x="33" y="244.66666666666663" width="348" height="259"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Flm-9s-mVz">
-                                    <size key="itemSize" width="142" height="59"/>
-                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
-                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                </collectionViewFlowLayout>
+                                <collectionViewLayout key="collectionViewLayout" id="0TT-5V-CS0"/>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="ARtm_CollectionCell" id="5EY-pd-sbN" customClass="ARtmCollectionViewCell">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="ARtm_CollectionCell" id="5EY-pd-sbN" customClass="ARCollectionViewCell">
                                         <rect key="frame" x="0.0" y="0.0" width="142" height="59"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="171-WE-LrS">
@@ -372,10 +367,10 @@
             </objects>
             <point key="canvasLocation" x="79.710144927536234" y="-720.53571428571422"/>
         </scene>
-        <!--Rtm Call View Controller-->
+        <!--Call View Controller-->
         <scene sceneID="wzd-tv-4rz">
             <objects>
-                <viewController storyboardIdentifier="ARtm_Call" id="zdh-bn-MMS" customClass="ARtmCallViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ARtm_Call" id="zdh-bn-MMS" customClass="ARCallViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="lxE-Jn-KM7">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -618,10 +613,10 @@
             </objects>
             <point key="canvasLocation" x="81" y="50"/>
         </scene>
-        <!--Rtm Meet View Controller-->
+        <!--Meet View Controller-->
         <scene sceneID="CUh-6L-497">
             <objects>
-                <viewController storyboardIdentifier="ARtm_Meet" id="3MH-P3-deL" customClass="ARtmMeetViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ARtm_Meet" id="3MH-P3-deL" customClass="ARMeetViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="LJV-hD-J9z">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -865,7 +860,7 @@
         <!--Root View Controller-->
         <scene sceneID="XBx-n0-D8t">
             <objects>
-                <tableViewController id="3oX-X4-icj" customClass="ARtmConfigController" sceneMemberID="viewController">
+                <tableViewController id="3oX-X4-icj" customClass="ARConfigController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" style="grouped" separatorStyle="none" rowHeight="50" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="mtv-DL-eJF">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -895,7 +890,7 @@
                                     </subviews>
                                 </tableViewCellContentView>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ARtmMeetCellID" id="Oq6-ea-d4e" customClass="ARtmConfigMeetCell">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ARtmMeetCellID" id="Oq6-ea-d4e" customClass="ARConfigMeetCell">
                                 <rect key="frame" x="0.0" y="105.33333206176758" width="414" height="50"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Oq6-ea-d4e" id="nG5-cT-vnA">

@@ -197,10 +197,14 @@ if [ -r "${ARTIFACT_LIST_FILE}" ]; then
 fi
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
+  install_framework "${PODS_ROOT}/ARtcKit_iOS/ARtcKit/ARtcKit.framework"
+  install_framework "${PODS_ROOT}/ARtmKit_iOS/ARtmKit/ARtmKit.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/Masonry/Masonry.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SVProgressHUD/SVProgressHUD.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
+  install_framework "${PODS_ROOT}/ARtcKit_iOS/ARtcKit/ARtcKit.framework"
+  install_framework "${PODS_ROOT}/ARtmKit_iOS/ARtmKit/ARtmKit.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/Masonry/Masonry.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SVProgressHUD/SVProgressHUD.framework"
 fi

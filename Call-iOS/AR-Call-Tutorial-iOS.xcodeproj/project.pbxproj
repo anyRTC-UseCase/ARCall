@@ -9,20 +9,21 @@
 /* Begin PBXBuildFile section */
 		0ED0DB8A3EDC39B5F9ED5419 /* Pods_AR_Call_Tutorial_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA097CF202F6D6C055171E6 /* Pods_AR_Call_Tutorial_iOS.framework */; };
 		63511E4324C42240004D405B /* ARtmUserManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 63511E4224C42240004D405B /* ARtmUserManager.m */; };
-		6357EC4E24F93480005E0C60 /* ARtmHomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6357EC4D24F93480005E0C60 /* ARtmHomeViewController.m */; };
-		636780C624C2FB8B004D5C1D /* ARtmConfigController.m in Sources */ = {isa = PBXBuildFile; fileRef = 636780C524C2FB8B004D5C1D /* ARtmConfigController.m */; };
+		63511E4324C42240004D405B /* ARUserManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 63511E4224C42240004D405B /* ARUserManager.m */; };
+		6357EC4E24F93480005E0C60 /* ARHomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6357EC4D24F93480005E0C60 /* ARHomeViewController.m */; };
+		636780C624C2FB8B004D5C1D /* ARConfigController.m in Sources */ = {isa = PBXBuildFile; fileRef = 636780C524C2FB8B004D5C1D /* ARConfigController.m */; };
 		6369014124F1326900958992 /* ARtmTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6369014024F1326900958992 /* ARtmTimer.m */; };
 		636C20BD24ED5DE10046DCAA /* UIAlertController+Blocks.m in Sources */ = {isa = PBXBuildFile; fileRef = 636C20BC24ED5DE10046DCAA /* UIAlertController+Blocks.m */; };
-		636C20D324EE1F050046DCAA /* ARtmCallViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 636C20D224EE1F050046DCAA /* ARtmCallViewController.m */; };
-		636C20D624EE1F220046DCAA /* ARtmMeetViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 636C20D524EE1F220046DCAA /* ARtmMeetViewController.m */; };
+		636C20D324EE1F050046DCAA /* ARCallViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 636C20D224EE1F050046DCAA /* ARCallViewController.m */; };
+		636C20D624EE1F220046DCAA /* ARMeetViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 636C20D524EE1F220046DCAA /* ARMeetViewController.m */; };
 		636C20D924EE66020046DCAA /* ARVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 636C20D824EE66020046DCAA /* ARVideoView.m */; };
 		636C20DB24EE66350046DCAA /* ARVideoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 636C20DA24EE66350046DCAA /* ARVideoView.xib */; };
 		636C20E124EEA7C90046DCAA /* CALayer+ARBordColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 636C20E024EEA7C90046DCAA /* CALayer+ARBordColor.m */; };
-		636F978F24F3E7D70025094F /* ARtmSuspensionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 636F978E24F3E7D70025094F /* ARtmSuspensionView.m */; };
-		636F979124F3E7E80025094F /* ARtmSuspensionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 636F979024F3E7E80025094F /* ARtmSuspensionView.xib */; };
+		636F978F24F3E7D70025094F /* ARSuspensionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 636F978E24F3E7D70025094F /* ARSuspensionView.m */; };
+		636F979124F3E7E80025094F /* ARSuspensionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 636F979024F3E7E80025094F /* ARSuspensionView.xib */; };
 		63871CEB24DBFFD9003C220D /* rtm_call.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 63871CEA24DBFFD9003C220D /* rtm_call.mp3 */; };
-		63B5B69F24F2737C004F3829 /* ARtmInvitationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 63B5B69E24F2737C004F3829 /* ARtmInvitationView.m */; };
-		63B5B6A124F274AB004F3829 /* ARtmInvitationView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 63B5B6A024F274AB004F3829 /* ARtmInvitationView.xib */; };
+		63B5B69F24F2737C004F3829 /* ARInvitationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 63B5B69E24F2737C004F3829 /* ARInvitationView.m */; };
+		63B5B6A124F274AB004F3829 /* ARInvitationView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 63B5B6A024F274AB004F3829 /* ARInvitationView.xib */; };
 		63CA2EF324C17971003FF0AC /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 63CA2EF224C17971003FF0AC /* AppDelegate.m */; };
 		63CA2EFC24C17971003FF0AC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 63CA2EFA24C17971003FF0AC /* Main.storyboard */; };
 		63CA2EFE24C17972003FF0AC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63CA2EFD24C17972003FF0AC /* Assets.xcassets */; };
@@ -30,7 +31,7 @@
 		63CA2F0424C17972003FF0AC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 63CA2F0324C17972003FF0AC /* main.m */; };
 		63CA2F1624C18B05003FF0AC /* ARtmManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 63CA2F1424C18B05003FF0AC /* ARtmManager.m */; };
 		63CA2F1924C18BC9003FF0AC /* ARCallCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 63CA2F1824C18BC9003FF0AC /* ARCallCommon.m */; };
-		63CA2F1C24C18E6A003FF0AC /* ARtmMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 63CA2F1B24C18E6A003FF0AC /* ARtmMainViewController.m */; };
+		63CA2F1C24C18E6A003FF0AC /* ARMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 63CA2F1B24C18E6A003FF0AC /* ARMainViewController.m */; };
 		63CA2F2F24C1EA79003FF0AC /* WMDragView.m in Sources */ = {isa = PBXBuildFile; fileRef = 63CA2F2D24C1EA79003FF0AC /* WMDragView.m */; };
 /* End PBXBuildFile section */
 
@@ -48,32 +49,32 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		63511E4124C42240004D405B /* ARtmUserManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmUserManager.h; sourceTree = "<group>"; };
-		63511E4224C42240004D405B /* ARtmUserManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmUserManager.m; sourceTree = "<group>"; };
-		6357EC4C24F93480005E0C60 /* ARtmHomeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmHomeViewController.h; sourceTree = "<group>"; };
-		6357EC4D24F93480005E0C60 /* ARtmHomeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmHomeViewController.m; sourceTree = "<group>"; };
-		636780C424C2FB8B004D5C1D /* ARtmConfigController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmConfigController.h; sourceTree = "<group>"; };
-		636780C524C2FB8B004D5C1D /* ARtmConfigController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmConfigController.m; sourceTree = "<group>"; };
+		63511E4124C42240004D405B /* ARUserManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARUserManager.h; sourceTree = "<group>"; };
+		63511E4224C42240004D405B /* ARUserManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARUserManager.m; sourceTree = "<group>"; };
+		6357EC4C24F93480005E0C60 /* ARHomeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARHomeViewController.h; sourceTree = "<group>"; };
+		6357EC4D24F93480005E0C60 /* ARHomeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARHomeViewController.m; sourceTree = "<group>"; };
+		636780C424C2FB8B004D5C1D /* ARConfigController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARConfigController.h; sourceTree = "<group>"; };
+		636780C524C2FB8B004D5C1D /* ARConfigController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARConfigController.m; sourceTree = "<group>"; };
 		6369013F24F1326900958992 /* ARtmTimer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmTimer.h; sourceTree = "<group>"; };
 		6369014024F1326900958992 /* ARtmTimer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmTimer.m; sourceTree = "<group>"; };
 		636C20BB24ED5DE10046DCAA /* UIAlertController+Blocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIAlertController+Blocks.h"; sourceTree = "<group>"; };
 		636C20BC24ED5DE10046DCAA /* UIAlertController+Blocks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertController+Blocks.m"; sourceTree = "<group>"; };
-		636C20D124EE1F050046DCAA /* ARtmCallViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmCallViewController.h; sourceTree = "<group>"; };
-		636C20D224EE1F050046DCAA /* ARtmCallViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmCallViewController.m; sourceTree = "<group>"; };
-		636C20D424EE1F220046DCAA /* ARtmMeetViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmMeetViewController.h; sourceTree = "<group>"; };
-		636C20D524EE1F220046DCAA /* ARtmMeetViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmMeetViewController.m; sourceTree = "<group>"; };
+		636C20D124EE1F050046DCAA /* ARCallViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARCallViewController.h; sourceTree = "<group>"; };
+		636C20D224EE1F050046DCAA /* ARCallViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARCallViewController.m; sourceTree = "<group>"; };
+		636C20D424EE1F220046DCAA /* ARMeetViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARMeetViewController.h; sourceTree = "<group>"; };
+		636C20D524EE1F220046DCAA /* ARMeetViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARMeetViewController.m; sourceTree = "<group>"; };
 		636C20D724EE66020046DCAA /* ARVideoView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARVideoView.h; sourceTree = "<group>"; };
 		636C20D824EE66020046DCAA /* ARVideoView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARVideoView.m; sourceTree = "<group>"; };
 		636C20DA24EE66350046DCAA /* ARVideoView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ARVideoView.xib; sourceTree = "<group>"; };
 		636C20DF24EEA7C90046DCAA /* CALayer+ARBordColor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CALayer+ARBordColor.h"; sourceTree = "<group>"; };
 		636C20E024EEA7C90046DCAA /* CALayer+ARBordColor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "CALayer+ARBordColor.m"; sourceTree = "<group>"; };
-		636F978D24F3E7D70025094F /* ARtmSuspensionView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmSuspensionView.h; sourceTree = "<group>"; };
-		636F978E24F3E7D70025094F /* ARtmSuspensionView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmSuspensionView.m; sourceTree = "<group>"; };
-		636F979024F3E7E80025094F /* ARtmSuspensionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ARtmSuspensionView.xib; sourceTree = "<group>"; };
+		636F978D24F3E7D70025094F /* ARSuspensionView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARSuspensionView.h; sourceTree = "<group>"; };
+		636F978E24F3E7D70025094F /* ARSuspensionView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARSuspensionView.m; sourceTree = "<group>"; };
+		636F979024F3E7E80025094F /* ARSuspensionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ARSuspensionView.xib; sourceTree = "<group>"; };
 		63871CEA24DBFFD9003C220D /* rtm_call.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = rtm_call.mp3; sourceTree = "<group>"; };
-		63B5B69D24F2737C004F3829 /* ARtmInvitationView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmInvitationView.h; sourceTree = "<group>"; };
-		63B5B69E24F2737C004F3829 /* ARtmInvitationView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmInvitationView.m; sourceTree = "<group>"; };
-		63B5B6A024F274AB004F3829 /* ARtmInvitationView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ARtmInvitationView.xib; sourceTree = "<group>"; };
+		63B5B69D24F2737C004F3829 /* ARInvitationView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARInvitationView.h; sourceTree = "<group>"; };
+		63B5B69E24F2737C004F3829 /* ARInvitationView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARInvitationView.m; sourceTree = "<group>"; };
+		63B5B6A024F274AB004F3829 /* ARInvitationView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ARInvitationView.xib; sourceTree = "<group>"; };
 		63CA2EEE24C17971003FF0AC /* anyRTC视频通话.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "anyRTC视频通话.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		63CA2EF124C17971003FF0AC /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		63CA2EF224C17971003FF0AC /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -87,8 +88,8 @@
 		63CA2F1524C18B05003FF0AC /* ARtmManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARtmManager.h; sourceTree = "<group>"; };
 		63CA2F1724C18BC9003FF0AC /* ARCallCommon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARCallCommon.h; sourceTree = "<group>"; };
 		63CA2F1824C18BC9003FF0AC /* ARCallCommon.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARCallCommon.m; sourceTree = "<group>"; };
-		63CA2F1A24C18E6A003FF0AC /* ARtmMainViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARtmMainViewController.h; sourceTree = "<group>"; };
-		63CA2F1B24C18E6A003FF0AC /* ARtmMainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARtmMainViewController.m; sourceTree = "<group>"; };
+		63CA2F1A24C18E6A003FF0AC /* ARMainViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARMainViewController.h; sourceTree = "<group>"; };
+		63CA2F1B24C18E6A003FF0AC /* ARMainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARMainViewController.m; sourceTree = "<group>"; };
 		63CA2F2D24C1EA79003FF0AC /* WMDragView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WMDragView.m; sourceTree = "<group>"; };
 		63CA2F2E24C1EA79003FF0AC /* WMDragView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WMDragView.h; sourceTree = "<group>"; };
 		8AFC5CD5596F128B5F08D513 /* Pods-AR-Call-Tutorial-iOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AR-Call-Tutorial-iOS.debug.xcconfig"; path = "Target Support Files/Pods-AR-Call-Tutorial-iOS/Pods-AR-Call-Tutorial-iOS.debug.xcconfig"; sourceTree = "<group>"; };
@@ -123,12 +124,12 @@
 				636C20D724EE66020046DCAA /* ARVideoView.h */,
 				636C20D824EE66020046DCAA /* ARVideoView.m */,
 				636C20DA24EE66350046DCAA /* ARVideoView.xib */,
-				63B5B69D24F2737C004F3829 /* ARtmInvitationView.h */,
-				63B5B69E24F2737C004F3829 /* ARtmInvitationView.m */,
-				63B5B6A024F274AB004F3829 /* ARtmInvitationView.xib */,
-				636F978D24F3E7D70025094F /* ARtmSuspensionView.h */,
-				636F978E24F3E7D70025094F /* ARtmSuspensionView.m */,
-				636F979024F3E7E80025094F /* ARtmSuspensionView.xib */,
+				63B5B69D24F2737C004F3829 /* ARInvitationView.h */,
+				63B5B69E24F2737C004F3829 /* ARInvitationView.m */,
+				63B5B6A024F274AB004F3829 /* ARInvitationView.xib */,
+				636F978D24F3E7D70025094F /* ARSuspensionView.h */,
+				636F978E24F3E7D70025094F /* ARSuspensionView.m */,
+				636F979024F3E7E80025094F /* ARSuspensionView.xib */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -151,8 +152,8 @@
 				63CA2F1824C18BC9003FF0AC /* ARCallCommon.m */,
 				63CA2F1524C18B05003FF0AC /* ARtmManager.h */,
 				63CA2F1424C18B05003FF0AC /* ARtmManager.m */,
-				63511E4124C42240004D405B /* ARtmUserManager.h */,
-				63511E4224C42240004D405B /* ARtmUserManager.m */,
+				63511E4124C42240004D405B /* ARUserManager.h */,
+				63511E4224C42240004D405B /* ARUserManager.m */,
 				6369013F24F1326900958992 /* ARtmTimer.h */,
 				6369014024F1326900958992 /* ARtmTimer.m */,
 				63CA2F2E24C1EA79003FF0AC /* WMDragView.h */,
@@ -210,14 +211,14 @@
 		63EDCF3924C5C843003AE948 /* Call */ = {
 			isa = PBXGroup;
 			children = (
-				6357EC4C24F93480005E0C60 /* ARtmHomeViewController.h */,
-				6357EC4D24F93480005E0C60 /* ARtmHomeViewController.m */,
-				63CA2F1A24C18E6A003FF0AC /* ARtmMainViewController.h */,
-				63CA2F1B24C18E6A003FF0AC /* ARtmMainViewController.m */,
-				636C20D124EE1F050046DCAA /* ARtmCallViewController.h */,
-				636C20D224EE1F050046DCAA /* ARtmCallViewController.m */,
-				636C20D424EE1F220046DCAA /* ARtmMeetViewController.h */,
-				636C20D524EE1F220046DCAA /* ARtmMeetViewController.m */,
+				6357EC4C24F93480005E0C60 /* ARHomeViewController.h */,
+				6357EC4D24F93480005E0C60 /* ARHomeViewController.m */,
+				63CA2F1A24C18E6A003FF0AC /* ARMainViewController.h */,
+				63CA2F1B24C18E6A003FF0AC /* ARMainViewController.m */,
+				636C20D124EE1F050046DCAA /* ARCallViewController.h */,
+				636C20D224EE1F050046DCAA /* ARCallViewController.m */,
+				636C20D424EE1F220046DCAA /* ARMeetViewController.h */,
+				636C20D524EE1F220046DCAA /* ARMeetViewController.m */,
 				636F978C24F3E7280025094F /* View */,
 			);
 			path = Call;
@@ -226,8 +227,8 @@
 		63EDCF3A24C5C860003AE948 /* Config */ = {
 			isa = PBXGroup;
 			children = (
-				636780C424C2FB8B004D5C1D /* ARtmConfigController.h */,
-				636780C524C2FB8B004D5C1D /* ARtmConfigController.m */,
+				636780C424C2FB8B004D5C1D /* ARConfigController.h */,
+				636780C524C2FB8B004D5C1D /* ARConfigController.m */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -252,7 +253,6 @@
 				63CA2EEB24C17971003FF0AC /* Frameworks */,
 				63CA2EEC24C17971003FF0AC /* Resources */,
 				63CA2F1124C17DBE003FF0AC /* Embed Frameworks */,
-				53A668AB02CE17643B9A8559 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -300,9 +300,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				636F979124F3E7E80025094F /* ARtmSuspensionView.xib in Resources */,
+				636F979124F3E7E80025094F /* ARSuspensionView.xib in Resources */,
 				63871CEB24DBFFD9003C220D /* rtm_call.mp3 in Resources */,
-				63B5B6A124F274AB004F3829 /* ARtmInvitationView.xib in Resources */,
+				63B5B6A124F274AB004F3829 /* ARInvitationView.xib in Resources */,
 				63CA2F0124C17972003FF0AC /* LaunchScreen.storyboard in Resources */,
 				63CA2EFE24C17972003FF0AC /* Assets.xcassets in Resources */,
 				63CA2EFC24C17971003FF0AC /* Main.storyboard in Resources */,
@@ -313,23 +313,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		53A668AB02CE17643B9A8559 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AR-Call-Tutorial-iOS/Pods-AR-Call-Tutorial-iOS-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AR-Call-Tutorial-iOS/Pods-AR-Call-Tutorial-iOS-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AR-Call-Tutorial-iOS/Pods-AR-Call-Tutorial-iOS-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		C7CE701EA82A74D9AFAE9838 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -359,18 +342,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				636C20D624EE1F220046DCAA /* ARtmMeetViewController.m in Sources */,
-				636F978F24F3E7D70025094F /* ARtmSuspensionView.m in Sources */,
-				636780C624C2FB8B004D5C1D /* ARtmConfigController.m in Sources */,
-				63B5B69F24F2737C004F3829 /* ARtmInvitationView.m in Sources */,
-				63511E4324C42240004D405B /* ARtmUserManager.m in Sources */,
-				6357EC4E24F93480005E0C60 /* ARtmHomeViewController.m in Sources */,
+				636C20D624EE1F220046DCAA /* ARMeetViewController.m in Sources */,
+				636F978F24F3E7D70025094F /* ARSuspensionView.m in Sources */,
+				636780C624C2FB8B004D5C1D /* ARConfigController.m in Sources */,
+				63B5B69F24F2737C004F3829 /* ARInvitationView.m in Sources */,
+				63511E4324C42240004D405B /* ARUserManager.m in Sources */,
+				6357EC4E24F93480005E0C60 /* ARHomeViewController.m in Sources */,
 				63CA2F2F24C1EA79003FF0AC /* WMDragView.m in Sources */,
 				63CA2F1924C18BC9003FF0AC /* ARCallCommon.m in Sources */,
-				636C20D324EE1F050046DCAA /* ARtmCallViewController.m in Sources */,
+				636C20D324EE1F050046DCAA /* ARCallViewController.m in Sources */,
 				63CA2EF324C17971003FF0AC /* AppDelegate.m in Sources */,
 				636C20D924EE66020046DCAA /* ARVideoView.m in Sources */,
-				63CA2F1C24C18E6A003FF0AC /* ARtmMainViewController.m in Sources */,
+				63CA2F1C24C18E6A003FF0AC /* ARMainViewController.m in Sources */,
 				636C20E124EEA7C90046DCAA /* CALayer+ARBordColor.m in Sources */,
 				636C20BD24ED5DE10046DCAA /* UIAlertController+Blocks.m in Sources */,
 				63CA2F0424C17972003FF0AC /* main.m in Sources */,
@@ -533,7 +516,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "AR.AR-Call-Tutorial-iOS";
 				PRODUCT_NAME = "anyRTC视频通话";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -563,7 +546,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "AR.AR-Call-Tutorial-iOS";
 				PRODUCT_NAME = "anyRTC视频通话";
 				PROVISIONING_PROFILE_SPECIFIER = "";

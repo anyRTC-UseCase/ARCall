@@ -1,24 +1,3 @@
-PODS:
-  - Bugly (2.5.71)
-  - Masonry (1.1.0)
-  - SVProgressHUD (2.2.5)
-
-DEPENDENCIES:
-  - Bugly (~> 2.5.2)
-  - Masonry
-  - SVProgressHUD (~> 2.2.5)
-
-SPEC REPOS:
-  trunk:
-    - Bugly
-    - Masonry
-    - SVProgressHUD
-
-SPEC CHECKSUMS:
-  Bugly: fd066c75c4a0eca1440f9b6a84bd37d51bfc85ac
-  Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
-  SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
-
-PODFILE CHECKSUM: 7abd622e9d6ff4f2aca4a73e6e0e0aad79082ba6
+PODFILE CHECKSUM: b49c3c32f68564e9fe0ae2321af1e3e3a430df34
 
 COCOAPODS: 1.9.3
