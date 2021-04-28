@@ -149,8 +149,8 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
                         if (rtcMember.canvas == null){
                             rtcMember.getVideoCanvas(this@MultiVideosActivity)
                         }
-                        RtcManager.instance.setupRemoteVideo(rtcMember.canvas!!)
-                        memberAdapter.getItem(index)?.isWaiting = false
+                        instance.setupRemoteVideo(rtcMember.canvas!!)
+                        memberAdapter.getItem(index).isWaiting = false
                         memberAdapter.notifyItemChanged(index,MemberAVStatus.WAITING(false))
                         return@forEachIndexed
                     }

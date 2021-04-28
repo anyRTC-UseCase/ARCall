@@ -112,22 +112,17 @@ class VideoActivity : BaseActivity() {
             showCallLayout(true, remoteInvitation!!.callerId)
         }
         RtcManager.instance.getRtcEngine()?.setEnableSpeakerphone(true)
-//        RtcManager.instance.getRtcEngine()?.setAudioProfile(Constants.AUDIO_PROFILE_SPEECH_STANDARD, Constants.AUDIO_SCENARIO_GAME_STREAMING)
-        RtcManager.instance.getRtcEngine()!!.setClientRole(Constants.CLIENT_ROLE_AUDIENCE)
+//        RtcManager.instance.getRtcEngine()?.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING)
+//        RtcManager.instance.getRtcEngine()?.setClientRole(Constants.CLIENT_ROLE_AUDIENCE)
         if (callMode == Constans.VIDEO_MODE) {
-            launch({
                 RtcManager.instance.enableVideo()
-                delay(500)
                 binding.rlVideoPreview.visibility = View.VISIBLE
-                RtcManager.instance.getRtcEngine()?.muteLocalVideoStream(false)
+                //RtcManager.instance.getRtcEngine()?.muteLocalVideoStream(false)
                 val mLocalView = RtcEngine.CreateRendererView(this)
                 binding.rlVideoPreview.addView(mLocalView,0)
                 RtcManager.instance.setupLocalVideo(mLocalView)
                 RtcManager.instance.getRtcEngine()?.startPreview()
-            })
-
         }
-        joinChannel()
         startRing()
         setNeedUnRegister(false) //单独处理 悬浮窗打开会走onStop 避免取消注册了回调 收不到消息
     }
@@ -215,7 +210,8 @@ class VideoActivity : BaseActivity() {
             Toast.makeText(this@VideoActivity, "声音将通过听筒播放", Toast.LENGTH_SHORT).show()
             RtcManager.instance.getRtcEngine()!!.setEnableSpeakerphone(false)
         }
-        RtcManager.instance.getRtcEngine()!!.setClientRole(Constants.CLIENT_ROLE_BROADCASTER)
+        joinChannel()
+       // RtcManager.instance.getRtcEngine()!!.setClientRole(Constants.CLIENT_ROLE_BROADCASTER)
     }
 
     private fun joinChannel() {
@@ -449,6 +445,7 @@ class VideoActivity : BaseActivity() {
     }
 
     fun SwitchSpeak(view: View?) {
+
         binding.ibtnSpeak.isSelected = !binding.ibtnSpeak.isSelected
         RtcManager.instance.getRtcEngine()!!.setEnableSpeakerphone(binding.ibtnSpeak.isSelected)
     }
@@ -464,6 +461,7 @@ class VideoActivity : BaseActivity() {
     }
 
     fun MuteLocalAudio(view: View?) {
+
         binding.ibtnAudio.isSelected = !binding.ibtnAudio.isSelected
         RtcManager.instance.getRtcEngine()!!.muteLocalAudioStream(binding.ibtnAudio.isSelected)
     }

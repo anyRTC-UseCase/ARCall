@@ -24,8 +24,10 @@
             android:screenOrientation="portrait"
             android:launchMode="singleInstance"/>
 
-        <activity android:name=".multi.MultiCallActivity" />
+        <activity android:name=".multi.MultiCallActivity"
+            android:screenOrientation="portrait"/>
         <activity android:name=".MainActivity"
+            android:screenOrientation="portrait"
            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
