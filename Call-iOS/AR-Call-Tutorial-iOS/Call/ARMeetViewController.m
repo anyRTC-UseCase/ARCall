@@ -595,6 +595,7 @@
         }
     }];
 }
+
 - (void)rtcEngine:(ARtcEngineKit *)engine connectionChangedToState:(ARConnectionStateType)state reason:(ARConnectionChangedReason)reason {
     if (state == ARConnectionStateReconnecting) {
         [SVProgressHUD setContainerView:self.view];
@@ -606,10 +607,13 @@
         [self endCall];
     }
 }
+
 //MARK: - other
+
 - (void)viewWillDisappear:(BOOL)animated {
     [SVProgressHUD setContainerView:nil];
 }
+
 - (UIStatusBarStyle)preferredStatusBarStyle {
     return UIStatusBarStyleLightContent;
 }
@@ -618,6 +622,5 @@
     [NSNotificationCenter.defaultCenter removeObserver:self];
     NSLog(@"Meet dealloc");
 }
-
 
 @end
