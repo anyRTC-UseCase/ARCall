@@ -2,7 +2,6 @@ package org.ar.call
 
 import android.content.Context
 import android.view.TextureView
-import com.lzf.easyfloat.EasyFloat
 import org.ar.call.utils.Constans
 import org.ar.call.utils.SpUtil
 import org.ar.rtc.Constants
@@ -33,7 +32,6 @@ class RtcManager private constructor(){
 
     fun init(context: Context){
         rtcEngine = RtcEngine.create(context,BuildConfig.APPID,RtcEvent())
-        enableVideo()
         var isOpen = SpUtil.getBoolean(Constans.OPEN_DENOISE)
         if (isOpen){
             rtcEngine!!.setParameters(JSONObject().apply {

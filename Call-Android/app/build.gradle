@@ -10,8 +10,8 @@ android {
         applicationId "org.ar.call"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 24
-        versionName "1.2.3"
+        versionCode 25
+        versionName "1.2.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -28,12 +28,12 @@ android {
 
     buildTypes {
         release {
-            buildConfigField("String", "APPID", '"YOUR APPID"')
+            buildConfigField("String", "APPID", '"YOUR APP ID"')
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
-            buildConfigField("String", "APPID", '"YOUR APPID"')
+            buildConfigField("String", "APPID", '"YOUR APP ID"')
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -81,7 +81,7 @@ dependencies {
     implementation 'com.jacktuotuo.customview:verificationcodeview:1.0.5'
 
     implementation 'com.readystatesoftware.systembartint:systembartint:1.0.3'
-    implementation 'io.anyrtc:rtc:4.2.0'
-    implementation 'io.anyrtc:rtm:1.0.2.1'
+    implementation 'io.anyrtc:rtc:4.2.1.1'
+    implementation 'io.anyrtc:rtm:1.0.2.2'
 
 }

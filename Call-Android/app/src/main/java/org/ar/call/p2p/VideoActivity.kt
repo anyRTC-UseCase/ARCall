@@ -117,7 +117,6 @@ class VideoActivity : BaseActivity() {
         if (callMode == Constans.VIDEO_MODE) {
                 RtcManager.instance.enableVideo()
                 binding.rlVideoPreview.visibility = View.VISIBLE
-                //RtcManager.instance.getRtcEngine()?.muteLocalVideoStream(false)
                 val mLocalView = RtcEngine.CreateRendererView(this)
                 binding.rlVideoPreview.addView(mLocalView,0)
                 RtcManager.instance.setupLocalVideo(mLocalView)
