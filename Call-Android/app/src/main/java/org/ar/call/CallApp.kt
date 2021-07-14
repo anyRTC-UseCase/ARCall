@@ -40,7 +40,6 @@ class CallApp : Application(),Application.ActivityLifecycleCallbacks{
         SpUtil.init(this)
         NotificationUtil.createNotificationChannel()
         RtmManager.instance.init(this)
-        RtcManager.instance.init(this)
         DialogSettings.style = DialogSettings.STYLE.STYLE_IOS
         EasyFloat.init(this)
         registerActivityLifecycleCallbacks(this)

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
 import com.gyf.immersionbar.ImmersionBar
 import com.kongzue.dialog.interfaces.OnMenuItemClickListener
 import com.kongzue.dialog.v3.BottomMenu
@@ -25,6 +26,7 @@ import org.ar.rtm.ErrorInfo
 import org.ar.rtm.LocalInvitation
 import org.ar.rtm.RemoteInvitation
 import org.ar.rtm.ResultCallback
+import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -35,7 +37,6 @@ class CallActivity :BaseActivity(){
     private val rtmCallManager = RtmManager.instance.getCallManager()
     private val rtmClient = RtmManager.instance.getRtmClient()
     private var localInvitation:LocalInvitation? =null
-    private val mainScope = MainScope()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,7 +82,7 @@ class CallActivity :BaseActivity(){
             return
         }
 
-        mainScope.launch {
+        lifecycleScope.launch {
             val result = queryOnline(HashSet<String>().apply {
                 add(binding.etUser.inputContent)
             })
@@ -89,7 +90,6 @@ class CallActivity :BaseActivity(){
                 BottomMenu.show(this@CallActivity, arrayOf("视频呼叫", "语音呼叫"), OnMenuItemClickListener { _, index -> makeCall(index) }).title = "请选择呼叫类型"
             }else{
                 MessageDialog.show(this@CallActivity, "提示", "对方不在线", "确定")
-
             }
         }
 
@@ -109,7 +109,7 @@ class CallActivity :BaseActivity(){
     }
 
     private fun makeCall(type:Int){
-        localInvitation = rtmCallManager?.createLocalInvitation(binding.etUser.inputContent)
+        localInvitation = rtmCallManager?.createLocalInvitation(binding.etUser.inputContent.toString())
         RtmManager.instance.localInvitation = localInvitation
         localInvitation?.content = JSONObject().apply {
             put("Mode",type)
@@ -117,6 +117,8 @@ class CallActivity :BaseActivity(){
             put("ChanId",((Math.random()*9+1)*100000000L).toLong().toString())
             put("UserData","")
             put("SipData","")
+            put("VidCodec","[\"H264\",\"MJpeg\"]")
+            put("AudCodec","[\"Opus\",\"G711\"]")
         }.toString()
         Intent().apply {
             setClass(this@CallActivity,VideoActivity::class.java)
@@ -153,9 +155,9 @@ class CallActivity :BaseActivity(){
                     rtmCallManager?.refuseRemoteInvitation(it,null) }
                 return@runOnUiThread
             }
-            val isMultiple = JSONObject(remote?.content).getBoolean("Conference")
+            val isMultiple = JSONObject(remote?.content)["Conference"]
             Intent().let {
-                if (isMultiple){
+                if (isMultiple==1&&isMultiple==true){
                     it.setClass(this@CallActivity,MultiCallActivity::class.java)
                 }else{
                     it.setClass(this@CallActivity,VideoActivity::class.java)
@@ -163,7 +165,7 @@ class CallActivity :BaseActivity(){
                 it.putExtra("RecCall",true)
                 startActivity(it)
             }
-            if (isMultiple){
+            if (isMultiple==1&&isMultiple==true){
                 finish()
             }
         }
@@ -171,7 +173,6 @@ class CallActivity :BaseActivity(){
 
     override fun onDestroy() {
         super.onDestroy()
-        mainScope.cancel()
     }
 
 

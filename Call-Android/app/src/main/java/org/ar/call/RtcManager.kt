@@ -39,6 +39,7 @@ class RtcManager private constructor(){
                 put("Enable", 1)
             }.toString())
         }
+
     }
 
      fun enableVideo(){
@@ -99,6 +100,7 @@ class RtcManager private constructor(){
 
     fun release(){
         RtcEngine.destroy()
+        rtcEngine =null
     }
 
     fun registerRtcEvent(rtcEvent:IRtcEngineEventHandler){

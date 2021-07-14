@@ -94,10 +94,10 @@ class SettingActivity : BaseActivity() {
     override fun onRemoteInvitationReceived(remoteInvitation: RemoteInvitation) {
         runOnUiThread {
             val jsonObject = JSONObject(remoteInvitation.content)
-            val isConference = jsonObject.getBoolean("Conference")
+            val isConference = jsonObject["Conference"]
             Intent().apply {
                 putExtra("RecCall",true)
-                setClass(this@SettingActivity,if (isConference){
+                setClass(this@SettingActivity,if (isConference==1||isConference==true){
                     MultiCallActivity::class.java
                 }else{
                     VideoActivity::class.java

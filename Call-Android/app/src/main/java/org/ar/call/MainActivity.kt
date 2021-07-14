@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import com.gyf.immersionbar.ImmersionBar
 import com.kongzue.dialog.interfaces.OnDialogButtonClickListener
 import com.kongzue.dialog.util.BaseDialog
@@ -34,7 +35,6 @@ class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private var isLoginSuccess = false
-    private val mainScope = MainScope()
     private var loginTipDialog: MessageDialog? = null
 
 
@@ -50,7 +50,7 @@ class MainActivity : BaseActivity() {
                     .runtime()
                     .permission(Permission.WRITE_EXTERNAL_STORAGE, Permission.CAMERA, Permission.RECORD_AUDIO)
                     .onGranted { _: List<String?>? ->
-                        mainScope.launch {
+                        lifecycleScope.launch {
                             login()
                         }
                     }
@@ -110,7 +110,6 @@ class MainActivity : BaseActivity() {
                     true
                 }.onOkButtonClickListener = OnDialogButtonClickListener { baseDialog: BaseDialog, v: View? ->
             baseDialog.doDismiss()
-            RtmManager.instance.release()
             RtcManager.instance.release()
             exitProcess(0)
             finish()
@@ -131,7 +130,7 @@ class MainActivity : BaseActivity() {
             val intent = Intent(this@MainActivity, CallActivity::class.java)
             startActivity(intent)
         }else{
-            mainScope.launch {
+            lifecycleScope.launch {
                 login()
             }
         }
@@ -142,7 +141,7 @@ class MainActivity : BaseActivity() {
             val intent = Intent(this@MainActivity, MultiCallActivity::class.java)
             startActivity(intent)
         }else{
-            mainScope.launch {
+            lifecycleScope.launch {
                 login()
             }
         }
@@ -156,10 +155,11 @@ class MainActivity : BaseActivity() {
                 return@runOnUiThread
             }
                 val jsonObject = JSONObject(remoteInvitation.content)
-                val isConference = jsonObject.getBoolean("Conference")
+                val isConference = jsonObject["Conference"]
+
                 Intent().apply {
                     putExtra("RecCall",true)
-                    setClass(this@MainActivity,if (isConference){
+                    setClass(this@MainActivity,if (isConference==1||isConference==true){
                         MultiCallActivity::class.java
                     }else{
                         VideoActivity::class.java
@@ -171,6 +171,5 @@ class MainActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mainScope.cancel()
     }
 }
