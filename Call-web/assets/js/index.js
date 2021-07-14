@@ -1,10 +1,47 @@
+// SDK 配置
+var Config = {
+  RTC_APPID: "", //RTC 应用ID
+  RTM_APPID: "", //RTM 应用ID
+  RTC_MODE: "live", //RTC 通信模式
+  RTC_CODEC: "h264", //RTC 视频编码格式
+  SELECT_CAMERA_DEVICE:
+    sessionStorage.getItem("defaultCameraDeviceId") || undefined,
+  // RTC 私有云配置
+  RTC_setParameters: {
+    // 是否开启私有云配置
+    switch: false,
+    // setParameters: {
+    //   //配置内网网关
+    //   ConfPriCloudAddr: {
+    //     ServerAdd: "192.168.1.143",
+    //     Port: 6080,
+    //     Wss: false,
+    //   },
+    // },
+  },
+  // RTM 私有云配置
+  RTM_setParameters: {
+    // 是否开启私有云配置
+    switch: false,
+    // setParameters: {
+    //   //配置内网网关
+    //   confPriCloudAddr: {
+    //     ServerAdd: "192.168.1.143",
+    //     Port: 7080,
+    //     Wss: false,
+    //   },
+    // },
+  },
+};
 // 页面工具类
 var Utils = {
   // 生成uid
   generateNumber(len) {
     var numLen = len || 8;
     var generateNum = Math.ceil(Math.random() * Math.pow(10, numLen));
-    return generateNum < Math.pow(10, numLen - 1) ? Utils.generateNumber(numLen) : generateNum;
+    return generateNum < Math.pow(10, numLen - 1)
+      ? Utils.generateNumber(numLen)
+      : generateNum;
   },
   // 事件打印
   printLog() {
@@ -23,13 +60,13 @@ var Utils = {
     $("#warningBox").html("").append(errMsg);
     //警告框自动消失
     setTimeout(function () {
-      $('[data-dismiss="alert"]').alert('close');
+      $('[data-dismiss="alert"]').alert("close");
     }, 2000);
   },
   // 全局警告框
   alertWhole: function (text, classStyle) {
     if (!classStyle) {
-      classStyle = "alert-danger"
+      classStyle = "alert-danger";
     }
     var oMsg = $(
       `
@@ -42,27 +79,31 @@ var Utils = {
     $("#warningWholeBox").html("").append(oMsg);
     //警告框自动消失
     setTimeout(function () {
-      $('[data-dismiss="alert"]').alert('close');
+      $('[data-dismiss="alert"]').alert("close");
     }, 2000);
   },
   //修改标题名称
   setPageTitle: function (title) {
-    $('title').html(title);
+    $("title").html(title);
   },
   // 生成用户标签
   createButtonUser: function (allInputVal) {
     if (Store.invitationUserIds.length <= 5) {
-      if (!~Store.invitationUserIds.indexOf(allInputVal) && allInputVal != Store.ownUserId) {
+      if (
+        !~Store.invitationUserIds.indexOf(allInputVal) &&
+        allInputVal != Store.ownUserId
+      ) {
         // 并创建新的div存放
         Store.invitationUserIds.push(allInputVal);
         var opt = $(
-          '<button type="button" class="btn btn-light user-tag" onclick="Utils.deleteButtonUser(this, ' + allInputVal +
-          ')">' +
-          allInputVal +
-          '<i class="iconfont icon-delete_close"></i>' +
-          '<i class="iconfont icon-delete_open"></i>' +
-          '</button>'
-        )
+          '<button type="button" class="btn btn-light user-tag" onclick="Utils.deleteButtonUser(this, ' +
+            allInputVal +
+            ')">' +
+            allInputVal +
+            '<i class="iconfont icon-delete_close"></i>' +
+            '<i class="iconfont icon-delete_open"></i>' +
+            "</button>"
+        );
         $("#multiUserBtn").append(opt);
       } else {
         Utils.alertError("该用户重复输入或不能输入自己");
@@ -73,13 +114,18 @@ var Utils = {
   },
   // 删除邀请用户标签
   deleteButtonUser: function (item, userid) {
-    if (!!~Store.invitationUserIds.indexOf('' + userid)) {
+    if (!!~Store.invitationUserIds.indexOf("" + userid)) {
       item.remove();
-      Store.invitationUserIds.splice(Store.invitationUserIds.indexOf('' + userid), 1);
+      Store.invitationUserIds.splice(
+        Store.invitationUserIds.indexOf("" + userid),
+        1
+      );
       if (Store.invitationUserIds.length == 0) {
-        !$("#MultipleCalls").hasClass("disabled") && $("#MultipleCalls").addClass("disabled");
+        !$("#MultipleCalls").hasClass("disabled") &&
+          $("#MultipleCalls").addClass("disabled");
       } else {
-        $("#MultipleCalls").hasClass("disabled") && $("#MultipleCalls").removeClass("disabled");
+        $("#MultipleCalls").hasClass("disabled") &&
+          $("#MultipleCalls").removeClass("disabled");
       }
     }
   },
@@ -88,34 +134,50 @@ var Utils = {
     if ($(`#${userid}Window`).length == 0) {
       // console.log("创建窗口", userid);
       // 创建窗口
-      var box = $('<div class="video-preview_small_box" id="' + userid + 'Window"></div>');
+      var box = $(
+        '<div class="video-preview_small_box" id="' + userid + 'Window"></div>'
+      );
       var basicView = $(
-        '<div class="d-flex video-preview justify-content-center align-items-center" id="' + userid + 'VideoView">' +
-        '<img draggable="false" style="position: absolute;" class="d-flex img-responsive" src="assets/images/logo_title.png" />' +
-        '</div>' +
-        '<!-- 左下角小方格 -->' +
-        '<div class="prompt_little d-flex">' +
-        '<i class="iconfont icon-audio_close_slant icon_color_red" id="' + userid + 'AudioState"></i>' +
-        '<div>' + userid + '</div>' +
-        '</div>'
+        '<div class="d-flex video-preview justify-content-center align-items-center" id="' +
+          userid +
+          'VideoView">' +
+          '<img draggable="false" style="position: absolute;" class="d-flex img-responsive" src="assets/images/logo_title.png" />' +
+          "</div>" +
+          "<!-- 左下角小方格 -->" +
+          '<div class="prompt_little d-flex">' +
+          '<i class="iconfont icon-audio_close_slant icon_color_red" id="' +
+          userid +
+          'AudioState"></i>' +
+          "<div>" +
+          userid +
+          "</div>" +
+          "</div>"
       );
       var statusView = $(
-        '<!-- 用户不在线 无人应答 拒绝 -->' +
-        '<div id="' + userid +
-        'StatusView" class="video-preview_state d-flex justify-content-center align-items-center">' +
-        '<div class="video-preview_status d-flex flex-column align-items-center">' +
-        '<span><i class="iconfont icon-loading video-icon_font"></i></span>' +
-        '<span id="' + userid + 'Status">' + (status === 1 ? "无人应答" : status === 0 && "等待应答") + '</span>' +
-        '</div>' +
-        '</div>'
+        "<!-- 用户不在线 无人应答 拒绝 -->" +
+          '<div id="' +
+          userid +
+          'StatusView" class="video-preview_state d-flex justify-content-center align-items-center">' +
+          '<div class="video-preview_status d-flex flex-column align-items-center">' +
+          '<span><i class="iconfont icon-loading video-icon_font"></i></span>' +
+          '<span id="' +
+          userid +
+          'Status">' +
+          (status === 1 ? "无人应答" : status === 0 && "等待应答") +
+          "</span>" +
+          "</div>" +
+          "</div>"
       );
       box.append(basicView);
       if (status === 0 || status === 3) {
         box.append(statusView);
         // 创建计时
-        Store.invitationClearTimeouts["Timeouts" + userid] = setTimeout(function () {
-          Utils.alertWhole("用户" + userid + "60s无人接听");
-        }, Store.invitationTimeout);
+        Store.invitationClearTimeouts["Timeouts" + userid] = setTimeout(
+          function () {
+            Utils.alertWhole("用户" + userid + "60s无人接听");
+          },
+          Store.invitationTimeout
+        );
       }
       $("#mineMutiTitleVideoPreview").append(box);
     } else {
@@ -131,43 +193,50 @@ var Utils = {
         Store.bigMutiUser = user;
         user.videoTrack.stop();
         user.videoTrack.play("peerMutiVideoPreview", {
-          fit: "contain"
+          fit: "contain",
         });
       } else {
         // 当前大屏用户与想展示用户不符
         if (Store.bigMutiUser.uid !== user.uid) {
           // 大屏用户切回去原来的小视图
           Store.bigMutiUser.videoTrack.stop();
-          Store.bigMutiUser.videoTrack.play(Store.bigMutiUser.uid + "VideoView", {
-            fit: "contain"
-          });
+          Store.bigMutiUser.videoTrack.play(
+            Store.bigMutiUser.uid + "VideoView",
+            {
+              fit: "contain",
+            }
+          );
           //当前点击的小窗口切换到大屏
           Store.bigMutiUser = user;
           user.videoTrack.stop();
           user.videoTrack.play("peerMutiVideoPreview", {
-            fit: "contain"
+            fit: "contain",
           });
         } else {
           user.videoTrack.stop();
           user.videoTrack.play(user.uid + "VideoView", {
-            fit: "contain"
+            fit: "contain",
           });
           Store.bigMutiUser = {};
         }
       }
-    })
+    });
   },
   // 更新用户在线状态
   updateUserViewStatus: function (userid, status) {
     // console.log("更新用户在线状态");
     Store.invitationUserIds.map(function (item) {
       if (item === userid) {
-        if (status === 1 || status === 2) { // 自定义用户状态： 0/1/2/3 无人应答/对方同意/对方拒绝/对方不在线
+        if (status === 1 || status === 2) {
+          // 自定义用户状态： 0/1/2/3 无人应答/对方同意/对方拒绝/对方不在线
           $("#" + userid + "StatusView").remove();
           // 停止计时
-          Store.invitationClearTimeouts["Timeouts" + userid] && clearTimeout(Store.invitationClearTimeouts["Timeouts" + userid]);
+          Store.invitationClearTimeouts["Timeouts" + userid] &&
+            clearTimeout(Store.invitationClearTimeouts["Timeouts" + userid]);
         } else {
-          $("#" + userid + "Status").html(status === 0 ? "等待应答" : status === 2 && "对方拒绝");
+          $("#" + userid + "Status").html(
+            status === 0 ? "等待应答" : status === 2 && "对方拒绝"
+          );
         }
       }
     });
@@ -176,17 +245,18 @@ var Utils = {
   deleteUserView: async function (userid) {
     // console.log("删除用户视图", userid);
     // 停止计时
-    Store.invitationClearTimeouts["Timeouts" + userid] && clearTimeout(Store.invitationClearTimeouts["Timeouts" + userid]);
+    Store.invitationClearTimeouts["Timeouts" + userid] &&
+      clearTimeout(Store.invitationClearTimeouts["Timeouts" + userid]);
     Store.invitationUserIds.map(function (item, index) {
       if (item === userid) {
         Store.invitationUserIds.splice(index, 1);
       }
-    })
+    });
     // 如果删除的视图有大视图，清空大视图存储数据
     if (Store.bigMutiUser && Store.bigMutiUser.uid === userid) {
       Store.bigMutiUser = {};
     }
-    $("#" + userid + "Window") && await $("#" + userid + "Window").remove();
+    $("#" + userid + "Window") && (await $("#" + userid + "Window").remove());
     // 频道内剩余两人时
     var oUserData = await Store.rtmChannel.getMembers();
     if (oUserData.length < 2) {
@@ -202,34 +272,40 @@ var Utils = {
   // 更新用户音频状态
   updateUserAudioState: function (userid, haveAudio) {
     if (haveAudio) {
-      $("#" + userid + "AudioState").hasClass("icon-audio_close_slant") && $("#" + userid + "AudioState").removeClass("icon-audio_close_slant");
+      $("#" + userid + "AudioState").hasClass("icon-audio_close_slant") &&
+        $("#" + userid + "AudioState").removeClass("icon-audio_close_slant");
     } else {
-      !$("#" + userid + "AudioState").hasClass("icon-audio_close_slant") && $("#" + userid + "AudioState").addClass("icon-audio_close_slant");
+      !$("#" + userid + "AudioState").hasClass("icon-audio_close_slant") &&
+        $("#" + userid + "AudioState").addClass("icon-audio_close_slant");
     }
   },
   // 用户ID输入  用户删除id (仅能输入一位用户)
   inputChangId: function (oid) {
     //监听用户ID输入
-    $(oid).bind('input propertychange', function (event) {
+    $(oid).bind("input propertychange", function (event) {
       var inputVal = $(this).val();
       var reg = /^[0-9]+$/;
       if (!reg.test(inputVal)) {
-        $(this).val('');
+        $(this).val("");
       } else {
-        $(this).next('input').select();
-        $(this).next('input').focus();
+        $(this).next("input").select();
+        $(this).next("input").focus();
       }
-      var oItem = '';
+      var oItem = "";
       for (var i = 0; i < $(oid).length; i++) {
-        oItem = oItem + $(oid)[i].value
+        oItem = oItem + $(oid)[i].value;
       }
       if (oItem.length == 4) {
-        $("#p2pAudioMakeCall").hasClass("disabled") && $("#p2pAudioMakeCall").removeClass("disabled");
-        $("#p2pVideoMakeCall").hasClass("disabled") && $("#p2pVideoMakeCall").removeClass("disabled");
-        oItem = '';
+        $("#p2pAudioMakeCall").hasClass("disabled") &&
+          $("#p2pAudioMakeCall").removeClass("disabled");
+        $("#p2pVideoMakeCall").hasClass("disabled") &&
+          $("#p2pVideoMakeCall").removeClass("disabled");
+        oItem = "";
       } else {
-        !$("#p2pAudioMakeCall").hasClass("disabled") && $("#p2pAudioMakeCall").addClass("disabled");
-        !$("#p2pVideoMakeCall").hasClass("disabled") && $("#p2pVideoMakeCall").addClass("disabled");
+        !$("#p2pAudioMakeCall").hasClass("disabled") &&
+          $("#p2pAudioMakeCall").addClass("disabled");
+        !$("#p2pVideoMakeCall").hasClass("disabled") &&
+          $("#p2pVideoMakeCall").addClass("disabled");
       }
     });
 
@@ -239,66 +315,111 @@ var Utils = {
       if ($(this).index() < 4) {
         if (event.keyCode == 46 || event.keyCode == 8) {
           if (this.value === "") {
-            $(this).prev('input').val('');
-            $(this).prev('input').focus();
+            $(this).prev("input").val("");
+            $(this).prev("input").focus();
           } else {
             this.value = "";
           }
           // 按钮变暗
-          !$("#p2pAudioMakeCall").hasClass("disabled") && $("#p2pAudioMakeCall").addClass("disabled");
-          !$("#p2pVideoMakeCall").hasClass("disabled") && $("#p2pVideoMakeCall").addClass("disabled");
+          !$("#p2pAudioMakeCall").hasClass("disabled") &&
+            $("#p2pAudioMakeCall").addClass("disabled");
+          !$("#p2pVideoMakeCall").hasClass("disabled") &&
+            $("#p2pVideoMakeCall").addClass("disabled");
         }
       }
     });
-
   },
   // 用户ID输入  用户删除id (输入多位用户并输出)
   inputChangIds: function () {
     // 监听用户ID输入 - 创建用户用户标签
-    $('#multiUserInputs > input').bind('input propertychange', function (event) {
-      var inputVal = $(this).val();
-      var reg = /^[0-9]+$/;
-      if (!reg.test(inputVal)) {
-        $(this).val('');
-      } else {
-        $(this).next('input').select();
-        $(this).next('input').focus();
-        var allInputVal = "";
-        $('#multiUserInputs > input').each(function () {
-          allInputVal += this.value;
-        });
-        // 筛选并创建用户标签
-        if (allInputVal.length === 4) {
-          // 生成用户标签
-          Utils.createButtonUser(allInputVal);
-          // 清空所有输入框
-          $('#multiUserInputs > input').each(function () {
-            this.value = "";
+    $("#multiUserInputs > input").bind(
+      "input propertychange",
+      function (event) {
+        var inputVal = $(this).val();
+        var reg = /^[0-9]+$/;
+        if (!reg.test(inputVal)) {
+          $(this).val("");
+        } else {
+          $(this).next("input").select();
+          $(this).next("input").focus();
+          var allInputVal = "";
+          $("#multiUserInputs > input").each(function () {
+            allInputVal += this.value;
           });
-          $('#multiUserInputs > input')[0].focus();
+          // 筛选并创建用户标签
+          if (allInputVal.length === 4) {
+            // 生成用户标签
+            Utils.createButtonUser(allInputVal);
+            // 清空所有输入框
+            $("#multiUserInputs > input").each(function () {
+              this.value = "";
+            });
+            $("#multiUserInputs > input")[0].focus();
+          }
+        }
+        if (Store.invitationUserIds.length == 0) {
+          !$("#MultipleCalls").hasClass("disabled") &&
+            $("#MultipleCalls").addClass("disabled");
+        } else {
+          $("#MultipleCalls").hasClass("disabled") &&
+            $("#MultipleCalls").removeClass("disabled");
         }
       }
-      if (Store.invitationUserIds.length == 0) {
-        !$("#MultipleCalls").hasClass("disabled") && $("#MultipleCalls").addClass("disabled");
-      } else {
-        $("#MultipleCalls").hasClass("disabled") && $("#MultipleCalls").removeClass("disabled");
-      }
-    });
+    );
     // 监听用户删除id
-    $('#multiUserInputs > input').keydown(function (event) {
+    $("#multiUserInputs > input").keydown(function (event) {
       // 删除往前 添加往后
       if ($(this).index() < 4) {
         if (event.keyCode == 46 || event.keyCode == 8) {
           if (this.value === "") {
-            $(this).prev('input').val('');
-            $(this).prev('input').focus();
+            $(this).prev("input").val("");
+            $(this).prev("input").focus();
           } else {
             this.value = "";
           }
         }
       }
     });
-  }
+  },
+};
+
+// 本地数据存储
+var Store = {
+  Conference: false, // 选择的呼叫模式  false: p2p呼叫  true: 多人呼叫
+  Calling: false, // 正在通话中(标识)
+  JoinRTCChannel: false, // 加入 RTC 频道(标识)
+  rtcClient: null, // 存放 RTC 客户端
+  rtmClient: null, // 存放 RTM 客户端
+  rtmChannel: null, // 存放 RTM 频道实例
+  localInvitation: null, // 存放主叫邀请实例
+  invitationClearTimeouts: {}, // 存放多个有效期计时(定时器仅多人呼叫使用)
+  bigMutiUser: {}, // 大屏展示(仅多人呼叫使用)
+  recordUser: [], // 记录页面展示的音视频轨道(仅多人呼叫使用)
+  remoteInvitation: null, // 存放被叫邀请实例
+  invitationTimeout: 58 * 1000, // 邀请有效期限
+  invitationClearTimeout: null, // 邀请有效期计时(定时器)
+  callDurationInterval: 0, // 通话时长
+  callDurationClearInterval: null, // 通话时长计时(定时器)
+  ownUserId: "" + Utils.generateNumber(4), //自己的用户ID - 这里需要转字符串
+  peerUserId: "", // 远端的用户的ID
+  // peerUserIdRTM: "", // 远端用户RTM的id
+  channelId: "" + Utils.generateNumber(9), // 频道房间
+  // RTC 本地采集的音视频轨道
+  localTracks: {
+    videoTrack: null,
+    audioTrack: null,
+  },
+  // 设置
+  setting: {
+    // p2p设置
+    videoSize: [320, 180], //设置视频采集的分辨率大小
+    audioDevice: "default", // 设置音频设备ID
+    videoDevice: "default", // 设置视频设备ID
+    // 多人设置
+    enableAudio: true, // 声音开关
+    enableVideo: true, // 视频开关
+  },
+  invitationUserIds: [], // 存放多人通话的用户id
 };
 
 // 页面隐藏显示操作类
@@ -308,32 +429,42 @@ var PageShow = {
     !$("#meetPage").hasClass("d-none") && $("#meetPage").addClass("d-none");
     $("#homePage").hasClass("d-none") && $("#homePage").removeClass("d-none");
     !$("#loginForm").hasClass("d-none") && $("#loginForm").addClass("d-none");
-    !$("#loginMutiFprm").hasClass("d-none") && $("#loginMutiFprm").addClass("d-none");
+    !$("#loginMutiFprm").hasClass("d-none") &&
+      $("#loginMutiFprm").addClass("d-none");
     $("#loginHome").hasClass("d-none") && $("#loginHome").removeClass("d-none");
-    !$("#makeCallPage").hasClass("d-none") && $("#makeCallPage").addClass("d-none");
-    !$("#reciveCallPage").hasClass("d-none") && $("#reciveCallPage").addClass("d-none");
+    !$("#makeCallPage").hasClass("d-none") &&
+      $("#makeCallPage").addClass("d-none");
+    !$("#reciveCallPage").hasClass("d-none") &&
+      $("#reciveCallPage").addClass("d-none");
     !$("#audioPage").hasClass("d-none") && $("#audioPage").addClass("d-none");
-    !$("#meetMutiPage").hasClass("d-none") && $("#meetMutiPage").addClass("d-none");
+    !$("#meetMutiPage").hasClass("d-none") &&
+      $("#meetMutiPage").addClass("d-none");
   },
   // 初始设置 (P2P)
   initSetingP2P: function () {
     // 清空所有输入框 (p2p)
-    $('#userInputs > input').each(function () {
+    $("#userInputs > input").each(function () {
       this.value = "";
     });
     // 音频通话计时
     $("#audioDuration").html("00:00");
     // 视频通话计时
     $("#videoDuration").html("00:00");
-    $('#userInputs > input')[0].focus();
+    $("#userInputs > input")[0].focus();
     $("#mineVideoPreview_bg").css("zIndex", "0");
-    $("#audioSwitchBtn > i").removeClass("icon-_yinpinguanbizhong").addClass("icon-_yinpinkaiqizhong icon_color_blue");
+    $("#audioSwitchBtn > i")
+      .removeClass("icon-_yinpinguanbizhong")
+      .addClass("icon-_yinpinkaiqizhong icon_color_blue");
     $("#mineVideoPreview").html($("#mineVideoPreview_bg"));
     $("#peerVideoPreview").html($("#peerVideoPreview_bg"));
-    !$("#p2pAudioMakeCall").hasClass("disabled") && $("#p2pAudioMakeCall").addClass("disabled");
-    !$("#p2pVideoMakeCall").hasClass("disabled") && $("#p2pVideoMakeCall").addClass("disabled");
-    !$("#MultipleCalls").hasClass("disabled") && $("#MultipleCalls").addClass("disabled");
-    $("#loginMutiSetting").hasClass("show") && $("#loginMutiSetting").removeClass("show");
+    !$("#p2pAudioMakeCall").hasClass("disabled") &&
+      $("#p2pAudioMakeCall").addClass("disabled");
+    !$("#p2pVideoMakeCall").hasClass("disabled") &&
+      $("#p2pVideoMakeCall").addClass("disabled");
+    !$("#MultipleCalls").hasClass("disabled") &&
+      $("#MultipleCalls").addClass("disabled");
+    $("#loginMutiSetting").hasClass("show") &&
+      $("#loginMutiSetting").removeClass("show");
   },
   // 初始设置 (多人)
   initSetingMulti: function () {
@@ -341,7 +472,8 @@ var PageShow = {
     $("#peerMutiVideoPreview").html($("#peerMutiVideoPreview img")); // 清空大窗口
     $("#callerIdView").html("");
     $("#multiUserBtn").html(""); // 清空生成的标签
-    $("#loginMutiSetting").hasClass("show") && $("#loginMutiSetting").removeClass("show");
+    $("#loginMutiSetting").hasClass("show") &&
+      $("#loginMutiSetting").removeClass("show");
   },
   // 登录 RTM
   loginRTM: function () {
@@ -353,7 +485,8 @@ var PageShow = {
   makeVoiceCall: function () {
     $("#calleeIdView").html(Store.localInvitation.calleeId);
     !$("#homePage").hasClass("d-none") && $("#homePage").addClass("d-none");
-    !$("#makeCallPage").hasClass("d-none") && $("#makeCallPage").addClass("d-none");
+    !$("#makeCallPage").hasClass("d-none") &&
+      $("#makeCallPage").addClass("d-none");
     $("#audioPage").hasClass("d-none") && $("#audioPage").removeClass("d-none");
   },
   // 视频呼叫邀请页面
@@ -361,33 +494,40 @@ var PageShow = {
     $("#calleeIdView").html(Store.localInvitation.calleeId);
     !$("#homePage").hasClass("d-none") && $("#homePage").addClass("d-none");
     !$("#audioPage").hasClass("d-none") && $("#audioPage").addClass("d-none");
-    $("#makeCallPage").hasClass("d-none") && $("#makeCallPage").removeClass("d-none");
+    $("#makeCallPage").hasClass("d-none") &&
+      $("#makeCallPage").removeClass("d-none");
   },
   // 被呼叫页面 是否转语音
   toSpeech: function (params) {
-    params === 1 ? $("#changAudioBtn").addClass("d-none") : ($(".switch-audio-call_item").fadeIn(),
-      $("#changAudioBtn").removeClass("d-none"));
+    params === 1
+      ? $("#changAudioBtn").addClass("d-none")
+      : ($(".switch-audio-call_item").fadeIn(),
+        $("#changAudioBtn").removeClass("d-none"));
   },
   // 显示被呼叫页面
   showCalledPage: function () {
     $("#callerIdView").html(Store.remoteInvitation.callerId);
     !$("#homePage").hasClass("d-none") && $("#homePage").addClass("d-none");
-    $("#reciveCallPage").hasClass("d-none") && $("#reciveCallPage").removeClass("d-none");
+    $("#reciveCallPage").hasClass("d-none") &&
+      $("#reciveCallPage").removeClass("d-none");
   },
   // 隐藏呼叫邀请页面
   hiddenCallPage: function () {
-    !$("#makeCallPage").hasClass("d-none") && $("#makeCallPage").addClass("d-none");
+    !$("#makeCallPage").hasClass("d-none") &&
+      $("#makeCallPage").addClass("d-none");
     $("#homePage").hasClass("d-none") && $("#homePage").removeClass("d-none");
     !$("#loginForm").hasClass("d-none") && $("#loginForm").addClass("d-none");
-    !$("#loginMutiFprm").hasClass("d-none") && $("#loginMutiFprm").addClass("d-none");
+    !$("#loginMutiFprm").hasClass("d-none") &&
+      $("#loginMutiFprm").addClass("d-none");
     $("#loginHome").hasClass("d-none") && $("#loginHome").removeClass("d-none");
     $("#calleeIdView").html("");
     // 如果在设置页面 退出设置页面
-    $("#closeSettingBtn").click()
+    $("#closeSettingBtn").click();
   },
   // 隐藏被呼叫页面
   hiddenCalledPage: function () {
-    !$("#reciveCallPage").hasClass("d-none") && $("#reciveCallPage").addClass("d-none");
+    !$("#reciveCallPage").hasClass("d-none") &&
+      $("#reciveCallPage").addClass("d-none");
     $("#callerIdView").html("");
   },
   // 显示视频页面
@@ -404,7 +544,13 @@ var PageShow = {
   },
   // 音频开关(p2p)
   audioSwitch: function () {
-    Store.localTracks.audioTrack.isMuted ? $("#audioSwitchBtn > i").removeClass("icon-audio_open icon_color_blue").addClass("icon-audio_close") : $("#audioSwitchBtn > i").removeClass("icon-audio_close").addClass("icon-audio_open icon_color_blue");
+    Store.localTracks.audioTrack.isMuted
+      ? $("#audioSwitchBtn > i")
+          .removeClass("icon-audio_open icon_color_blue")
+          .addClass("icon-audio_close")
+      : $("#audioSwitchBtn > i")
+          .removeClass("icon-audio_close")
+          .addClass("icon-audio_open icon_color_blue");
   },
 
   // 显示会议页面 (多人)
@@ -412,33 +558,37 @@ var PageShow = {
     !$("#homePage").hasClass("d-none") && $("#homePage").addClass("d-none");
     !$("#audioPage").hasClass("d-none") && $("#audioPage").addClass("d-none");
     !$("#meetPage").hasClass("d-none") && $("#meetPage").addClass("d-none");
-    !$("#reciveCallPage").hasClass("d-none") && $("#reciveCallPage").addClass("d-none");
-    $("#meetMutiPage").hasClass("d-none") && $("#meetMutiPage").removeClass("d-none");
+    !$("#reciveCallPage").hasClass("d-none") &&
+      $("#reciveCallPage").addClass("d-none");
+    $("#meetMutiPage").hasClass("d-none") &&
+      $("#meetMutiPage").removeClass("d-none");
   },
   // 本地麦克风状态
   setEnableAudio: function (enable) {
     if (enable) {
-      !$("#localAudioEnableIcon").hasClass("icon-audio_open") && $("#localAudioEnableIcon").addClass("icon-audio_open");
-      $("#localAudioEnableIcon").hasClass("icon-audio_close") && $("#localAudioEnableIcon").removeClass(
-        "icon-audio_close");
+      !$("#localAudioEnableIcon").hasClass("icon-audio_open") &&
+        $("#localAudioEnableIcon").addClass("icon-audio_open");
+      $("#localAudioEnableIcon").hasClass("icon-audio_close") &&
+        $("#localAudioEnableIcon").removeClass("icon-audio_close");
     } else {
-      $("#localAudioEnableIcon").hasClass("icon-audio_open") && $("#localAudioEnableIcon").removeClass(
-        "icon-audio_open");
-      !$("#localAudioEnableIcon").hasClass("icon-audio_close") && $("#localAudioEnableIcon").addClass(
-        "icon-audio_close");
+      $("#localAudioEnableIcon").hasClass("icon-audio_open") &&
+        $("#localAudioEnableIcon").removeClass("icon-audio_open");
+      !$("#localAudioEnableIcon").hasClass("icon-audio_close") &&
+        $("#localAudioEnableIcon").addClass("icon-audio_close");
     }
   },
   // 本地摄像头开关
   setEnableVideo: function (enable) {
     if (enable) {
-      !$("#localVideoEnableIcon").hasClass("icon-video_open") && $("#localVideoEnableIcon").addClass("icon-video_open");
-      $("#localVideoEnableIcon").hasClass("icon-video_close") && $("#localVideoEnableIcon").removeClass(
-        "icon-video_close");
+      !$("#localVideoEnableIcon").hasClass("icon-video_open") &&
+        $("#localVideoEnableIcon").addClass("icon-video_open");
+      $("#localVideoEnableIcon").hasClass("icon-video_close") &&
+        $("#localVideoEnableIcon").removeClass("icon-video_close");
     } else {
-      $("#localVideoEnableIcon").hasClass("icon-video_open") && $("#localVideoEnableIcon").removeClass(
-        "icon-video_open");
-      !$("#localVideoEnableIcon").hasClass("icon-video_close") && $("#localVideoEnableIcon").addClass(
-        "icon-video_close");
+      $("#localVideoEnableIcon").hasClass("icon-video_open") &&
+        $("#localVideoEnableIcon").removeClass("icon-video_open");
+      !$("#localVideoEnableIcon").hasClass("icon-video_close") &&
+        $("#localVideoEnableIcon").addClass("icon-video_close");
     }
   },
 };
@@ -489,7 +639,9 @@ var SdkPackge = {
       if (cameras.length > 0) {
         cameras.map(function (camera, index) {
           var label = camera.label !== "" ? camera.label : "Camera " + index;
-          var opt = $('<option value="' + camera.deviceId + '">' + label + '</option>');
+          var opt = $(
+            '<option value="' + camera.deviceId + '">' + label + "</option>"
+          );
           $("#videoInputSelect").append(opt);
         });
         Store.setting.videoDevice = cameras[0].deviceId;
@@ -500,15 +652,18 @@ var SdkPackge = {
       $("#audioInputSelect").html("");
       if (microhones.length > 0) {
         microhones.map(function (camera, index) {
-          var label = camera.label !== "" ? camera.label : "Microphone " + index;
-          var opt = $('<option value="' + camera.deviceId + '">' + label + '</option>');
+          var label =
+            camera.label !== "" ? camera.label : "Microphone " + index;
+          var opt = $(
+            '<option value="' + camera.deviceId + '">' + label + "</option>"
+          );
           $("#audioInputSelect").append(opt);
         });
         Store.setting.audioDevice = microhones[0].deviceId;
       }
-    }
+    },
   },
-  // RTC 相关 
+  // RTC 相关
   RTC: {
     // RTC 初始化
     init: function () {
@@ -516,17 +671,12 @@ var SdkPackge = {
       // 创建RTC客户端
       Store.rtcClient = ArRTC.createClient({
         mode: Config.RTC_MODE,
-        codec: Config.RTC_CODEC
+        codec: Config.RTC_CODEC,
       });
       // 配置私有云
-      // Store.rtcClient.setParameters({
-      //   //配置内网网关
-      //   ConfPriCloudAddr: {
-      //     ServerAdd: "",
-      //     Port: ,
-      //     Wss: true
-      //   },
-      // })
+      Config.RTC_setParameters.switch
+        ? Store.rtcClient.setParameters(Config.RTC_setParameters.setParameters)
+        : "";
       // RTC SDK 监听用户发布
       Store.rtcClient.on("user-published", SdkPackge.RTC.userPublished);
       // RTC SDK 监听用户取消发布
@@ -542,16 +692,20 @@ var SdkPackge = {
     userPublished: async function (user, mediaType) {
       // 订阅用户发布的音视频
       await Store.rtcClient.subscribe(user, mediaType);
-      console.log("用户" + user.uid + "发布" + mediaType);
-      Utils.printLog('[info] subscribe success');
+      // console.log("用户" + user.uid + "发布" + mediaType);
+      Utils.printLog("[info] subscribe success");
       // 模式判断 多人/p2p
-      Store.Conference ? OperationPackge.multi.userPublished(user, mediaType) : OperationPackge.p2p.userPublished(user, mediaType);
+      Store.Conference
+        ? OperationPackge.multi.userPublished(user, mediaType)
+        : OperationPackge.p2p.userPublished(user, mediaType);
     },
     // 用户取消发布
     userUnpublished: async function (user, mediaType) {
-      Utils.printLog('[info] user-unpublished success');
+      Utils.printLog("[info] user-unpublished success");
       // 模式判断 多人/p2p
-      Store.Conference ? OperationPackge.multi.userUnpublished(user, mediaType) : OperationPackge.p2p.userUnpublished(user, mediaType);
+      Store.Conference
+        ? OperationPackge.multi.userUnpublished(user, mediaType)
+        : OperationPackge.p2p.userUnpublished(user, mediaType);
     },
     // 用户加入频道
     userJoined: async function (user) {
@@ -566,7 +720,9 @@ var SdkPackge = {
     userLeft: async function (user, reason) {
       // console.log("用户离开频道", user);
       // 模式判断 多人/p2p
-      Store.Conference ? OperationPackge.multi.userLeft(user, reason) : OperationPackge.p2p.userLeft(user, reason);
+      Store.Conference
+        ? OperationPackge.multi.userLeft(user, reason)
+        : OperationPackge.p2p.userLeft(user, reason);
     },
     // SDK 与服务器的连接状态发生改变
     // connectionStateChange: async function (curState, revState, reason) {
@@ -582,18 +738,22 @@ var SdkPackge = {
         ArRTC.getMicrophones(),
       ]);
       if (cameras.length > 0 && microhones.length > 0) {
-        [Store.localTracks.audioTrack, Store.localTracks.videoTrack] = await ArRTC.createMicrophoneAndCameraTracks({
-          microphoneId: Store.setting.audioDevice
-        }, {
-          cameraId: Store.setting.videoDevice,
-          encoderConfig: {
-            bitrateMax: 1130,
-            // bitrateMin: ,
-            frameRate: 15,
-            height: Store.setting.videoSize[1],
-            width: Store.setting.videoSize[0],
-          }
-        });
+        [Store.localTracks.audioTrack, Store.localTracks.videoTrack] =
+          await ArRTC.createMicrophoneAndCameraTracks(
+            {
+              microphoneId: Store.setting.audioDevice,
+            },
+            {
+              cameraId: Store.setting.videoDevice,
+              encoderConfig: {
+                bitrateMax: 1130,
+                // bitrateMin: ,
+                frameRate: 15,
+                height: Store.setting.videoSize[1],
+                width: Store.setting.videoSize[0],
+              },
+            }
+          );
       } else {
         if (cameras.length > 0) {
           Store.localTracks.videoTrack = await ArRTC.createCameraVideoTrack({
@@ -604,18 +764,19 @@ var SdkPackge = {
               frameRate: 15,
               height: Store.setting.videoSize[1],
               width: Store.setting.videoSize[0],
-            }
+            },
           }).catch(function (err) {
             console.log("err => ", err);
           });
         }
         if (microhones.length > 0) {
-          Store.localTracks.audioTrack = await ArRTC.createMicrophoneAudioTrack({
-              microphoneId: Store.setting.audioDevice
-            })
-            .catch(function (err) {
-              console.log("err => ", err);
-            });
+          Store.localTracks.audioTrack = await ArRTC.createMicrophoneAudioTrack(
+            {
+              microphoneId: Store.setting.audioDevice,
+            }
+          ).catch(function (err) {
+            console.log("err => ", err);
+          });
         }
       }
       // 音频展示(p2p)
@@ -627,26 +788,37 @@ var SdkPackge = {
         // 设置主播身份
         await Store.rtcClient.setClientRole("host");
         // 发布
-        await Store.rtcClient.publish([Store.localTracks.videoTrack, Store.localTracks.audioTrack]);
+        await Store.rtcClient.publish([
+          Store.localTracks.videoTrack,
+          Store.localTracks.audioTrack,
+        ]);
       }
     },
     // 取消本地发布
     unpublishLocalTracks: async function () {
       // 取消本地音频发布
-      Store.localTracks.audioTrack && Store.localTracks.audioTrack.on("track-ended", () => {
-        Store.rtcClient.unpublish(Store.localTracks.audioTrack);
-      });
+      Store.localTracks.audioTrack &&
+        Store.localTracks.audioTrack.on("track-ended", () => {
+          Store.rtcClient.unpublish(Store.localTracks.audioTrack);
+        });
       // 取消本地视频发布
-      Store.localTracks.videoTrack && Store.localTracks.videoTrack.on("track-ended", () => {
-        Store.rtcClient.unpublish(Store.localTracks.videoTrack);
-        $("#" + Store.ownUserId + "VideoView").html($("#" + Store.ownUserId + "VideoView" + " " + "img"))
-      });
+      Store.localTracks.videoTrack &&
+        Store.localTracks.videoTrack.on("track-ended", () => {
+          Store.rtcClient.unpublish(Store.localTracks.videoTrack);
+          $("#" + Store.ownUserId + "VideoView").html(
+            $("#" + Store.ownUserId + "VideoView" + " " + "img")
+          );
+        });
     },
     // 释放采集设备
     LocalTracksClose: function () {
-      Store.localTracks.videoTrack && (Store.localTracks.videoTrack.close(), Store.localTracks.videoTrack = null);
-      Store.localTracks.audioTrack && (Store.localTracks.audioTrack.close(), Store.localTracks.audioTrack = null);
-    }
+      Store.localTracks.videoTrack &&
+        (Store.localTracks.videoTrack.close(),
+        (Store.localTracks.videoTrack = null));
+      Store.localTracks.audioTrack &&
+        (Store.localTracks.audioTrack.close(),
+        (Store.localTracks.audioTrack = null));
+    },
   },
   // RTM 相关
   RTM: {
@@ -656,37 +828,47 @@ var SdkPackge = {
       // console.log("初始化RTM")
       Store.rtmClient = ArRTM.createInstance(Config.RTM_APPID);
       // 配置私有云
-      // Store.rtmClient.setParameters({
-      //   confPriCloudAddr: {
-      //     ServerAdd: "",
-      //     Port: ,
-      //     Wss: true
-      //   },
-      // })
+      Config.RTM_setParameters.switch
+        ? Store.rtmClient.setParameters(Config.RTM_setParameters.setParameters)
+        : "";
+      // 配置私有云
       // 登录 RTM
-      Store.rtmClient.login({
-        uid: Store.ownUserId
-      }).then(function () {
-        Store.rtcLogin = true;
-        // 页面操作
-        PageShow.loginRTM();
-      }).catch(function (err) {
-        Store.rtcLogin = false;
-        Utils.alertWhole("RTM 登录失败", "alert-danger");
-      });
+      Store.rtmClient
+        .login({
+          uid: Store.ownUserId,
+        })
+        .then(function () {
+          Store.rtcLogin = true;
+          // 页面操作
+          PageShow.loginRTM();
+        })
+        .catch(function (err) {
+          Store.rtcLogin = false;
+          Utils.alertWhole("RTM 登录失败", "alert-danger");
+        });
 
       // 监听收到来自主叫的呼叫邀请
-      Store.rtmClient.on("RemoteInvitationReceived", SdkPackge.RTM.RemoteInvitationReceived);
+      Store.rtmClient.on(
+        "RemoteInvitationReceived",
+        SdkPackge.RTM.RemoteInvitationReceived
+      );
       // 监听收到来自对端的点对点消息
-      Store.rtmClient.on("MessageFromPeer", SdkPackge.RTM.MessageFromPeer)
+      Store.rtmClient.on("MessageFromPeer", SdkPackge.RTM.MessageFromPeer);
       // 通知 SDK 与 RTM 系统的连接状态发生了改变
-      Store.rtmClient.on("ConnectionStateChanged", SdkPackge.RTM.ConnectionStateChanged)
+      Store.rtmClient.on(
+        "ConnectionStateChanged",
+        SdkPackge.RTM.ConnectionStateChanged
+      );
     },
     // 收到来自主叫的呼叫邀请
     RemoteInvitationReceived: async function (remoteInvitation) {
-      Utils.printLog("[info]", "You recive an invitation from " + remoteInvitation.callerId);
+      Utils.printLog(
+        "[info]",
+        "You recive an invitation from " + remoteInvitation.callerId
+      );
       // 是否正在通话
-      if (Store.Calling) { // 正在通话中
+      if (Store.Calling) {
+        // 正在通话中
         await OperationPackge.public.callIng(remoteInvitation);
       } else {
         // 存放被叫实例
@@ -697,10 +879,22 @@ var SdkPackge = {
         await OperationPackge.p2p.closeSeting();
         // 标识为正在通话中
         Store.Calling = true;
-        Store.Conference = invitationContent.Conference;
-        Store.Conference ? // 多人逻辑操作
-          OperationPackge.multi.RemoteInvitationReceived(invitationContent) : // p2p逻辑操作
-          OperationPackge.p2p.RemoteInvitationReceived(invitationContent);
+        // 手表不支持 web端
+        if (
+          invitationContent.VidCodec &&
+          invitationContent.VidCodec.indexOf("MJpeg") !== -1
+        ) {
+          await OperationPackge.public.watches(remoteInvitation);
+        } else {
+          // p2p时保存对方用户id
+          // Store.Conference
+          //   ? ""
+          //   : (Store.peerUserIdRTM = remoteInvitation.callerId);
+          Store.Conference = invitationContent.Conference;
+          Store.Conference // 多人逻辑操作
+            ? OperationPackge.multi.RemoteInvitationReceived(invitationContent) // p2p逻辑操作
+            : OperationPackge.p2p.RemoteInvitationReceived(invitationContent);
+        }
       }
     },
     // 收到来自对端的点对点消息
@@ -715,7 +909,9 @@ var SdkPackge = {
             // 语音通话
             await PageShow.showVoicePage();
             // 关闭视频并释放
-            await Store.localTracks.videoTrack && (Store.localTracks.videoTrack.close(), Store.localTracks.videoTrack = null);
+            (await Store.localTracks.videoTrack) &&
+              (Store.localTracks.videoTrack.close(),
+              (Store.localTracks.videoTrack = null));
             // console.log("关闭视频并释放", Store.localTracks.videoTrack);
             // 显示音频通话时长
             OperationPackge.public.communicationDuration("audioDuration");
@@ -723,12 +919,9 @@ var SdkPackge = {
           }
         }, 500);
       } else if (message.text.Cmd === "EndCall") {
-        var oTimeTemporary = setInterval(function () {
-          if (Store.localTracks.audioTrack || Store.localTracks.videoTrack) {
-            clearInterval(oTimeTemporary);
-            OperationPackge.p2p.hangupInfo();
-          }
-        }, 50)
+        if (Store.localTracks.audioTrack || Store.localTracks.videoTrack) {
+          OperationPackge.p2p.hangupInfo();
+        }
       }
     },
     // SDK 与 RTM 系统的连接状态
@@ -741,55 +934,65 @@ var SdkPackge = {
           window.location.reload();
         }, 1000);
       }
-    }
+    },
   },
   // RTM 频道相关(多人通话使用)
   RTMChannel: {
     init: function () {
       Store.rtmChannel = Store.rtmClient.createChannel(Store.channelId);
       // 监听频道消息
-      Store.rtmChannel.on("ChannelMessage", OperationPackge.multi.ChannelMessage);
+      Store.rtmChannel.on(
+        "ChannelMessage",
+        OperationPackge.multi.ChannelMessage
+      );
       // 监听频道人员加入, 如果人数超过512，该回调失效
       Store.rtmChannel.on("MemberJoined", OperationPackge.multi.MemberJoined);
       // 监听频道人员离开
       Store.rtmChannel.on("MemberLeft", OperationPackge.multi.MemberLeft);
     },
-  }
+  },
 };
 
 // 此应用使用的相关逻辑操作封装
+
 var OperationPackge = {
   // 公共的操作
   public: {
     // 回退到首页
     backToHome: async function () {
       !$("#loginForm").hasClass("d-none") && $("#loginForm").addClass("d-none");
-      !$("#loginMutiFprm").hasClass("d-none") && $("#loginMutiFprm").addClass("d-none");
-      $("#loginHome").hasClass("d-none") && $("#loginHome").removeClass("d-none");
-      Utils.setPageTitle("anyrtc 呼叫邀请DEMO - anyRTC")
+      !$("#loginMutiFprm").hasClass("d-none") &&
+        $("#loginMutiFprm").addClass("d-none");
+      $("#loginHome").hasClass("d-none") &&
+        $("#loginHome").removeClass("d-none");
+      Utils.setPageTitle("anyrtc 呼叫邀请DEMO - anyRTC");
     },
     // 通讯时长  id 传入要显示的元素id  (现仅提供p2p操作)
     communicationDuration: function (id) {
       // 清除视频通话时长
-      Store.callDurationClearInterval && clearInterval(Store.callDurationClearInterval);
+      Store.callDurationClearInterval &&
+        clearInterval(Store.callDurationClearInterval);
       Store.callDurationClearInterval = setInterval(function () {
         Store.callDurationInterval++;
         var oMin = Math.floor(Store.callDurationInterval / 60);
         var oSec = Math.floor(Store.callDurationInterval % 60);
-        oMin >= 10 ? oMin : oMin = "0" + oMin;
-        oSec >= 10 ? oSec : oSec = "0" + oSec;
+        oMin >= 10 ? oMin : (oMin = "0" + oMin);
+        oSec >= 10 ? oSec : (oSec = "0" + oSec);
         $("#" + id).text(oMin + ":" + oSec);
       }, 1000);
     },
     // 本地存储恢复
     restoreDefault: function () {
       // console.log("加入RTC频道", Store.JoinRTCChannel);
-      (Store.rtcClient && Store.JoinRTCChannel) && Store.rtcClient.leave();
-      (Store.rtmChannel && Store.Conference) && Store.rtmChannel.leave();
+      Store.rtcClient && Store.JoinRTCChannel && Store.rtcClient.leave();
+      Store.rtmChannel && Store.Conference && Store.rtmChannel.leave();
       // 邀请有效期计时(定时器)
-      Store.invitationClearTimeout && clearTimeout(Store.invitationClearTimeout);
+      Store.invitationClearTimeout &&
+        clearTimeout(Store.invitationClearTimeout);
       // 清除通话计时
-      Store.callDurationClearInterval && (clearInterval(Store.callDurationClearInterval), Store.callDurationClearInterval = null);
+      Store.callDurationClearInterval &&
+        (clearInterval(Store.callDurationClearInterval),
+        (Store.callDurationClearInterval = null));
       // 恢复
       Object.assign(Store, {
         Conference: false, // 选择的呼叫模式  false: p2p呼叫  true: 多人呼叫
@@ -811,7 +1014,7 @@ var OperationPackge = {
           videoTrack: null,
           audioTrack: null,
         },
-      })
+      });
     },
     // 正在通话中
     callIng: async function (remoteInvitation) {
@@ -821,10 +1024,20 @@ var OperationPackge = {
         // Reason: "Calling",
         refuseId: Store.ownUserId,
         Reason: "calling",
-        Cmd: "Calling"
+        Cmd: "Calling",
       });
       await remoteInvitation.refuse();
-    }
+    },
+    // 手表不支持 web 通话
+    watches: async function (remoteInvitation) {
+      remoteInvitation.response = await JSON.stringify({
+        // Reason: "Calling",
+        refuseId: Store.ownUserId,
+        Reason: "calling",
+        Cmd: "platfrom",
+      });
+      await remoteInvitation.refuse();
+    },
   },
   p2p: {
     // 语音呼叫
@@ -864,7 +1077,7 @@ var OperationPackge = {
           Mode: 1,
           Conference: false,
           UserData: "",
-          SipData: ""
+          SipData: "",
         });
         // 显示语音页面
         PageShow.showVoicePage();
@@ -873,7 +1086,7 @@ var OperationPackge = {
           Mode: 0,
           Conference: false,
           UserData: "",
-          SipData: ""
+          SipData: "",
         });
         // 显示视频页面
         PageShow.showVideoPage();
@@ -886,19 +1099,22 @@ var OperationPackge = {
     cancelCall: async function () {
       if (Store.localTracks.audioTrack || Store.localTracks.videoTrack) {
         // 发送挂断信息
-        Store.rtmClient && await Store.rtmClient.sendMessageToPeer({
-            text: JSON.stringify({
-              Cmd: "EndCall"
-            })
-          },
-          Store.peerUserId, // 对端用户的 uid。
-        );
+        Store.rtmClient &&
+          (await Store.rtmClient.sendMessageToPeer(
+            {
+              text: JSON.stringify({
+                Cmd: "EndCall",
+              }),
+            },
+            Store.peerUserId // 对端用户的 uid。
+          ));
+        // Store.peerUserIdRTM ? Store.peerUserIdRTM :
         Utils.alertWhole("通话已结束", "alert-success");
         // 释放采集设备
         await SdkPackge.RTC.LocalTracksClose();
         // 本地存储恢复
         await OperationPackge.public.restoreDefault();
-        // 页面恢复初始 
+        // 页面恢复初始
         await PageShow.initSetingP2P();
         // 回到首页
         await PageShow.showIndex();
@@ -912,7 +1128,7 @@ var OperationPackge = {
           Store.localTracks.videoTrack.setEncoderConfiguration({
             height: Store.setting.videoSize[1],
             width: Store.setting.videoSize[0],
-          })
+          });
           break;
         case "设置音频设备":
           Store.localTracks.audioTrack.setDevice(Store.setting.audioDevice);
@@ -929,13 +1145,14 @@ var OperationPackge = {
       var oTimeTemporary = setInterval(async function () {
         if (Store.localTracks.videoTrack || Store.localTracks.audioTrack) {
           await clearInterval(oTimeTemporary);
-          $("#loginSetting").hasClass("show") && ($("#loginSetting").removeClass("show"),
-            $("#loginMutiSetting").hasClass("show") && $("#loginMutiSetting").removeClass("show"),
+          $("#loginSetting").hasClass("show") &&
+            ($("#loginSetting").removeClass("show"),
+            $("#loginMutiSetting").hasClass("show") &&
+              $("#loginMutiSetting").removeClass("show"),
             $("#settingVideoPreview").html(""),
-            await SdkPackge.RTC.LocalTracksClose()
-          )
+            await SdkPackge.RTC.LocalTracksClose());
         }
-      }, 50)
+      }, 50);
     },
     // 获取输入的用户
     getPeerUserId: function () {
@@ -955,7 +1172,9 @@ var OperationPackge = {
     peerUserVaplidity: async function (calleeId) {
       if (calleeId.length === 4) {
         //查询状态
-        var userOnlineResults = await Store.rtmClient.queryPeersOnlineStatus([calleeId]);
+        var userOnlineResults = await Store.rtmClient.queryPeersOnlineStatus([
+          calleeId,
+        ]);
         if (!userOnlineResults[calleeId] || !userOnlineResults[calleeId]) {
           Utils.alertError("不允许呼叫，因为对方不在线");
           return;
@@ -968,16 +1187,23 @@ var OperationPackge = {
           Utils.alertError("不能呼叫自己");
           return;
         }
-        return calleeId
+        return calleeId;
       }
     },
     // RTM 主叫: 创建呼叫邀请并发送 (callMode: 视频通话 0 语音通话 1)
     createLocalInvitationAndSend: async function (callMode) {
       // 加入实时通讯频道
-      Store.ownUserId = await Store.rtcClient.join(Config.RTC_APPID, Store.channelId, null, Store.ownUserId);
+      Store.ownUserId = await Store.rtcClient.join(
+        Config.RTC_APPID,
+        Store.channelId,
+        null,
+        Store.ownUserId
+      );
       Store.JoinRTCChannel = true;
       // 创建呼叫邀请
-      Store.localInvitation = Store.rtmClient.createLocalInvitation(Store.peerUserId);
+      Store.localInvitation = Store.rtmClient.createLocalInvitation(
+        Store.peerUserId
+      );
       // 这里将呼叫邀请的内容 设置为视频通讯时使用的频道id - 进入同一个频道
       Store.localInvitation.content = JSON.stringify({
         Mode: callMode, // 呼叫类型 视频通话 0 语音通话 1
@@ -985,20 +1211,37 @@ var OperationPackge = {
         ChanId: Store.channelId, // 频道房间
         UserData: "",
         SipData: "",
+        VidCodec: ["H264"],
+        AudCodec: ["Opus"],
       });
       // 发送呼叫邀请
       Store.localInvitation.send();
       Utils.printLog("[info]", "you sent an invitation to " + Store.peerUserId);
       // 监听被叫已收到呼叫邀请
-      Store.localInvitation.on("LocalInvitationReceivedByPeer", OperationPackge.p2p.localInvitationReceivedByPeer);
+      Store.localInvitation.on(
+        "LocalInvitationReceivedByPeer",
+        OperationPackge.p2p.localInvitationReceivedByPeer
+      );
       // 监听被叫已接受呼叫邀请
-      Store.localInvitation.on("LocalInvitationAccepted", OperationPackge.p2p.localInvitationAccepted);
+      Store.localInvitation.on(
+        "LocalInvitationAccepted",
+        OperationPackge.p2p.localInvitationAccepted
+      );
       // 监听被叫拒绝了你的呼叫邀请
-      Store.localInvitation.on("LocalInvitationRefused", OperationPackge.p2p.localInvitationRefused);
+      Store.localInvitation.on(
+        "LocalInvitationRefused",
+        OperationPackge.p2p.localInvitationRefused
+      );
       // 监听呼叫邀请进程失败
-      Store.localInvitation.on("LocalInvitationFailure", OperationPackge.p2p.localInvitationFailure);
+      Store.localInvitation.on(
+        "LocalInvitationFailure",
+        OperationPackge.p2p.localInvitationFailure
+      );
       // 监听呼叫邀请已被成功取消
-      Store.localInvitation.on("LocalInvitationCanceled", OperationPackge.p2p.localInvitationCanceled);
+      Store.localInvitation.on(
+        "LocalInvitationCanceled",
+        OperationPackge.p2p.localInvitationCanceled
+      );
     },
     // p2p 本地视频视图渲染
     createVideoAdd: function () {
@@ -1008,8 +1251,9 @@ var OperationPackge = {
       var videoBox = document.createElement("div");
       videoBox.id = Store.ownUserId;
       videoBox.className = "video-preview_box";
-      document.getElementById('mineVideoPreview').appendChild(videoBox);
-      Store.localTracks.videoTrack && Store.localTracks.videoTrack.play(videoBox.id);
+      document.getElementById("mineVideoPreview").appendChild(videoBox);
+      Store.localTracks.videoTrack &&
+        Store.localTracks.videoTrack.play(videoBox.id);
     },
     // p2p 远端音视频渲染
     createPeerVideoAdd: function (peer) {
@@ -1017,30 +1261,39 @@ var OperationPackge = {
       var videoBox = document.createElement("div");
       videoBox.id = peer.uid;
       videoBox.className = "video-preview_box";
-      document.getElementById('peerVideoPreview').appendChild(videoBox);
-      peer.videoTrack && peer.videoTrack.play(videoBox.id, {
-        fit: "contain"
-      });
+      document.getElementById("peerVideoPreview").appendChild(videoBox);
+      peer.videoTrack &&
+        peer.videoTrack.play(videoBox.id, {
+          fit: "contain",
+        });
     },
     // RTM 主叫: 呼叫邀请有效期
     localInvitationValidity: function () {
       // 呼叫邀请有效期
       Store.invitationClearTimeout = setTimeout(function () {
         Utils.alertWhole("60s无人接听,取消呼叫");
-      }, Store.invitationTimeout)
+      }, Store.invitationTimeout);
     },
     // RTM 主叫: 被叫已收到呼叫邀请
     localInvitationReceivedByPeer: async function () {
-      Utils.printLog("[info]", "Your invitation has been received by " + Store.localInvitation.calleeId);
+      Utils.printLog(
+        "[info]",
+        "Your invitation has been received by " + Store.localInvitation.calleeId
+      );
       // 标识为正在通话中
       Store.Calling = true;
       // 呼叫邀请有效期开始计时
       OperationPackge.p2p.localInvitationValidity();
       // 对方收到邀请，说明对方已经上线，这个时候应该监听对方的在线状态，如果对方离线 主动取消邀请（防止对方刷新或掉线时无法通知服务端）
-      Store.rtmClient.subscribePeersOnlineStatus([Store.localInvitation.calleeId]);
+      Store.rtmClient.subscribePeersOnlineStatus([
+        Store.localInvitation.calleeId,
+      ]);
       Store.rtmClient.on("PeersOnlineStatusChanged", (userOnlineStatus) => {
         // console.log("对方收到邀请", Store.localInvitation);
-        if (Store.localInvitation && userOnlineStatus[Store.localInvitation.calleeId] === "OFFLINE") {
+        if (
+          Store.localInvitation &&
+          userOnlineStatus[Store.localInvitation.calleeId] === "OFFLINE"
+        ) {
           Utils.alertWhole("用户离线，取消呼叫");
           Store.localInvitation.cancel();
         }
@@ -1048,10 +1301,14 @@ var OperationPackge = {
     },
     // RTM 主叫: 被叫已接受呼叫邀请
     localInvitationAccepted: async function (response) {
-      Utils.printLog("[info]", Store.localInvitation.calleeId + " accepted your invitation");
+      Utils.printLog(
+        "[info]",
+        Store.localInvitation.calleeId + " accepted your invitation"
+      );
       // console.log("p2p 被叫已接受呼叫邀请");
       // 呼叫邀请有效期清除计时
-      Store.invitationClearTimeout && clearTimeout(Store.invitationClearTimeout);
+      Store.invitationClearTimeout &&
+        clearTimeout(Store.invitationClearTimeout);
       Utils.alertWhole("呼叫邀请成功", "alert-success");
       var invitationResponse = JSON.parse(response);
       // 采集音视频
@@ -1062,7 +1319,9 @@ var OperationPackge = {
         // 语音通话
         PageShow.showVoicePage();
         // 关闭视频并释放
-        Store.localTracks.videoTrack && (await Store.localTracks.videoTrack.close(), Store.localTracks.videoTrack = null);
+        Store.localTracks.videoTrack &&
+          (await Store.localTracks.videoTrack.close(),
+          (Store.localTracks.videoTrack = null));
         // 发布媒体流
         await SdkPackge.RTC.publishLocalTracks();
         // 显示通话时长
@@ -1080,13 +1339,19 @@ var OperationPackge = {
     },
     // RTM 主叫: 被叫拒绝了你的呼叫邀请
     localInvitationRefused: async function (response) {
-      Utils.printLog("danger", "Your invitation has been refused by " + Store.localInvitation.calleeId);
+      Utils.printLog(
+        "danger",
+        "Your invitation has been refused by " + Store.localInvitation.calleeId
+      );
       // console.log("p2p 被叫拒绝了你的呼叫邀请", response);
       // 呼叫邀请有效期清除计时
-      Store.invitationClearTimeout && clearTimeout(Store.invitationClearTimeout);
+      Store.invitationClearTimeout &&
+        clearTimeout(Store.invitationClearTimeout);
       // 字符串转换
-      response ? response = JSON.parse(response) : "";
-      response.Cmd == "Calling" ? Utils.alertWhole("呼叫的用户正在通话中", "alert-info") : Utils.alertWhole("用户拒绝了你的呼叫邀请", "alert-info");
+      response ? (response = JSON.parse(response)) : "";
+      response.Cmd == "Calling"
+        ? Utils.alertWhole("呼叫的用户正在通话中", "alert-info")
+        : Utils.alertWhole("用户拒绝了你的呼叫邀请", "alert-info");
       // 本地存储恢复
       OperationPackge.public.restoreDefault();
       // 隐藏呼叫邀请页面
@@ -1096,13 +1361,15 @@ var OperationPackge = {
     localInvitationFailure: async function (response) {
       // console.log("p2p 呼叫邀请进程失败", response);
       // 呼叫邀请有效期清除计时
-      Store.invitationClearTimeout && clearTimeout(Store.invitationClearTimeout);
+      Store.invitationClearTimeout &&
+        clearTimeout(Store.invitationClearTimeout);
     },
     // RTM 主叫: 呼叫邀请已被成功取消 (主动挂断)
     localInvitationCanceled: async function () {
       // console.log("p2p 呼叫邀请已被成功取消  主叫主动挂断");
       // 呼叫邀请有效期清除计时
-      Store.invitationClearTimeout && clearTimeout(Store.invitationClearTimeout);
+      Store.invitationClearTimeout &&
+        clearTimeout(Store.invitationClearTimeout);
       // 本地存储恢复
       await OperationPackge.public.restoreDefault();
       // 隐藏呼叫邀请页面
@@ -1113,20 +1380,37 @@ var OperationPackge = {
     RemoteInvitationReceived: async function (invitationContent) {
       // console.log("p2p 收到来自主叫的呼叫邀请");
       // RTC 加入房间
-      Store.ownUserId = await Store.rtcClient.join(Config.RTC_APPID, invitationContent.ChanId, null, Store.ownUserId);
+      Store.ownUserId = await Store.rtcClient.join(
+        Config.RTC_APPID,
+        invitationContent.ChanId,
+        null,
+        Store.ownUserId
+      );
       Store.JoinRTCChannel = true;
       // 被呼叫页面 转换语音按钮是否显示
       PageShow.toSpeech(invitationContent.Mode);
       // 被呼叫页面展示
       PageShow.showCalledPage();
       // 监听接受呼叫邀请
-      Store.remoteInvitation.on("RemoteInvitationAccepted", OperationPackge.p2p.RemoteInvitationAccepted);
+      Store.remoteInvitation.on(
+        "RemoteInvitationAccepted",
+        OperationPackge.p2p.RemoteInvitationAccepted
+      );
       // 监听拒绝呼叫邀请
-      Store.remoteInvitation.on("RemoteInvitationRefused", OperationPackge.p2p.RemoteInvitationRefused);
+      Store.remoteInvitation.on(
+        "RemoteInvitationRefused",
+        OperationPackge.p2p.RemoteInvitationRefused
+      );
       // 监听主叫取消呼叫邀请
-      Store.remoteInvitation.on("RemoteInvitationCanceled", OperationPackge.p2p.RemoteInvitationCanceled);
+      Store.remoteInvitation.on(
+        "RemoteInvitationCanceled",
+        OperationPackge.p2p.RemoteInvitationCanceled
+      );
       // 监听呼叫邀请进程失败
-      Store.remoteInvitation.on("RemoteInvitationFailure", OperationPackge.p2p.RemoteInvitationFailure);
+      Store.remoteInvitation.on(
+        "RemoteInvitationFailure",
+        OperationPackge.p2p.RemoteInvitationFailure
+      );
     },
     // RTM 被叫: 接受呼叫邀请成功
     RemoteInvitationAccepted: async function () {
@@ -1140,7 +1424,9 @@ var OperationPackge = {
         // 语音通话
         await PageShow.showVoicePage();
         // 关闭视频并释放
-        Store.localTracks.videoTrack && (await Store.localTracks.videoTrack.close(), Store.localTracks.videoTrack = null);
+        Store.localTracks.videoTrack &&
+          (await Store.localTracks.videoTrack.close(),
+          (Store.localTracks.videoTrack = null));
         // 发布媒体流
         await SdkPackge.RTC.publishLocalTracks();
         // 显示通话时长
@@ -1200,7 +1486,7 @@ var OperationPackge = {
       await SdkPackge.RTC.LocalTracksClose();
       // 本地存储恢复
       await OperationPackge.public.restoreDefault();
-      // 通话页面恢复初始 
+      // 通话页面恢复初始
       await PageShow.initSetingP2P();
       // 回到首页
       await PageShow.showIndex();
@@ -1227,9 +1513,18 @@ var OperationPackge = {
       //因网络断线离开
       if (reason == "ServerTimeOut") {
         Utils.alertWhole("用户" + user.uid + "网络断线离开");
+      } else {
+        Utils.alertWhole("通话已结束", "alert-success");
       }
-
-    }
+      // 释放采集设备
+      await SdkPackge.RTC.LocalTracksClose();
+      // 本地存储恢复
+      await OperationPackge.public.restoreDefault();
+      // 页面恢复初始
+      await PageShow.initSetingP2P();
+      // 回到首页
+      await PageShow.showIndex();
+    },
   },
   multi: {
     // 频道消息
@@ -1263,11 +1558,17 @@ var OperationPackge = {
       // 本地用户加入 RTM 频道
       await OperationPackge.multi.JoinRTMChannel();
       // 本地用户加入 RTC 实时通讯频道
-      Store.ownUserId = await Store.rtcClient.join(Config.RTC_APPID, Store.channelId, null, Store.ownUserId);
+      Store.ownUserId = await Store.rtcClient.join(
+        Config.RTC_APPID,
+        Store.channelId,
+        null,
+        Store.ownUserId
+      );
       // 标识加入 RTC 频道
       Store.JoinRTCChannel = true;
       // 提示用户不在线
-      userOnlineStatus.oNotOline.length > 0 && Utils.alertWhole("用户" + userOnlineStatus.oNotOline + "不在线");
+      userOnlineStatus.oNotOline.length > 0 &&
+        Utils.alertWhole("用户" + userOnlineStatus.oNotOline + "不在线");
       // 显示会议页面
       await PageShow.showMeetPage();
       // 创建窗口
@@ -1279,7 +1580,9 @@ var OperationPackge = {
     },
     // 查询呼叫的用户是否在线
     QueryPeersOnlineStatus: async function () {
-      var userOnlineStatus = await Store.rtmClient.queryPeersOnlineStatus(Store.invitationUserIds);
+      var userOnlineStatus = await Store.rtmClient.queryPeersOnlineStatus(
+        Store.invitationUserIds
+      );
       // 分离在线用户和不在线用户
       var oOline = [];
       var oNotOline = [];
@@ -1293,8 +1596,8 @@ var OperationPackge = {
       });
       return {
         oOline, // 在线用户
-        oNotOline // 不在线用户
-      }
+        oNotOline, // 不在线用户
+      };
     },
     // 加入 RTM 频道
     JoinRTMChannel: async function () {
@@ -1312,7 +1615,7 @@ var OperationPackge = {
         Utils.createUserView(userid, 0);
         // 创建呼叫邀请并发送
         OperationPackge.multi.createLocalInvitationAndSend(userid);
-      })
+      });
     },
     // 接受呼叫
     acceptCall: async function () {
@@ -1324,7 +1627,7 @@ var OperationPackge = {
         Conference: true,
         refuseId: Store.ownUserId,
         UserData: "",
-        SipData: ""
+        SipData: "",
       });
       await Store.remoteInvitation.accept();
       // 隐藏被呼叫页面
@@ -1348,26 +1651,34 @@ var OperationPackge = {
       // 设置音视频
       await OperationPackge.multi.setVideoOrAudio();
       // 本地预览
-      Store.localTracks.videoTrack && await Store.localTracks.videoTrack.play(Store.ownUserId + "VideoView", {
-        fit: "contain"
-      });
+      Store.localTracks.videoTrack &&
+        (await Store.localTracks.videoTrack.play(
+          Store.ownUserId + "VideoView",
+          {
+            fit: "contain",
+          }
+        ));
       await Utils.updateUserViewStatus(Store.ownUserId, 1);
       // 更新音频状态
-      await Utils.updateUserAudioState(Store.ownUserId, Store.setting.enableAudio);
+      await Utils.updateUserAudioState(
+        Store.ownUserId,
+        Store.setting.enableAudio
+      );
       // 绑定大小屏切换
-      Store.localTracks.videoTrack && await Utils.switchover({
-        uid: Store.ownUserId,
-        videoTrack: Store.localTracks.videoTrack
-      });
+      Store.localTracks.videoTrack &&
+        (await Utils.switchover({
+          uid: Store.ownUserId,
+          videoTrack: Store.localTracks.videoTrack,
+        }));
     },
     // 会议邀请 邀请用户
     MeetingUser: async function () {
       var userid = "";
-      $('#userMutiModalInputs > input').each(function () {
+      $("#userMutiModalInputs > input").each(function () {
         userid += this.value;
       });
       // 清空所有输入框
-      $('#userMutiModalInputs > input').each(function () {
+      $("#userMutiModalInputs > input").each(function () {
         this.value = "";
       });
       // 筛选用户
@@ -1376,24 +1687,32 @@ var OperationPackge = {
         return;
       }
       // 查看用户已存在
-      if (~Store.invitationUserIds.indexOf(userid) || userid == Store.ownUserId) {
+      if (
+        ~Store.invitationUserIds.indexOf(userid) ||
+        userid == Store.ownUserId
+      ) {
         Utils.alertWhole("邀请的用户已存在", "alert-danger");
         return;
       }
       // 用户是否在线
-      var userOnlineStatus = await Store.rtmClient.queryPeersOnlineStatus([userid]);
+      var userOnlineStatus = await Store.rtmClient.queryPeersOnlineStatus([
+        userid,
+      ]);
       if (!userOnlineStatus[userid]) {
         Utils.alertWhole("用户不在线,无法邀请", "alert-danger");
         return;
       }
-      return userid
+      return userid;
     },
     // RTM 主叫: 创建呼叫邀请并发送
     createLocalInvitationAndSend: async function (userid) {
       var localInvitation = await Store.rtmClient.createLocalInvitation(userid);
       var oUserData = await Store.rtmChannel.getMembers();
-      if ([Store.ownUserId].concat(Store.invitationUserIds).length > oUserData.length) {
-        oUserData = [Store.ownUserId].concat(Store.invitationUserIds)
+      if (
+        [Store.ownUserId].concat(Store.invitationUserIds).length >
+        oUserData.length
+      ) {
+        oUserData = [Store.ownUserId].concat(Store.invitationUserIds);
       }
       oUserData = [...new Set(oUserData)];
       // 设置邀请内容
@@ -1403,31 +1722,48 @@ var OperationPackge = {
         ChanId: Store.channelId,
         UserData: oUserData, // 邀请的人员添加到UserData [Store.ownUserId].concat(Store.invitationUserIds)
         SipData: "",
+        VidCodec: ["H264"],
+        AudCodec: ["Opus"],
       });
       // 发送
       await localInvitation.send();
       Utils.printLog("[info]", "you sent an invitation to " + userid);
       // 主叫：被叫已收到呼叫邀请。
       localInvitation.on("LocalInvitationReceivedByPeer", async function () {
-        Utils.printLog("[info]", "Your invitation has been received by " + localInvitation.calleeId);
+        Utils.printLog(
+          "[info]",
+          "Your invitation has been received by " + localInvitation.calleeId
+        );
       });
       // 主叫：被叫已接受呼叫邀请。
-      localInvitation.on("LocalInvitationAccepted", OperationPackge.multi.LocalInvitationAccepted);
+      localInvitation.on(
+        "LocalInvitationAccepted",
+        OperationPackge.multi.LocalInvitationAccepted
+      );
       // 主叫: 被叫拒绝呼叫邀请
-      localInvitation.on("LocalInvitationRefused", OperationPackge.multi.LocalInvitationRefused);
+      localInvitation.on(
+        "LocalInvitationRefused",
+        OperationPackge.multi.LocalInvitationRefused
+      );
       // 主叫: 呼叫邀请已被成功取消。
       localInvitation.on("LocalInvitationCanceled", function () {
         Utils.printLog("[info]", "Local invitation canceled");
       });
       // 主叫：呼叫邀请进程失败。
-      localInvitation.on("LocalInvitationFailure", OperationPackge.multi.LocalInvitationFailure);;
+      localInvitation.on(
+        "LocalInvitationFailure",
+        OperationPackge.multi.LocalInvitationFailure
+      );
     },
     // RTM 主叫: 被叫已接受呼叫邀请。
     LocalInvitationAccepted: async function (response) {
       // console.log("被叫已接受呼叫邀请。", response);
       if (response) {
         response = JSON.parse(response);
-        Utils.printLog("[info]", response.refuseId + " accepted your invitation");
+        Utils.printLog(
+          "[info]",
+          response.refuseId + " accepted your invitation"
+        );
         // 更新用户状态及窗口显示 - 对方已接收
         Utils.updateUserViewStatus(response.refuseId, 1);
       }
@@ -1441,7 +1777,10 @@ var OperationPackge = {
       if (response.Cmd == "Calling") {
         await Utils.alertWhole("呼叫的用户正在通话中", "alert-info");
       } else {
-        await Utils.alertWhole("用户" + response.refuseId + "拒绝呼叫邀请", "alert-info");
+        await Utils.alertWhole(
+          "用户" + response.refuseId + "拒绝呼叫邀请",
+          "alert-info"
+        );
       }
       // 移除用户窗口
       await Utils.deleteUserView(response.refuseId);
@@ -1452,7 +1791,10 @@ var OperationPackge = {
     },
     // RTM 被叫: 多人 收到来自主叫的呼叫邀请
     RemoteInvitationReceived: async function (invitationContent) {
-      Utils.printLog("[info]", "You recive an invitation from " + Store.remoteInvitation.callerId);
+      Utils.printLog(
+        "[info]",
+        "You recive an invitation from " + Store.remoteInvitation.callerId
+      );
       // console.log("多人 收到来自主叫的呼叫邀请");
       // 加入的频道
       Store.channelId = invitationContent.ChanId;
@@ -1465,19 +1807,36 @@ var OperationPackge = {
       // 隐藏转换语音通话按钮
       PageShow.toSpeech(1);
       // 被叫: 接受呼叫邀请
-      Store.remoteInvitation.on("RemoteInvitationAccepted", OperationPackge.multi.RemoteInvitationAccepted);
+      Store.remoteInvitation.on(
+        "RemoteInvitationAccepted",
+        OperationPackge.multi.RemoteInvitationAccepted
+      );
       // 被叫: 拒绝呼叫邀请
-      Store.remoteInvitation.on("RemoteInvitationRefused", OperationPackge.multi.RemoteInvitationRefused);
+      Store.remoteInvitation.on(
+        "RemoteInvitationRefused",
+        OperationPackge.multi.RemoteInvitationRefused
+      );
       // 被叫: 主叫已取消呼叫邀请
-      Store.remoteInvitation.on("RemoteInvitationCanceled", OperationPackge.multi.RemoteInvitationCanceled);
+      Store.remoteInvitation.on(
+        "RemoteInvitationCanceled",
+        OperationPackge.multi.RemoteInvitationCanceled
+      );
       // 被叫: 呼叫邀请进程失败
-      Store.remoteInvitation.on("RemoteInvitationFailure", OperationPackge.multi.RemoteInvitationFailure);
+      Store.remoteInvitation.on(
+        "RemoteInvitationFailure",
+        OperationPackge.multi.RemoteInvitationFailure
+      );
     },
     // RTM 被叫: 接受呼叫邀请
     RemoteInvitationAccepted: async function () {
       // console.log("被叫: 接受呼叫邀请");
       // 加入 RTC 实时通讯频道
-      Store.ownUserId = await Store.rtcClient.join(Config.RTC_APPID, Store.channelId, null, Store.ownUserId);
+      Store.ownUserId = await Store.rtcClient.join(
+        Config.RTC_APPID,
+        Store.channelId,
+        null,
+        Store.ownUserId
+      );
       Store.JoinRTCChannel = true;
       // 更新用户状态及窗口显示 - 对方已接收
       await Utils.updateUserViewStatus(Store.remoteInvitation.callerId, 1);
@@ -1486,7 +1845,7 @@ var OperationPackge = {
     // RTM 被叫: 拒绝呼叫邀请
     RemoteInvitationRefused: async function () {
       Utils.alertWhole("已拒绝呼叫邀请", "alert-info");
-      PageShow.initSetingMulti() // 恢复初始
+      PageShow.initSetingMulti(); // 恢复初始
       // 恢复默认
       await OperationPackge.public.restoreDefault();
       // 显示首页
@@ -1519,11 +1878,12 @@ var OperationPackge = {
         // 绑定大小屏切换
         await Utils.switchover(user);
         // 存放用户发布的视频
-        user.videoTrack && await user.videoTrack.play(user.uid + "VideoView", {
-          fit: "contain"
-        });
+        user.videoTrack &&
+          (await user.videoTrack.play(user.uid + "VideoView", {
+            fit: "contain",
+          }));
       } else {
-        user.audioTrack && await user.audioTrack.play();
+        user.audioTrack && (await user.audioTrack.play());
         // 更改用户的音频状态
         await Utils.updateUserAudioState(user.uid, user.hasAudio);
       }
@@ -1532,7 +1892,7 @@ var OperationPackge = {
     userUnpublished: async function (user, mediaType) {
       // console.log("用户" + user.uid + "取消发布" + mediaType);
       if (mediaType === "audio") {
-        Utils.updateUserAudioState(user.uid, user.hasAudio);
+        Utils.updateUserAudioState(user.uid, false);
       }
     },
     // RTC 用户离开频道
@@ -1544,81 +1904,30 @@ var OperationPackge = {
       } else {
         await Utils.alertWhole("用户" + user.uid + "离开", "alert-danger");
       }
-    }
-  }
-};
-
-// SDK 配置
-var Config = {
-  RTC_APPID: "ee0ca1b2bf559ea6823698acb0600e62", //RTC 应用ID 
-  RTM_APPID: "ee0ca1b2bf559ea6823698acb0600e62", //RTM 应用ID 
-  RTC_MODE: "live", //RTC 通信模式
-  RTC_CODEC: "h264", //RTC 视频编码格式
-  SELECT_CAMERA_DEVICE: sessionStorage.getItem("defaultCameraDeviceId") || undefined
-};
-// 本地数据存储
-var Store = {
-  Conference: false, // 选择的呼叫模式  false: p2p呼叫  true: 多人呼叫
-  Calling: false, // 正在通话中(标识)
-  JoinRTCChannel: false, // 加入 RTC 频道(标识)
-  rtcClient: null, // 存放 RTC 客户端
-  rtmClient: null, // 存放 RTM 客户端
-  rtmChannel: null, // 存放 RTM 频道实例
-  localInvitation: null, // 存放主叫邀请实例
-  invitationClearTimeouts: {}, // 存放多个有效期计时(定时器仅多人呼叫使用)
-  bigMutiUser: {}, // 大屏展示(仅多人呼叫使用)
-  recordUser: [], // 记录页面展示的音视频轨道(仅多人呼叫使用)
-  remoteInvitation: null, // 存放被叫邀请实例
-  invitationTimeout: 58 * 1000, // 邀请有效期限
-  invitationClearTimeout: null, // 邀请有效期计时(定时器)
-  callDurationInterval: 0, // 通话时长
-  callDurationClearInterval: null, // 通话时长计时(定时器)
-  ownUserId: "" + Utils.generateNumber(4), //自己的用户ID - 这里需要转字符串 
-  peerUserId: "", // 远端的用户的ID
-  channelId: "" + Utils.generateNumber(9), // 频道房间
-  // RTC 本地采集的音视频轨道
-  localTracks: {
-    videoTrack: null,
-    audioTrack: null,
+    },
   },
-  // 设置
-  setting: {
-    // p2p设置
-    videoSize: [320, 180], //设置视频采集的分辨率大小
-    audioDevice: "default", // 设置音频设备ID
-    videoDevice: "default", // 设置视频设备ID
-    // 多人设置
-    enableAudio: true, // 声音开关
-    enableVideo: true, // 视频开关
-  },
-  invitationUserIds: [], // 存放多人通话的用户id
 };
 
 // SDK 自检
-(
-  async function () {
-    //查看sdk版本
-    console.log(ArRTC.VERSION);
-    // 视频设备状态变化
-    ArRTC.onCameraChanged = function (info) {
-      SdkPackge.Support.cameraChanged(info)
-    };
-    // 音频设备状态变化
-    ArRTC.onMicrophoneChanged = function (info) {
-      SdkPackge.Support.microphoneChanged(info)
-    };
-    // SDK 设备支持检测
-    var fase = await SdkPackge.Support.hardwareSupport();
-    fase && (
-      // 初始化RTC
-      SdkPackge.RTC.init(),
-      // 初始化RTM
-      SdkPackge.RTM.init()
-    )
-  }
-)()
-
-
+(async function () {
+  //查看sdk版本
+  console.log(ArRTC.VERSION);
+  // 视频设备状态变化
+  ArRTC.onCameraChanged = function (info) {
+    SdkPackge.Support.cameraChanged(info);
+  };
+  // 音频设备状态变化
+  ArRTC.onMicrophoneChanged = function (info) {
+    SdkPackge.Support.microphoneChanged(info);
+  };
+  // SDK 设备支持检测
+  var fase = await SdkPackge.Support.hardwareSupport();
+  fase &&
+    // 初始化RTC
+    (SdkPackge.RTC.init(),
+    // 初始化RTM
+    SdkPackge.RTM.init());
+})();
 
 // p2p点击相关操作4
 {
@@ -1638,10 +1947,11 @@ var Store = {
       await $("#settingVideoPreview").html("");
       // 释放采集设备
       await SdkPackge.RTC.LocalTracksClose();
-      // 重新采集视频 
+      // 重新采集视频
       await SdkPackge.RTC.getUserMedia();
       // 本地预览
-      Store.localTracks.videoTrack && Store.localTracks.videoTrack.play("settingVideoPreview");
+      Store.localTracks.videoTrack &&
+        Store.localTracks.videoTrack.play("settingVideoPreview");
       Store.localTracks.audioTrack && Store.localTracks.audioTrack.play();
     }
   });
@@ -1651,7 +1961,10 @@ var Store = {
   });
   // 监听用户设置视频大小
   $("#settingVideoResolution").change(async function () {
-    Store.setting.videoSize = await $("#settingVideoResolution").val().split("*").map(Number);
+    Store.setting.videoSize = await $("#settingVideoResolution")
+      .val()
+      .split("*")
+      .map(Number);
     await OperationPackge.p2p.setOperation("分辨率");
   });
   // 监听用户设置音频设备
@@ -1687,13 +2000,16 @@ var Store = {
 
   // 被叫-呼叫页面 转语音通话
   $("#changAudioBtn").on("click", function () {
-    OperationPackge.p2p.acceptCall("语音呼叫")
+    OperationPackge.p2p.acceptCall("语音呼叫");
   });
 
   // 音视频展示-语音通话页面 音频开关
   $("#audioSwitchBtn").click(function () {
-    Store.localTracks.audioTrack.isMuted = !Store.localTracks.audioTrack.isMuted;
-    Store.localTracks.audioTrack.setEnabled(!Store.localTracks.audioTrack.isMuted);
+    Store.localTracks.audioTrack.isMuted =
+      !Store.localTracks.audioTrack.isMuted;
+    Store.localTracks.audioTrack.setEnabled(
+      !Store.localTracks.audioTrack.isMuted
+    );
     PageShow.audioSwitch();
   });
   // 音视频展示-语音通话页面 音频挂断
@@ -1705,27 +2021,29 @@ var Store = {
   $("#hangupBtn").click(function () {
     // 取消当前通话
     OperationPackge.p2p.cancelCall();
-  })
+  });
   // 音视频展示-视频通话页面 切换语音通话
   $("#switchToAudioCall").click(async function () {
     // console.log("切换语音通话", Store.peerUserId);
     if (Store.localTracks.videoTrack) {
-      await Store.rtmClient.sendMessageToPeer({
+      await Store.rtmClient.sendMessageToPeer(
+        {
           text: JSON.stringify({
-            Cmd: "SwitchAudio"
-          })
+            Cmd: "SwitchAudio",
+          }),
         },
-        Store.peerUserId, // 对端用户的 uid。
+        Store.peerUserId // 对端用户的 uid。
       );
       // 语音通话
       await PageShow.showVoicePage();
       // 关闭视频并释放
-      await Store.localTracks.videoTrack && (Store.localTracks.videoTrack.close(), Store.localTracks.videoTrack = null);
+      (await Store.localTracks.videoTrack) &&
+        (Store.localTracks.videoTrack.close(),
+        (Store.localTracks.videoTrack = null));
       // 显示音频通话时长
       await OperationPackge.public.communicationDuration("audioDuration");
     }
-
-  })
+  });
 }
 
 // 多人点击相关操作
@@ -1733,8 +2051,9 @@ var Store = {
   // 选择多人呼叫
   $("#openMultiInvite").click(function () {
     !$("#loginHome").hasClass("d-none") && $("#loginHome").addClass("d-none");
-    $("#loginMutiFprm").hasClass("d-none") && $("#loginMutiFprm").removeClass("d-none");
-    Utils.setPageTitle("anyrtc 多人呼叫邀请DEMO - anyRTC")
+    $("#loginMutiFprm").hasClass("d-none") &&
+      $("#loginMutiFprm").removeClass("d-none");
+    Utils.setPageTitle("anyrtc 多人呼叫邀请DEMO - anyRTC");
     Store.Conference = true;
   });
   // 用户输入
@@ -1759,13 +2078,15 @@ var Store = {
   });
   // 监听关闭设置按钮点击
   $("#closeMutiSettingBtn").click(function () {
-    $("#loginMutiSetting").hasClass("show") && $("#loginMutiSetting").removeClass("show");
+    $("#loginMutiSetting").hasClass("show") &&
+      $("#loginMutiSetting").removeClass("show");
   });
   // 发起多人音视频通话
   $("#MultipleCalls").click(async function () {
     if (Store.invitationUserIds.length > 0) {
       // 查询呼叫的用户是否在线
-      var userOnlineStatus = await OperationPackge.multi.QueryPeersOnlineStatus();
+      var userOnlineStatus =
+        await OperationPackge.multi.QueryPeersOnlineStatus();
       // 输入的用户中有在线的
       if (userOnlineStatus.oOline.length > 0) {
         // 主叫处理
@@ -1782,7 +2103,10 @@ var Store = {
   // 音频开关
   $("#setAudioEnableBtn").click(async function () {
     Store.setting.enableAudio = !Store.setting.enableAudio;
-    Store.localTracks.audioTrack && await Store.localTracks.audioTrack.setEnabled(Store.setting.enableAudio);
+    Store.localTracks.audioTrack &&
+      (await Store.localTracks.audioTrack.setEnabled(
+        Store.setting.enableAudio
+      ));
     // 更改用户的音频状态
     Utils.updateUserAudioState(Store.ownUserId, Store.setting.enableAudio);
     PageShow.setEnableAudio(Store.setting.enableAudio);
@@ -1794,26 +2118,30 @@ var Store = {
       Store.localTracks.audioTrack.setEnabled(!Store.setting.enableAudio);
       setTimeout(function () {
         Store.localTracks.audioTrack.setEnabled(Store.setting.enableAudio);
-      }, 200)
+      }, 200);
     }
-    Store.localTracks.videoTrack && await Store.localTracks.videoTrack.setEnabled(Store.setting.enableVideo);
-    PageShow.setEnableVideo(Store.setting.enableVideo);
+    Store.localTracks.videoTrack &&
+      (await Store.localTracks.videoTrack.setEnabled(
+        Store.setting.enableVideo
+      ));
+    // console.log("视频开关", Store.setting.enableVideo);
+    await PageShow.setEnableVideo(Store.setting.enableVideo);
   });
   // 挂断
   $("#hangupMutiBtn").click(async function () {
     Object.keys(Store.invitationClearTimeouts).forEach(function (key) {
-      Store.invitationClearTimeouts[key] && clearTimeout(Store.invitationClearTimeouts[key]);
+      Store.invitationClearTimeouts[key] &&
+        clearTimeout(Store.invitationClearTimeouts[key]);
     });
     // 释放采集设备
     await SdkPackge.RTC.LocalTracksClose();
 
-    // 通话页面恢复初始 
+    // 通话页面恢复初始
     await PageShow.initSetingMulti();
     // 回到首页
     await PageShow.showIndex();
     // 本地存储恢复
     await OperationPackge.public.restoreDefault();
-
   });
   // 输入框 (会议中邀请)
   Utils.inputChangId("#userMutiModalInputs > input");
@@ -1827,9 +2155,8 @@ var Store = {
       // 创建用户视图窗口
       Utils.createUserView(userid, 0);
       // 隐藏邀请窗口
-      $('#invitationModal').modal('hide');
+      $("#invitationModal").modal("hide");
     }
-
   });
 }
 
@@ -1837,13 +2164,15 @@ var Store = {
 {
   // 被叫-呼叫页面 接受邀请
   $("#acceptCallBtn").on("click", function () {
-    Store.Conference ? OperationPackge.multi.acceptCall() : OperationPackge.p2p.acceptCall("视频呼叫");
+    Store.Conference
+      ? OperationPackge.multi.acceptCall()
+      : OperationPackge.p2p.acceptCall("视频呼叫");
   });
 
   // 被叫-呼叫页面 拒绝接听
   $("#refuseCallBtn").on("click", function () {
     Store.remoteInvitation.response = JSON.stringify({
-      refuseId: Store.ownUserId
+      refuseId: Store.ownUserId,
     });
     // 拒绝接听
     Store.remoteInvitation && Store.remoteInvitation.refuse();
