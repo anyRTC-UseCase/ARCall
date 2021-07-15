@@ -11,10 +11,10 @@ var Config = {
     // 是否开启私有云配置
     switch: false,
     // setParameters: {
-    //   //配置内网网关
+    //   //配置私有云网关
     //   ConfPriCloudAddr: {
-    //     ServerAdd: "192.168.1.143",
-    //     Port: 6080,
+    //     ServerAdd: "",
+    //     Port: ,
     //     Wss: false,
     //   },
     // },
@@ -26,8 +26,8 @@ var Config = {
     // setParameters: {
     //   //配置内网网关
     //   confPriCloudAddr: {
-    //     ServerAdd: "192.168.1.143",
-    //     Port: 7080,
+    //     ServerAdd: "",
+    //     Port: ,
     //     Wss: false,
     //   },
     // },
@@ -879,21 +879,22 @@ var SdkPackge = {
         await OperationPackge.p2p.closeSeting();
         // 标识为正在通话中
         Store.Calling = true;
-        // 手表不支持 web端
+        console.log(invitationContent);
         if (
-          invitationContent.VidCodec &&
-          invitationContent.VidCodec.indexOf("MJpeg") !== -1
+          !invitationContent.VidCodec ||
+          !invitationContent.AudCodec ||
+          (invitationContent.VidCodec &&
+            invitationContent.VidCodec.indexOf("H264") !== -1) ||
+          (invitationContent.AudCodec &&
+            invitationContent.AudCodec.indexOf("Opus") !== -1)
         ) {
-          await OperationPackge.public.watches(remoteInvitation);
-        } else {
-          // p2p时保存对方用户id
-          // Store.Conference
-          //   ? ""
-          //   : (Store.peerUserIdRTM = remoteInvitation.callerId);
           Store.Conference = invitationContent.Conference;
           Store.Conference // 多人逻辑操作
             ? OperationPackge.multi.RemoteInvitationReceived(invitationContent) // p2p逻辑操作
             : OperationPackge.p2p.RemoteInvitationReceived(invitationContent);
+        } else {
+          // 手表不支持 web 端
+          await OperationPackge.public.watches(remoteInvitation);
         }
       }
     },
