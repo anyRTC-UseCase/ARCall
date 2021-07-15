@@ -24,21 +24,20 @@ import com.lzf.easyfloat.interfaces.OnInvokeView
 import com.lzf.easyfloat.interfaces.OnPermissionResult
 import com.lzf.easyfloat.permission.PermissionUtils.checkPermission
 import com.lzf.easyfloat.permission.PermissionUtils.requestPermission
-import kotlinx.coroutines.delay
 import org.ar.call.*
 import org.ar.call.CallApp.Companion.callApp
 import org.ar.call.R
-import org.ar.call.databinding.ActivityMulticallBinding
 import org.ar.call.databinding.ActivityVideoBinding
 import org.ar.call.p2p.VideoActivity
 import org.ar.call.utils.Constans
 import org.ar.call.utils.DensityUtil
 import org.ar.call.utils.KeepAliveService
-import org.ar.call.utils.launch
-import org.ar.call.weight.DragViewLayout
+import org.ar.call.utils.toast
 import org.ar.rtc.Constants
 import org.ar.rtc.IRtcEngineEventHandler
 import org.ar.rtc.RtcEngine
+import org.ar.rtc.VideoEncoderConfiguration
+import org.ar.rtc.VideoEncoderConfiguration.VideoDimensions
 import org.ar.rtc.video.VideoCanvas
 import org.ar.rtm.*
 import org.json.JSONException
@@ -75,7 +74,7 @@ class VideoActivity : BaseActivity() {
         val view = binding.root
         setContentView(view)
         ImmersionBar.with(this).statusBarDarkFont(false, 0.2f).keyboardEnable(true).init()
-
+        RtcManager.instance.init(this)
         //呼叫等待页面
         rtmClient = RtmManager.instance.getRtmClient()
         rtmCallManager = RtmManager.instance.getCallManager()
@@ -112,13 +111,11 @@ class VideoActivity : BaseActivity() {
             showCallLayout(true, remoteInvitation!!.callerId)
         }
         RtcManager.instance.getRtcEngine()?.setEnableSpeakerphone(true)
-//        RtcManager.instance.getRtcEngine()?.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING)
-//        RtcManager.instance.getRtcEngine()?.setClientRole(Constants.CLIENT_ROLE_AUDIENCE)
         if (callMode == Constans.VIDEO_MODE) {
                 RtcManager.instance.enableVideo()
                 binding.rlVideoPreview.visibility = View.VISIBLE
                 val mLocalView = RtcEngine.CreateRendererView(this)
-                binding.rlVideoPreview.addView(mLocalView,0)
+                binding.rlVideoPreview.addView(mLocalView, 0)
                 RtcManager.instance.setupLocalVideo(mLocalView)
                 RtcManager.instance.getRtcEngine()?.startPreview()
         }
@@ -179,7 +176,7 @@ class VideoActivity : BaseActivity() {
         }
     }
 
-    private fun initEngineAndJoinChannel() {
+    private fun initEngineAndJoinChannel(isApp: Boolean, watchParams: String?) {
         isWaiting = false
         isCalling = true
         stopRing()
@@ -209,8 +206,26 @@ class VideoActivity : BaseActivity() {
             Toast.makeText(this@VideoActivity, "声音将通过听筒播放", Toast.LENGTH_SHORT).show()
             RtcManager.instance.getRtcEngine()!!.setEnableSpeakerphone(false)
         }
+        if (!isApp){
+            RtcManager.instance.getRtcEngine()!!.setParameters("{\"Cmd\":\"SetEncoderType\", \"VidCodecType\": 5, \"AudCodecType\": 3}")
+            if (callMode == Constans.VIDEO_MODE){
+                watchParams?.let {
+                    val json = JSONObject(it)
+                    val width = json.getInt("Width")
+                    val height = json.getInt("Height")
+                    val fps = json.getInt("Fps")
+                    val configuration = VideoEncoderConfiguration()
+                    configuration.dimensions = VideoDimensions(width, height)
+                    configuration.bitrate = 128
+                    configuration.minBitrate = 128
+                    configuration.frameRate = fps
+                    configuration.minFrameRate = 1
+                    RtcManager.instance.getRtcEngine()!!.setVideoEncoderConfiguration(configuration)
+                }
+            }
+
+        }
         joinChannel()
-       // RtcManager.instance.getRtcEngine()!!.setClientRole(Constants.CLIENT_ROLE_BROADCASTER)
     }
 
     private fun joinChannel() {
@@ -258,6 +273,7 @@ class VideoActivity : BaseActivity() {
                 RtcManager.instance.inMeeting = true
                 RtcManager.instance.callMode = Constans.SINGLE_MODE
                 binding.chronometer.start()
+                toast(channelId+"频道ID")
             }
         }
 
@@ -360,7 +376,7 @@ class VideoActivity : BaseActivity() {
                         if (callApp.p2pMeetingActivityTaskId == -1) {
                             return@OnClickListener
                         }
-                        val intent = Intent(CallApp.callApp.curActivity,VideoActivity::class.java)
+                        val intent = Intent(CallApp.callApp.curActivity, VideoActivity::class.java)
                         CallApp.callApp.curActivity?.startActivity(intent)
 //                        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 //                        activityManager.moveTaskToFront(callApp.p2pMainActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
@@ -431,6 +447,7 @@ class VideoActivity : BaseActivity() {
         if (callMode == Constans.AUDIO_MODE && binding.chronometer != null) {
             binding.chronometer!!.stop()
         }
+        RtcManager.instance.release()
         UnSubscribe(remoteUserId)
     }
 
@@ -557,7 +574,7 @@ class VideoActivity : BaseActivity() {
 
     fun AudioMuteLocalAudio(view: View?) {
         binding.ibtnAudioAudio.isSelected = ! binding.ibtnAudioAudio.isSelected
-        RtcManager.instance.getRtcEngine()!!.muteLocalAudioStream( binding.ibtnAudioAudio.isSelected)
+        RtcManager.instance.getRtcEngine()!!.muteLocalAudioStream(binding.ibtnAudioAudio.isSelected)
     }
 
     fun showTipDialog(tips: String?) {
@@ -592,15 +609,29 @@ class VideoActivity : BaseActivity() {
     }
 
     override fun onLocalInvitationAccepted(local: LocalInvitation, s: String) {
-        runOnUiThread { //被叫已接受呼叫邀请。这时候还需要判断一下 对方是不是切换到语音接听了
+        runOnUiThread { //返回给主叫：被叫已接受呼叫邀请。这时候还需要判断一下 对方是不是切换到语音接听了
             try {
                 val jsonObject = JSONObject(s)
                 callMode = jsonObject.getInt("Mode")
+                binding.rlCallPre.visibility = View.GONE
+                var watchParam:String? = null
+                var vidCodec = ""
+                var audCodec = ""
+                if (!jsonObject.isNull("VidCodec")){
+                    vidCodec =  jsonObject.getString("VidCodec")
+                }
+                if (!jsonObject.isNull("AudCodec")){
+                    audCodec = jsonObject.getString("AudCodec")
+                }
+                if (!jsonObject.isNull("Parameters")){
+                    watchParam = jsonObject.getString("Parameters")
+                }
+                var  isNotWatch = vidCodec.isNullOrEmpty()||vidCodec.contains("H264")||audCodec.isNullOrEmpty()||audCodec.contains("Opus")
+                initEngineAndJoinChannel(isNotWatch, watchParam)
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
-            binding.rlCallPre.visibility = View.GONE
-            initEngineAndJoinChannel()
+
         }
     }
 
@@ -629,16 +660,30 @@ class VideoActivity : BaseActivity() {
     }
 
     override fun onRemoteInvitationAccepted(remote: RemoteInvitation) {
-        runOnUiThread { //接受呼叫邀请成
+        runOnUiThread { //返回给被叫：已经接受呼叫邀请
             binding.rlCallPre.visibility = View.GONE
-            initEngineAndJoinChannel()
+            val jsonObject = JSONObject(remote.content)
+            var watchParam:String? = null
+            var vidCodec = ""
+            var audCodec = ""
+            if (!jsonObject.isNull("VidCodec")){
+                vidCodec =  jsonObject.getString("VidCodec")
+            }
+            if (!jsonObject.isNull("AudCodec")){
+                audCodec = jsonObject.getString("AudCodec")
+            }
+            if (!jsonObject.isNull("Parameters")){
+                watchParam = jsonObject.getString("Parameters")
+            }
+            var  isApp = vidCodec.isNullOrEmpty()||vidCodec.contains("H264")||audCodec.isNullOrEmpty()||audCodec.contains("Opus")
+            initEngineAndJoinChannel(isApp, watchParam)
         }
     }
 
     override fun onRemoteInvitationRefused(remoteInvitation: RemoteInvitation) {
         runOnUiThread(Runnable {
             //你拒绝了对方
-            if (isCalling||isWaiting) { //正在通话中
+            if (isCalling || isWaiting) { //正在通话中
 
             } else {
                 RtcManager.instance.inMeeting = false
@@ -719,7 +764,7 @@ class VideoActivity : BaseActivity() {
                         if (callApp.p2pMeetingActivityTaskId == -1) {
                             return@OnClickListener
                         }
-                        val intent = Intent(CallApp.callApp.curActivity,VideoActivity::class.java)
+                        val intent = Intent(CallApp.callApp.curActivity, VideoActivity::class.java)
                         CallApp.callApp.curActivity?.startActivity(intent)
 //                        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 //                        activityManager.moveTaskToFront(callApp.p2pMainActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
@@ -768,7 +813,7 @@ class VideoActivity : BaseActivity() {
                 if (callApp.p2pMeetingActivityTaskId == -1) {
                     return
                 }
-                val intent = Intent(CallApp.callApp.curActivity,VideoActivity::class.java)
+                val intent = Intent(CallApp.callApp.curActivity, VideoActivity::class.java)
                 CallApp.callApp.curActivity?.startActivity(intent)
             }
 

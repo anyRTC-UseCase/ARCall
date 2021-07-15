@@ -6,11 +6,9 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
-import android.view.Gravity
-import android.view.MotionEvent
-import android.view.View
-import android.view.WindowManager
+import android.view.*
 import android.widget.*
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.gyf.immersionbar.ImmersionBar
@@ -28,7 +26,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.ar.call.*
 import org.ar.call.R
-import org.ar.call.RtcManager.Companion.instance
 import org.ar.call.databinding.ActivityMultiVideosBinding
 import org.ar.call.p2p.VideoActivity
 import org.ar.call.utils.*
@@ -57,7 +54,6 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
     private val localInvitationList: ArrayList<LocalInvitation> = ArrayList() //主叫需要呼叫的
 
     private lateinit var memberAdapter: MemberAdapter
-    private val mainScope = MainScope()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,7 +63,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
         val view = binding.root
         setContentView(view)
         ImmersionBar.with(this).statusBarColor(R.color.video_title).statusBarDarkFont(false, 0.2f).keyboardEnable(true).init()
-      
+        RtcManager.instance.init(this)
 
         callArray = intent.getStringArrayListExtra("callArray")
         channelId = intent.getStringExtra("channelId")
@@ -149,7 +145,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
                         if (rtcMember.canvas == null){
                             rtcMember.getVideoCanvas(this@MultiVideosActivity)
                         }
-                        instance.setupRemoteVideo(rtcMember.canvas!!)
+                        RtcManager.instance.setupRemoteVideo(rtcMember.canvas!!)
                         memberAdapter.getItem(index).isWaiting = false
                         memberAdapter.notifyItemChanged(index,MemberAVStatus.WAITING(false))
                         return@forEachIndexed
@@ -289,25 +285,32 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
             callArray?.remove(userId)
         }
         if (memberAdapter.data.size == 1) {//only self
-            RtcManager.instance.inMeeting = false
+            exit()
             toast("通话已结束")
             dismissFloatWindow()
-            finish()
+
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK){
+            exit()
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
+    private fun exit() {
         KeepAliveService.stop(this)
         stopRing()
-        mainScope.cancel()
         RtcManager.instance.inMeeting = false
         RtcManager.instance.callMode = -1
         RtcManager.instance.unRegisterRtcEvent(rtcEvent)
         RtcManager.instance.getRtcEngine()?.leaveChannel()
-        RtcManager.instance.disableVideo()
+        RtcManager.instance.release()
         RtmManager.instance.releaseChannel()
         RtmManager.instance.unRegisterChannelEvent(this)
+        finish()
     }
 
     override fun onResume() {
@@ -329,8 +332,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
         memberAdapter.data.forEach {
             it.release()
         }
-        RtcManager.instance.inMeeting = false
-        finish()
+        exit()
     }
 
     fun muteAudio(view: View) {
@@ -375,7 +377,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
                     toast("用户已在通话中")
                     return@setOnClickListener
                 }
-                mainScope.launch() {
+                lifecycleScope.launch{
                     val isOnlne = queryOnlineMember(etId.inputContent)
                     if (!isOnlne) {
                         toast("该用户不在线")
@@ -468,7 +470,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
             })
             return
         }
-        instance.windowMode = true
+        RtcManager.instance.windowMode = true
         val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         activityManager.moveTaskToFront(CallApp.callApp.multiMainActivityTaskId, ActivityManager.MOVE_TASK_NO_USER_ACTION)
         EasyFloat.with(this)
@@ -518,7 +520,7 @@ class MultiVideosActivity : BaseActivity(), RtmChannelListener{
     }
 
     private fun dismissFloatWindow(){
-        instance.windowMode = false
+        RtcManager.instance.windowMode = false
         if (EasyFloat.appFloatIsShow()){
             EasyFloat.dismissAppFloat()
         }

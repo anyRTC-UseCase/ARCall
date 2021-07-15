@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -49,7 +50,6 @@ class MultiCallActivity : BaseActivity() ,OnItemChildClickListener,RtmChannelLis
 
     private val mineUserId = CallApp.callApp.userId
 
-    private val mainScope = MainScope()
     private val rtmClient = RtmManager.instance.getRtmClient()
     private var rtmChannel: RtmChannel? = null
     private val rtmCallManager = RtmManager.instance.getCallManager()
@@ -144,7 +144,7 @@ class MultiCallActivity : BaseActivity() ,OnItemChildClickListener,RtmChannelLis
             toast("请输入要呼叫的ID")
             return
         }
-        mainScope.launch {
+        lifecycleScope.launch {
           val onlineMember  = queryOnlineMember()
           if (onlineMember.size == 0){
               toast("您邀请的用户都不在线")
@@ -278,7 +278,7 @@ class MultiCallActivity : BaseActivity() ,OnItemChildClickListener,RtmChannelLis
                     }
                     return@runOnUiThread
                 }
-                if(JSONObject(remote?.content).getBoolean("Conference")){
+                if(JSONObject(remote?.content)["Conference"]==1 ||JSONObject(remote?.content)["Conference"]==true){
                     remoteInvitation = remote
                     val remoteBean = Gson().fromJson(remote?.content, MultiUserBean::class.java)
                     calledArray = remoteBean.userData as ArrayList<String>
@@ -309,7 +309,6 @@ class MultiCallActivity : BaseActivity() ,OnItemChildClickListener,RtmChannelLis
     override fun onDestroy() {
         super.onDestroy()
         RtmManager.instance.unRegisterChannelEvent(this)
-        mainScope.cancel()
     }
 
     override fun onMemberCountUpdated(var1: Int) {
