@@ -56,14 +56,23 @@
     self.rtmCallKit.callDelegate = self;
 
     if (self.calling) {
-        //主叫
+        // 主叫
         self.acceptButton.hidden = YES;
         self.switchVoiceButton.hidden = YES;
 
-        NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithInt:self.mode],@"Mode",[NSNumber numberWithBool:NO],@"Conference",self.channelId,@"ChanId",nil];
+        NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:
+                        [NSNumber numberWithInt:self.mode], @"Mode",
+                        [NSNumber numberWithBool:NO], @"Conference",
+                        self.channelId, @"ChanId",
+                        @"", @"UserData",
+                        @"", @"SipData",
+                        [ARCallCommon fromArrToJSON:@[@"H264", @"MJpeg"]], @"VidCodec",
+                        [ARCallCommon fromArrToJSON:@[@"Opus", @"G711"]], @"AudCodec",
+                        nil];
         self.localInvitation = [[ARtmLocalInvitation alloc] initWithCalleeId:self.callerId];
         self.localInvitation.content = [ARCallCommon returnJSONStringWithDictionary:dic];
-        //发送呼叫请求
+        
+        // 发送呼叫请求
         [self.rtmCallKit sendLocalInvitation:self.localInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
             if (errorCode == ARtmInvitationApiCallErrorAlreadySent) {
                 NSLog(@"sendLocalInvitation");
@@ -71,25 +80,25 @@
         }];
         [self subscribePeersOnline:self.localInvitation.calleeId];
     } else {
-        //被叫
+        // 被叫
         self.switchVoiceButton.hidden = self.mode;
         self.stateLabel.text = @"接听中...";
     }
     [self initializeRtcKit];
+    self.isWatch ? [self watchConfiguration] : nil;
+    [self joinChannel];
     
-    //监听AI降噪开关配置
+    // 监听AI降噪开关配置
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(observerNoise:) name:ARtmCallNoiseNotification object:nil];
 }
 
 - (void)initializeRtcKit {
     //===================== rtc 模块 =======================
-    //实例化ARtcEngineKit对象
+    // 实例化ARtcEngineKit对象
     self.rtcKit = [ARtcEngineKit sharedEngineWithAppId:appID delegate:self];
     ARUserInfo *userInfo = ARUserManager.getUserInfo;
-    if (userInfo.aiNoise) {
-        //开启AI降噪
-        [self switchNoise:YES];
-    }
+    // 开启AI降噪
+    (userInfo.aiNoise) ? ([self switchNoise:YES]) : 0;
     
     ARVideoEncoderConfiguration *config = [[ARVideoEncoderConfiguration alloc] init];
     if ([userInfo.dimensions isEqualToString:@"240*320"]) {
@@ -100,35 +109,49 @@
         config.dimensions = CGSizeMake(1280, 720);
     }
     
-    //分辨率
     config.frameRate = userInfo.frameRate;
-    //码率
     config.bitrate = 500;
-    //编码方向
     config.orientationMode = ARVideoOutputOrientationModeAdaptative;
-    //设置视频编码配置
     [self.rtcKit setVideoEncoderConfiguration:config];
-    
     [self.rtcKit setClientRole:ARClientRoleAudience];
+    [self.rtcKit setEnableSpeakerphone:!self.mode];
+}
+
+- (void)joinChannel {
     [self.rtcKit joinChannelByToken:nil channelId:self.channelId uid:[ARtmManager getLocalUid] joinSuccess:^(NSString * _Nonnull channel, NSString * _Nonnull uid, NSInteger elapsed) {
         NSLog(@"joinChannelByToken");
     }];
-    [self.rtcKit setEnableSpeakerphone:!self.mode];
+}
+
+- (void)watchConfiguration {
+    // 手表配置
+    NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:@"SetEncoderType", @"Cmd", [NSNumber numberWithInt:5], @"VidCodecType", [NSNumber numberWithInt:3], @"AudCodecType",  nil];
+    [_rtcKit setParameters:[ARCallCommon returnJSONStringWithDictionary:dic]];
+    
+    if (self.mode == 0) {
+        ARVideoEncoderConfiguration *watchConfig = [[ARVideoEncoderConfiguration alloc] init];
+        watchConfig.dimensions = CGSizeMake(160, 160);
+        watchConfig.frameRate = 7;
+        watchConfig.bitrate = 128;
+        watchConfig.minBitrate = 128;
+        watchConfig.minFrameRate = 1;
+        [_rtcKit setVideoEncoderConfiguration:watchConfig];
+    }
 }
 
 - (void)becomeBroadcaster {
     [self.rtcKit setClientRole:ARClientRoleBroadcaster];
     if (!self.mode) {
-        //开启视频模块
+        // 开启视频模块
         [self.rtcKit enableVideo];
-        //初始化本地视图
+        // 初始化本地视图
         ARtcVideoCanvas *videoCanvas = [[ARtcVideoCanvas alloc] init];
         videoCanvas.uid = [ARtmManager getLocalUid];
         self.localView.frame = CGRectMake(SCREEN_WIDTH - 140, 30, 120, 160);
         [ARtmManager.rtmWindow addSubview:self.localView];
         videoCanvas.view = self.localView;
         [self.rtcKit setupLocalVideo:videoCanvas];
-        //初始化远程视图
+        // 初始化远程视图
         self.remoteView.frame = CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         [self.view insertSubview:self.remoteView atIndex:0];
     }
@@ -136,115 +159,112 @@
 
 - (IBAction)didClickRtmCallButton:(UIButton *)sender {
     sender.selected = !sender.selected;
-    switch (sender.tag) {
-        case 50:
-            //最小化
-            self.callMinimize = YES;
-            ARtmManager.rtmWindow.hidden = YES;
-            
-            if (self.mode || !self.callState) {
-                [self popMinimizeSuspension];
+    
+    if (sender.tag == 50) {
+        // 最小化
+        self.callMinimize = YES;
+        ARtmManager.rtmWindow.hidden = YES;
+        
+        if (self.mode || !self.callState) {
+            [self popMinimizeSuspension];
+        } else {
+            if ([self.localView.superview isKindOfClass:[UIWindow class]]) {
+                [self switchVideoSize];
             } else {
-                if ([self.localView.superview isKindOfClass:[UIWindow class]]) {
-                    [self switchVideoSize];
-                } else {
-                    [UIApplication.sharedApplication.delegate.window addSubview:self.remoteView];
-                }
+                [UIApplication.sharedApplication.delegate.window addSubview:self.remoteView];
             }
-            break;
-        case 51:
-            if (self.calling) {
-                //取消呼叫
-                [self.rtmCallKit cancelLocalInvitation:self.localInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
-                    NSLog(@"cancelLocalInvitation == %ld",(long)errorCode);
-                }];
-            } else {
-                //被叫拒绝
-                [self.rtmCallKit refuseRemoteInvitation:self.remoteInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
-                      NSLog(@"refuseRemoteInvitation == %ld",(long)errorCode);
-                }];
-            }
-            [self endCall:ARtmCallStop];
-            break;
-        case 52:
-        case 53:
-            {
-                [ARCallCommon playMusic:NO];
-                //52 切换语音接听 53 正常接听
-                (sender.tag == 52) ? (self.mode = 1) : 0;
-                NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithInt:self.mode],@"Mode",[NSNumber numberWithBool:NO],@"Conference",nil];
-                self.remoteInvitation.response = [ARCallCommon returnJSONStringWithDictionary:dic];
-                [self.rtmCallKit acceptRemoteInvitation:self.remoteInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
-                    NSLog(@"acceptRemoteInvitation == %ld",(long)errorCode);
-                }];
-                self.stateLabel.hidden = YES;
-                self.callState = YES;
-                
-                [self switchCallMode:self.mode];
-                [self becomeBroadcaster];
-            }
-            break;
-        case 54:
-            //切换语音模式
-        {
-            self.mode = 1;
-            NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:@"SwitchAudio",@"Cmd", nil];
-            ARtmMessage *rtmMessage = [[ARtmMessage alloc] initWithText:[ARCallCommon returnJSONStringWithDictionary:dic]];
-            ARtmSendMessageOptions *options = [[ARtmSendMessageOptions alloc] init];
-            [ARtmManager.rtmKit sendMessage:rtmMessage toPeer:self.callerId sendMessageOptions:options completion:^(ARtmSendPeerMessageErrorCode errorCode) {
-                NSLog(@"sendMessage SwitchAudio");
-            }];
-            [self.remoteView removeFromSuperview];
-            [self.localView removeFromSuperview];
-            [self switchCallMode:1];
-            [self.rtcKit disableVideo];
-            self.backView.hidden = NO;
-            [self.rtcKit setEnableSpeakerphone:!self.mode];
         }
-            break;
-        case 55:
-            //音频
-            [self.rtcKit muteLocalAudioStream:sender.selected];
-            break;
-        case 56:
-        {
-            //挂断(通话中...)
-            NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:@"EndCall",@"Cmd", nil];
-            ARtmMessage *rtmMessage = [[ARtmMessage alloc] initWithText:[ARCallCommon returnJSONStringWithDictionary:dic]];
-            ARtmSendMessageOptions *options = [[ARtmSendMessageOptions alloc] init];
-            [ARtmManager.rtmKit sendMessage:rtmMessage toPeer:self.callerId sendMessageOptions:options completion:^(ARtmSendPeerMessageErrorCode errorCode) {
-                NSLog(@"sendMessage EndCall");
+        
+    } else if (sender.tag == 51) {
+        
+        if (self.calling) {
+            // 取消呼叫
+            [self.rtmCallKit cancelLocalInvitation:self.localInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
+                NSLog(@"cancelLocalInvitation == %ld",(long)errorCode);
             }];
-            [self endCall:ARtmCallStop];
+        } else {
+            // 被叫拒绝
+            [self.rtmCallKit refuseRemoteInvitation:self.remoteInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
+                  NSLog(@"refuseRemoteInvitation == %ld",(long)errorCode);
+            }];
         }
-            break;
-        case 57:
-            //切换摄像头
-            [self.rtcKit switchCamera];
-            break;
-        case 58:
-            //扬声器
-            [self.rtcKit setEnableSpeakerphone:sender.selected];
-            break;
-        default:
-            break;
+        [self endCall:ARtmCallStop];
+        
+    } else if (sender.tag == 52 || sender.tag == 53) {
+        
+        [ARCallCommon playMusic:NO];
+        // 52 切换语音接听 53 正常接听
+        (sender.tag == 52) ? (self.mode = 1) : 0;
+        NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithInt:self.mode],@"Mode",[NSNumber numberWithBool:NO],@"Conference",nil];
+        self.remoteInvitation.response = [ARCallCommon returnJSONStringWithDictionary:dic];
+        [self.rtmCallKit acceptRemoteInvitation:self.remoteInvitation completion:^(ARtmInvitationApiCallErrorCode errorCode) {
+            NSLog(@"acceptRemoteInvitation == %ld",(long)errorCode);
+        }];
+        self.stateLabel.hidden = YES;
+        self.callState = YES;
+        
+        [self switchCallMode:self.mode];
+        [self becomeBroadcaster];
+        
+    } else if (sender.tag == 54) {
+        
+        // 切换语音模式
+        self.mode = 1;
+        NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:@"SwitchAudio",@"Cmd", nil];
+        ARtmMessage *rtmMessage = [[ARtmMessage alloc] initWithText:[ARCallCommon returnJSONStringWithDictionary:dic]];
+        ARtmSendMessageOptions *options = [[ARtmSendMessageOptions alloc] init];
+        [ARtmManager.rtmKit sendMessage:rtmMessage toPeer:self.callerId sendMessageOptions:options completion:^(ARtmSendPeerMessageErrorCode errorCode) {
+            NSLog(@"sendMessage SwitchAudio");
+        }];
+        [self.remoteView removeFromSuperview];
+        [self.localView removeFromSuperview];
+        [self switchCallMode:1];
+        [self.rtcKit disableVideo];
+        self.backView.hidden = NO;
+        [self.rtcKit setEnableSpeakerphone:!self.mode];
+        
+    } else if (sender.tag == 55) {
+        
+        // 音频
+        [self.rtcKit muteLocalAudioStream:sender.selected];
+        
+    } else if (sender.tag == 56) {
+        
+        // 挂断(通话中...)
+        NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:@"EndCall",@"Cmd", nil];
+        ARtmMessage *rtmMessage = [[ARtmMessage alloc] initWithText:[ARCallCommon returnJSONStringWithDictionary:dic]];
+        ARtmSendMessageOptions *options = [[ARtmSendMessageOptions alloc] init];
+        [ARtmManager.rtmKit sendMessage:rtmMessage toPeer:self.callerId sendMessageOptions:options completion:^(ARtmSendPeerMessageErrorCode errorCode) {
+            NSLog(@"sendMessage EndCall");
+        }];
+        [self endCall:ARtmCallStop];
+        
+    } else if (sender.tag == 57) {
+        
+        // 切换摄像头
+        [self.rtcKit switchCamera];
+        
+    } else if (sender.tag == 58) {
+        
+        // 扬声器
+        [self.rtcKit setEnableSpeakerphone:sender.selected];
     }
 }
 
 - (void)observerNoise:(NSNotification *)notification {
-    //监听AI降噪开关配置
+    // 监听AI降噪开关配置
     NSDictionary * infoDic = [notification object];
     [self switchNoise:[[infoDic objectForKey:@"noise"] boolValue]];
 }
 
 - (void)switchNoise:(BOOL)enable {
-    //开启AI降噪
+    // 开启AI降噪
     NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:@"SetAudioAiNoise",@"Cmd",[NSNumber numberWithInt:(int)enable],@"Enable",nil];
     [_rtcKit setParameters:[ARCallCommon returnJSONStringWithDictionary:dic]];
 }
 
 - (void)subscribePeersOnline:(NSString *)calleeId {
-    //订阅指定单个或多个用户的在线状态
+    // 订阅指定单个或多个用户的在线状态
     if (calleeId.length != 0) {
         [ARtmManager.rtmKit subscribePeersOnlineStatus:@[calleeId] completion:^(ARtmPeerSubscriptionStatusErrorCode errorCode) {
             NSLog(@"subscribePeersOnlineStatus errorcode == %ld",(long)errorCode);
@@ -253,7 +273,7 @@
 }
 
 - (void)popMinimizeSuspension {
-    //窗口最小化
+    // 窗口最小化
     if (self.callMinimize) {
         @weakify(self);
         self.suspensionView = [ARtmSuspensionView loadSuspensionView:^{
@@ -281,7 +301,7 @@
     [self.suspensionView removeFromSuperview];
     
     if (self.rtcKit) {
-        //离开频道，释放rtc资源
+        // 离开频道，释放 rtc 资源
         [self.rtcKit leaveChannel:nil];
         [ARtcEngineKit destroy];
     }
@@ -296,7 +316,7 @@
 //MARK: - ARtmDelegate
 
 - (void)rtmKit:(ARtmKit * _Nonnull)kit peersOnlineStatusChanged:(NSArray< ARtmPeerOnlineStatus *> * _Nonnull)onlineStatus {
-    //被订阅用户在线状态改变回调
+    // 被订阅用户在线状态改变回调
     if (onlineStatus.count != 0) {
         ARtmPeerOnlineStatus *status = onlineStatus[0];
         if (status.state != ARtmPeerOnlineStateOnline) {
@@ -307,7 +327,7 @@
 
 - (void)rtmKit:(ARtmKit *)kit messageReceived:(ARtmMessage *)message fromPeer:(NSString *)peerId {
     if ([peerId isEqualToString:self.callerId]) {
-        //切换语音模式（通话中...）
+        // 切换语音模式（通话中...）
         if (message.text.length != 0) {
             NSDictionary *dic = [ARCallCommon dictionaryWithJSONString:message.text];
             NSString *value = [dic objectForKey:@"Cmd"];
@@ -330,11 +350,11 @@
 //MARK: - ARtmCallDelegate
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationReceivedByPeer:(ARtmLocalInvitation * _Nonnull)localInvitation {
-    //被叫已收到呼叫邀请
+    // 被叫已收到呼叫邀请
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationAccepted:(ARtmLocalInvitation * _Nonnull)localInvitation withResponse:(NSString * _Nullable) response {
-    //被叫已接受呼叫邀请
+    // 被叫已接受呼叫邀请
     self.callState = YES;
     [ARCallCommon playMusic:NO];
     if (response.length != 0) {
@@ -349,13 +369,22 @@
         [self switchCallMode:mode];
         [self becomeBroadcaster];
         self.stateLabel.hidden = YES;
+        
+        if ([dic.allKeys containsObject:@"VidCodec"]) {
+            NSArray *videCodecArr = [ARCallCommon fromJsonStringToArr:[dic objectForKey:@"VidCodec"]];
+            if (videCodecArr.count == 1) {
+                [self.rtcKit leaveChannel:nil];
+                [self watchConfiguration];
+                [self joinChannel];
+            }
+        }
     } else {
         [self endCall:ARtmCallStop];
     }
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationRefused:(ARtmLocalInvitation * _Nonnull)localInvitation withResponse:(NSString * _Nullable) response {
-    //被叫已拒绝呼叫邀请
+    // 被叫已拒绝呼叫邀请
     NSString *info = ARtmCallStop;
     if (response.length != 0) {
         NSDictionary *dic = [ARCallCommon dictionaryWithJSONString:response];
@@ -368,17 +397,17 @@
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationCanceled:(ARtmLocalInvitation * _Nonnull)localInvitation {
-    //呼叫邀请已被取消
+    // 呼叫邀请已被取消
     [self endCall:ARtmCallStop];
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationFailure:(ARtmLocalInvitation * _Nonnull)localInvitation errorCode:(ARtmLocalInvitationErrorCode)errorCode {
-    //呼叫邀请发送失败
+    // 呼叫邀请发送失败
     [self endCall:ARtmCallStop];
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationReceived:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
-    //收到一个呼叫邀请
+    // 收到一个呼叫邀请
     
     //通话中收到一个新的呼叫请求
     NSDictionary *dic = [[NSDictionary alloc] initWithObjectsAndKeys:@"Calling",@"Cmd",nil];
@@ -391,15 +420,15 @@
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationRefused:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
-    //拒绝呼叫邀请成功
+    // 拒绝呼叫邀请成功
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationAccepted:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
-    //接受呼叫邀请成功
+    // 接受呼叫邀请成功
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationCanceled:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
-    //主叫已取消呼叫邀请
+    // 主叫已取消呼叫邀请
     [ARCallCommon showInfoWithStatus:ARtmRemoteCanceledInvitation];
     if ([self.callerId isEqualToString:remoteInvitation.callerId]) {
         [self endCall:ARtmRemoteCanceledInvitation];
@@ -407,23 +436,22 @@
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationFailure:(ARtmRemoteInvitation * _Nonnull)remoteInvitation errorCode:(ARtmRemoteInvitationErrorCode) errorCode {
-    //来自对端的邀请失败
+    // 来自对端的邀请失败
 }
 
 //MARK: - ARtcEngineDelegate
 
 - (void)rtcEngine:(ARtcEngineKit *_Nonnull)engine firstRemoteVideoDecodedOfUid:(NSString *_Nonnull)uid size:(CGSize)size elapsed:(NSInteger)elapsed {
-    //已完成远端视频首帧解码回调
+    // 已完成远端视频首帧解码回调
     ARtcVideoCanvas *videoCanvas = [[ARtcVideoCanvas alloc] init];
     videoCanvas.uid = uid;
     videoCanvas.view = self.remoteView;
-    //初始化远端用户视图
     [self.rtcKit setupRemoteVideo:videoCanvas];
     self.remoteView.placeholderView.hidden = YES;
 }
 
 - (void)rtcEngine:(ARtcEngineKit *)engine didJoinedOfUid:(NSString *)uid elapsed:(NSInteger)elapsed {
-    //远端用户/主播加入回调
+    // 远端用户/主播加入回调
     [ARCallCommon playMusic:NO];
     @weakify(self);
     [self.rtmTimer creatGCDTimer:0 withTarget:self response:^(NSInteger index) {
@@ -438,7 +466,7 @@
       [self endCall:@"网络连接已断开"];
 }
 - (void)rtcEngine:(ARtcEngineKit *)engine didOfflineOfUid:(NSString *)uid reason:(ARUserOfflineReason)reason {
-    //远端用户（通信场景）/主播（直播场景）离开当前频道回调
+    // 远端用户（通信场景）/主播（直播场景）离开当前频道回调
     [self endCall:ARtmCallStop];
 }
 
@@ -448,7 +476,7 @@
     self.toolView.hidden = NO;
     self.callView.hidden = YES;
     self.hangupButton.hidden = NO;
-    //0视频 1语音
+    // 0视频 1语音
     self.switchButton.hidden = mode;
     self.switchCameraButton.hidden = mode;
     self.audioButton.hidden = !mode;

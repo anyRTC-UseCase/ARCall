@@ -66,6 +66,8 @@ UIKIT_EXTERN NSString *const ARtmCallUserExisting;
  字典转json字符串
 */
 + (NSString *)returnJSONStringWithDictionary:(NSDictionary *)dictionary;
++ (NSString *)fromArrToJSON:(NSArray *)arr;
++ (NSArray *)fromJsonStringToArr:(NSString *)jsonString;
 /**
  等分布局
 */
