@@ -51,8 +51,8 @@ abstract class BaseActivity : AppCompatActivity(), RtmClientListener, RtmCallEve
                 reconnectDialog?.show()
             } else if (state == 3) {
                 if (isReconnect) {
-                    if (reconnectDialog != null) {
-                        reconnectDialog!!.doDismiss()
+                    reconnectDialog?.let {
+                        it.doDismiss()
                     }
                     isReconnect = false
                     TipDialog.show(this@BaseActivity, "重连成功！", TipDialog.TYPE.SUCCESS).onDismissListener = OnDismissListener { }

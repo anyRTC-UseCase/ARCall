@@ -39,6 +39,8 @@ class RtcManager private constructor(){
                 put("Enable", 1)
             }.toString())
         }
+//        rtcEngine?.setParameters("{\"Cmd\":\"ConfPriCloudAddr\", \"ServerAdd\": \"pro.gateway.agrtc.cn\", \"Port\": 6080}")
+//        rtcEngine?.setParameters("{\"Cmd\":\"ConfPriEventAddr\", \"ServerAdd\": \"pro.gateway.agrtc.cn\", \"Port\": 6089}")
 
     }
 
