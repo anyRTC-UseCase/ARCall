@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -14,6 +14,10 @@
             <rect key="frame" x="0.0" y="0.0" width="186" height="186"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rg3-14-IWJ">
+                    <rect key="frame" x="0.0" y="0.0" width="186" height="186"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6cb-Ar-zDI">
                     <rect key="frame" x="0.0" y="0.0" width="186" height="186"/>
                     <subviews>
@@ -41,7 +45,7 @@
                             </constraints>
                         </imageView>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="等待接听" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bWX-07-Vqa">
-                            <rect key="frame" x="67" y="120.5" width="52.5" height="18.5"/>
+                            <rect key="frame" x="67" y="120.5" width="52" height="18.5"/>
                             <fontDescription key="fontDescription" name="PingFangSC-Regular" family="PingFang SC" pointSize="13"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <nil key="highlightedColor"/>
@@ -67,11 +71,15 @@
                     <state key="selected" image="icon_closemic"/>
                 </button>
             </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstItem="eMz-aY-bkI" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="3Fh-OL-Eb6"/>
                 <constraint firstItem="eMz-aY-bkI" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="3pP-mc-KzZ"/>
+                <constraint firstItem="rg3-14-IWJ" firstAttribute="bottom" secondItem="iN0-l3-epB" secondAttribute="bottom" id="7iq-l8-hxb"/>
+                <constraint firstItem="rg3-14-IWJ" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="HW0-4Y-gbR"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="6cb-Ar-zDI" secondAttribute="trailing" id="HbG-10-hmN"/>
+                <constraint firstItem="rg3-14-IWJ" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="KRT-b5-Zmm"/>
                 <constraint firstItem="Nro-p2-K4E" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="LPc-Hd-N0K"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="Nro-p2-K4E" secondAttribute="bottom" id="Wj3-iJ-YXl"/>
                 <constraint firstItem="6cb-Ar-zDI" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="deL-Bf-zTe"/>
@@ -79,15 +87,16 @@
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="6cb-Ar-zDI" secondAttribute="bottom" id="rZr-8F-lnE"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="eMz-aY-bkI" secondAttribute="bottom" id="t5S-Br-bsC"/>
                 <constraint firstItem="6cb-Ar-zDI" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="v8h-aY-xIH"/>
+                <constraint firstItem="rg3-14-IWJ" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailing" id="xgO-Qy-m6w"/>
             </constraints>
             <nil key="simulatedTopBarMetrics"/>
             <nil key="simulatedBottomBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <connections>
                 <outlet property="loadingImageView" destination="qGX-po-jWU" id="NO0-I4-q8M"/>
                 <outlet property="loadingView" destination="eMz-aY-bkI" id="JsK-Il-9mo"/>
                 <outlet property="placeholderView" destination="6cb-Ar-zDI" id="QVx-7O-oDP"/>
+                <outlet property="renderView" destination="rg3-14-IWJ" id="PaP-KQ-IXj"/>
                 <outlet property="stateLabel" destination="bWX-07-Vqa" id="9Tn-xS-nmw"/>
                 <outlet property="titleButton" destination="Nro-p2-K4E" id="zYY-Xr-XvZ"/>
             </connections>

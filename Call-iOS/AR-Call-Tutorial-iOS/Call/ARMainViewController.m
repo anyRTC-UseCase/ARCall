@@ -59,7 +59,7 @@
     for (UIButton *button in self.stackView.subviews) {
         [button addTarget:self action:@selector(didClickTextField:) forControlEvents:UIControlEventTouchUpInside];
     }
-    //隐藏键盘
+    // 隐藏键盘
     self.calleeIdTextField = [[UITextField alloc] initWithFrame:CGRectZero];
     self.calleeIdTextField.delegate = self;
     self.calleeIdTextField.keyboardType = UIKeyboardTypeNumberPad;
@@ -69,7 +69,7 @@
 
 - (IBAction)didClickCallButton:(id)sender {
     [ARCallCommon hideKeyBoard];
-    //当前是否正在通话
+    // 当前是否正在通话
     BOOL index = false;
     for (UIWindow *window in UIApplication.sharedApplication.windows) {
         if (window.tag == ARtmWindowIdentifier) {
@@ -79,7 +79,7 @@
     
     if (!index) {
         if (self.type) {
-            //多人呼叫
+            // 多人呼叫
             if (self.callArr.count != 0) {
                 [ARtmManager.rtmKit queryPeersOnlineStatus:self.callArr completion:^(NSArray<ARtmPeerOnlineStatus *> * _Nullable peerOnlineStatus, ARtmQueryPeersOnlineErrorCode errorCode) {
                     NSMutableArray *arr = [NSMutableArray array];
@@ -108,7 +108,7 @@
                 }];
             }
         } else {
-            //单人呼叫
+            // 单人呼叫
             __block NSString *calleeId = self.calleeIdTextField.text;
             if (![calleeId isEqualToString:[ARtmManager getLocalUid]]) {
                 if (calleeId.length == 4) {
@@ -137,7 +137,7 @@
 }
 
 - (void)makeRtmCall {
-    //点对点呼叫邀请
+    // 点对点呼叫邀请
     @weakify(self);
     [UIAlertController showActionSheetInViewController:self withTitle:nil message:nil cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@[@"视频呼叫",@"语音呼叫"] popoverPresentationControllerBlock:^(UIPopoverPresentationController * _Nonnull popover) {
         
@@ -183,7 +183,7 @@
 //MARK: - ARtmDelegate
 
 - (void)rtmKit:(ARtmKit * _Nonnull)kit connectionStateChanged:(ARtmConnectionState)state reason:(ARtmConnectionChangeReason)reason {
-    //连接状态改变回调
+    // 连接状态改变回调
     if (state == ARtmConnectionStateReconnecting && reason == ARtmConnectionChangeReasonInterrupted) {
         [ARCallCommon showInfoWithStatus:ARtmReconnection];
     }
@@ -191,42 +191,43 @@
 }
 
 - (void)rtmKit:(ARtmKit * _Nonnull)kit peersOnlineStatusChanged:(NSArray< ARtmPeerOnlineStatus *> * _Nonnull)onlineStatus {
-    //被订阅用户在线状态改变回调
+    // 被订阅用户在线状态改变回调
 }
 
 //MARK: - ARtmCallDelegate
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationReceivedByPeer:(ARtmLocalInvitation * _Nonnull)localInvitation {
-    //被叫已收到呼叫邀请
+    // 被叫已收到呼叫邀请
     NSLog(@"%@",ARtmReceivedInvitationByPeer);
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationAccepted:(ARtmLocalInvitation * _Nonnull)localInvitation withResponse:(NSString * _Nullable) response {
-    //被叫已接受呼叫邀请
+    // 被叫已接受呼叫邀请
     NSLog(@"%@",ARtmAcceptedInvitation);
     [ARCallCommon playMusic:NO];
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationRefused:(ARtmLocalInvitation * _Nonnull)localInvitation withResponse:(NSString * _Nullable) response {
-    //被叫已拒绝呼叫邀请
+    // 被叫已拒绝呼叫邀请
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationCanceled:(ARtmLocalInvitation * _Nonnull)localInvitation {
-    //呼叫邀请已被取消
+    // 呼叫邀请已被取消
     NSLog(@"%@",ARtmCanceledInvitation);
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit localInvitationFailure:(ARtmLocalInvitation * _Nonnull)localInvitation errorCode:(ARtmLocalInvitationErrorCode)errorCode {
-    //呼叫邀请发送失败
+    // 呼叫邀请发送失败
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationReceived:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
-    //收到一个呼叫邀请
+    // 收到一个呼叫邀请
     [ARCallCommon hideKeyBoard];
     NSDictionary *dic = [ARCallCommon dictionaryWithJSONString:remoteInvitation.content];
     NSString *channelId = [dic objectForKey:@"ChanId"];
     if ([[dic objectForKey:@"Conference"] boolValue]) {
-        //多人呼叫
+        
+        // 多人呼叫
         NSMutableArray *arr = [NSMutableArray arrayWithArray:[dic objectForKey:@"UserData"]];
         [arr removeObject:[ARtmManager getLocalUid]];
         
@@ -237,32 +238,38 @@
         meetVc.callArr = arr;
         ARtmManager.rtmWindow.rootViewController = meetVc;
     } else {
-        //点对点呼叫
+        
+        // 点对点呼叫
         ARCallViewController *callVc = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ARtm_Call"];
         callVc.remoteInvitation = remoteInvitation;
         callVc.calling = NO;
         callVc.callerId = remoteInvitation.callerId;
         callVc.channelId = [dic objectForKey:@"ChanId"];
         callVc.mode =  [[dic objectForKey:@"Mode"] intValue];
+        
+        if ([dic.allKeys containsObject:@"VidCodec"]) {
+            NSArray *videCodecArr = [ARCallCommon fromJsonStringToArr:[dic objectForKey:@"VidCodec"]];
+            (videCodecArr.count == 1) ? (callVc.isWatch = YES) : 0;
+        }
         ARtmManager.rtmWindow.rootViewController = callVc;
     }
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationRefused:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
-    //拒绝呼叫邀请成功
+    // 拒绝呼叫邀请成功
     NSLog(@"%@",ARtmRefusedInvitation);
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationAccepted:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
-    //接受呼叫邀请成功
+    // 接受呼叫邀请成功
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationCanceled:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
-    //主叫已取消呼叫邀请
+    // 主叫已取消呼叫邀请
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationFailure:(ARtmRemoteInvitation * _Nonnull)remoteInvitation errorCode:(ARtmRemoteInvitationErrorCode) errorCode {
-    //来自对端的邀请失败
+    // 来自对端的邀请失败
 }
 
 //MARK: - UITextFieldDelegate
@@ -295,7 +302,7 @@
 //MARK: - other
 
 - (void)removeLabel:(UIButton *)sender {
-    //删除标签
+    // 删除标签
     [self.callArr removeObjectAtIndex:sender.tag];
     self.rtmCollectionView.hidden = !self.callArr.count;
     [self.rtmCollectionView reloadData];
@@ -307,12 +314,12 @@
 }
 
 - (void)limitTextField:(UITextField *)textField {
-    //限制输入
+    // 限制输入
     if (textField.text.length > 4) {
         textField.text = [textField.text substringToIndex:4];
     }
     if (self.type) {
-        //多人呼叫
+        // 多人呼叫
         if (self.callArr.count < 6) {
             NSArray *arr = [ARCallCommon getSubString:textField.text];
             for (NSInteger i = 0; i < self.stackView.subviews.count; i++) {
@@ -348,7 +355,7 @@
             [ARCallCommon showInfoWithStatus:ARtmCallLimitMax];
         }
     } else {
-        //单人呼叫
+        // 单人呼叫
         if (textField.text.length == 4) {
             self.callButton.selected = YES;
             self.callButton.backgroundColor = [UIColor whiteColor];

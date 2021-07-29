@@ -27,6 +27,7 @@ typedef NS_ENUM(NSInteger, ARVideoSetting) {
 
 @interface ARVideoView : UIView
 
+@property (weak, nonatomic) IBOutlet UIView *renderView;
 @property (weak, nonatomic) IBOutlet UIView *placeholderView;
 @property (weak, nonatomic) IBOutlet UIView *loadingView;
 @property (weak, nonatomic) IBOutlet UIButton *titleButton;

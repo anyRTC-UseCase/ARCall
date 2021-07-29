@@ -12,11 +12,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ARCallViewController : UIViewController
 
+/** 0 视频 1 语音 */
 @property (nonatomic, assign) int mode;
 @property (nonatomic, copy) NSString * callerId;
 @property (nonatomic, copy) NSString * channelId;
 /** 主叫、被叫 */
 @property (nonatomic, assign) BOOL calling;
+@property (nonatomic, assign) BOOL isWatch;
 @property (nonatomic, strong) ARtmRemoteInvitation * remoteInvitation;
 
 @end

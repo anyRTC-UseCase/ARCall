@@ -44,7 +44,7 @@
 }
 
 - (void)startCountdown {
-    //开启60s倒计时
+    // 开启60s倒计时
     [self endCountdown];
     @weakify(self);
     [self.rtmTimer creatGCDTimer:60 withTarget:self response:^(NSInteger index) {

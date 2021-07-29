@@ -171,6 +171,37 @@ static AVAudioPlayer *player;
     return mutStr;
 }
 
++ (NSString *)fromArrToJSON:(NSArray *)arr {
+    // 数组转字符串
+    NSData *data=[NSJSONSerialization dataWithJSONObject:arr options:NSJSONWritingPrettyPrinted error:nil];
+    
+    NSString *jsonStr=[[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding];
+    
+    //去除空格和回车：
+    jsonStr = [jsonStr stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    jsonStr = [jsonStr stringByReplacingOccurrencesOfString:@" " withString:@""];
+    jsonStr = [jsonStr stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+    return jsonStr;
+}
+
++ (NSArray *)fromJsonStringToArr:(NSString *)jsonString {
+    // 字符串转数组
+    if (jsonString == nil) {
+        return nil;
+    }
+    
+    NSData *jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *err;
+    NSArray *arr = [NSJSONSerialization JSONObjectWithData:jsonData
+                                                        options:NSJSONReadingMutableContainers
+                                                          error:&err];
+    if(err) {
+        NSLog(@"json解析失败：%@",err);
+        return nil;
+    }
+    return arr;
+}
+
 //等分布局
 + (void)makeEqualViews:(NSArray *)views inView:(UIView *)containerView ItemWidth:(CGFloat)itemWidth itemHeight:(CGFloat)itemHeight warpCount:(NSInteger)warpCount{
     //可以通过lastView确定行列的位置

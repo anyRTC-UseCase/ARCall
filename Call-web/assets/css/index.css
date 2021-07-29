@@ -251,6 +251,26 @@ p {
 }
 
 /* meet page */
+@media screen and (max-width: 576px) {
+  .meet-view {
+    width: 100%;
+    height: 100%;
+    /* width: 400px;
+    height: 300px; */
+  }
+
+  .video-preview_little {
+    user-select: none;
+    margin: 20px;
+    width: 128px;
+    height: 96px;
+    z-index: 8;
+    background: #1c1c1c;
+    border: 1px solid #999999;
+    position: absolute;
+  }
+
+}
 
 @media (min-width: 576px) and (max-width: 767.98px) {
   .meet-view {
