@@ -1,0 +1,112 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages 
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "AR-Call",
+				"enablePullDownRefresh": false,
+				"navigationStyle": "custom",
+				"app-plus": {
+					"bounce": "none",
+					"titleView": false,
+					"subNVues": [{ // 弹窗
+						"id": "poPup", // 唯一标识  
+						"path": "paltfrom/app-plus/subNVue/poPup", // 页面路径  
+						/*"type": "popup",  这里不需要*/
+						"style": {
+							"position": "static",
+							"dock": "top",
+							"top": "80px",
+							"width": "100%",
+							"height": "100%",
+							"background": "transparent",
+							"zindex": 999
+						}
+					}]
+				}
+			}
+		}, {
+			"path": "pages/index/p2p",
+			"style": {
+				"navigationBarTitleText": "AR-Call",
+				"enablePullDownRefresh": false,
+				"navigationStyle": "custom",
+				"app-plus": {
+					"bounce": "none",
+					"titleView": false,
+					"subNVues": [{ // 弹窗
+						"id": "poPup-p2p", // 唯一标识  
+						"path": "paltfrom/app-plus/subNVue/poPup", // 页面路径  
+						/*"type": "popup",  这里不需要*/
+						"style": {
+							"position": "static",
+							"dock": "top",
+							"top": "80px",
+							"width": "100%",
+							"height": "100%",
+							"background": "transparent",
+							"zindex": 999
+						}
+					}]
+				}
+			}
+		}, {
+			"path": "pages/index/rtmPage",
+			"style": {
+				"navigationBarTitleText": "实时消息",
+				"enablePullDownRefresh": false,
+				"navigationStyle": "custom",
+				"app-plus": {
+					"bounce": "none",
+					"titleView": false,
+					"subNVues": [{ // 弹窗
+							"id": "poPup-rtm", // 唯一标识  
+							"path": "paltfrom/app-plus/subNVue/poPup", // 页面路径  
+							"style": {
+								"position": "static",
+								"dock": "top",
+								"top": "80px",
+								"width": "100%",
+								"height": "100%",
+								"background": "transparent",
+								"zindex": 999
+							}
+						},
+						{ // 弹窗
+							"id": "CavasViewRTC", // 唯一标识  
+							"path": "paltfrom/app-plus/subNVue/rtcPage", // 页面路径  
+							"style": {
+								"position": "static",
+								"dock": "top",
+								"width": "100%",
+								"height": "100%",
+								"background": "transparent",
+								"zindex": 888
+							}
+						}
+					]
+				}
+			}
+		}, {
+			"path": "pages/index/set",
+			"style": {
+				"navigationBarTitleText": "设置",
+				"enablePullDownRefresh": false,
+				"app-plus": {
+					"bounce": "none"
+				}
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+		// "navigationStyle":"custom",
+		// "app-plus": {
+		// 	"titleView": false
+		// }
+
+	}
+}

@@ -1,0 +1,67 @@
+<!-- 提示框 -->
+<template>
+	<view>
+		<view v-if="message" class="pop">
+			<text :class="['message',type]" v-if="typeoption === 'string'">{{message}}</text>
+			<view v-else>
+				<text v-for="item in message" :key="item" :class="['message',type]">{{item}}</text>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				type: 'info',
+				message: '',
+				typeoption: 'string',
+			}
+		},
+		mounted() {
+			uni.$on('paltfrom-popup', (data) => {
+				if (typeof data.message === 'string') {
+					this.typeoption = 'string';
+				} else {
+					this.typeoption = 'array';
+				}
+				this.message = data.message;
+				this.type = data.type;
+			})
+		}
+	}
+</script>
+
+<style scoped>
+	.message {
+		margin: 0 12px;
+		padding: 12px;
+		border-radius: 2px;
+		text-align: center;
+	}
+
+	// 消息
+	.info {
+		background-color: #f4f4f5;
+		color: #909399;
+	}
+
+	// 成功
+	.success {
+		background-color: #f0f9eb;
+		color: #67c23a;
+	}
+
+	// 警告
+	.warn {
+		background-color: #fdf6ec;
+		color: #e6a23c;
+	}
+
+	// 错误
+	.error {
+		background-color: #fef0f0;
+		color: #f56c6c;
+	}
+</style>

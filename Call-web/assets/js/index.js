@@ -1340,23 +1340,26 @@ var OperationPackge = {
     },
     // RTM 主叫: 被叫拒绝了你的呼叫邀请
     localInvitationRefused: async function (response) {
-      Utils.printLog(
-        "danger",
-        "Your invitation has been refused by " + Store.localInvitation.calleeId
-      );
-      // console.log("p2p 被叫拒绝了你的呼叫邀请", response);
-      // 呼叫邀请有效期清除计时
-      Store.invitationClearTimeout &&
-        clearTimeout(Store.invitationClearTimeout);
-      // 字符串转换
-      response ? (response = JSON.parse(response)) : "";
-      response.Cmd == "Calling"
-        ? Utils.alertWhole("呼叫的用户正在通话中", "alert-info")
-        : Utils.alertWhole("用户拒绝了你的呼叫邀请", "alert-info");
-      // 本地存储恢复
-      OperationPackge.public.restoreDefault();
-      // 隐藏呼叫邀请页面
-      PageShow.hiddenCallPage();
+      if (Store.localInvitation) {
+        Utils.printLog(
+          "danger",
+          "Your invitation has been refused by " +
+            Store.localInvitation.calleeId
+        );
+        // console.log("p2p 被叫拒绝了你的呼叫邀请", response);
+        // 呼叫邀请有效期清除计时
+        Store.invitationClearTimeout &&
+          clearTimeout(Store.invitationClearTimeout);
+        // 字符串转换
+        response ? (response = JSON.parse(response)) : "";
+        response.Cmd == "Calling"
+          ? Utils.alertWhole("呼叫的用户正在通话中", "alert-info")
+          : Utils.alertWhole("用户拒绝了你的呼叫邀请", "alert-info");
+        // 本地存储恢复
+        OperationPackge.public.restoreDefault();
+        // 隐藏呼叫邀请页面
+        PageShow.hiddenCallPage();
+      }
     },
     // RTM 主叫: 呼叫邀请进程失败
     localInvitationFailure: async function (response) {
@@ -1771,8 +1774,8 @@ var OperationPackge = {
     },
     // RTM 主叫: 被叫拒绝呼叫邀请
     LocalInvitationRefused: async function (response) {
-      // console.log("被叫拒绝呼叫邀请");
-      response = JSON.parse(response);
+      // console.log("被叫拒绝呼叫邀请",response);
+      response = response ? JSON.parse(response) : '';
       // 更新用户状态及窗口显示 - 对方已拒绝
       await Utils.updateUserViewStatus(response.refuseId, 2);
       if (response.Cmd == "Calling") {

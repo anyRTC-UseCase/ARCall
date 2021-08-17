@@ -1,0 +1,430 @@
+<!-- rtc 实时音视频 -->
+<template>
+	<view v-if="show">
+		<!-- 语音通话 -->
+		<view class="conent" :style="{width: windowWidth + 'px',height: windowHeight + 'px'}" v-if="mode === 1">
+			<view style="justify-content: center;align-items: center;margin-top: 160px;">
+				<image style="width: 120px;height: 120px;" src="../../../static/icon_head.png"></image>
+				<text class="icon_text">{{peerId}}</text>
+			</view>
+			<!-- 计时器 -->
+			<view class="timer">
+				<text class="icon_text">{{timeCall}}</text>
+			</view>
+			<view class="audio_bottom">
+				<view class=""></view>
+				<!-- 音频 -->
+				<view class="icon" @click="enableLocalAudioFn">
+					<image class="icon_img" src="../../../static/icon_openaudio.png" v-if="audio"></image>
+					<image class="icon_img" src="../../../static/icon_closeaudio.png" v-else></image>
+					<text class="icon_text">静音</text>
+				</view>
+				<!-- 挂断 -->
+				<view class="icon" @click="leaveFn">
+					<image class="icon_img" src="../../../static/icon_hangup.png" mode=""></image>
+					<text class="icon_text">挂断</text>
+				</view>
+				<!-- 免提 -->
+				<view class="icon" @click="SpeakerphoneFn">
+					<image class="icon_img" src="../../../static/icon_speakers.png" v-if="Speakerphone"></image>
+					<image class="icon_img" src="../../../static/icon_speaker.png" v-else></image>
+					<text class="icon_text">免提</text>
+				</view>
+				<view class=""></view>
+			</view>
+		</view>
+		<!-- 视频通话 -->
+		<view class="conent" :style="{width: windowWidth + 'px',height: windowHeight + 'px'}" v-else>
+			<!-- 远端视频 -->
+			<view v-if="switchover" class="remote" :style="{width: windowWidth + 'px',height: windowHeight + 'px'}">
+				<AR-CanvasView ref="remote" style="flex: 1;" />
+			</view>
+			<view v-else class="remote" :style="{width: windowWidth + 'px',height: windowHeight + 'px'}">
+				<AR-CanvasView ref="location" style="flex: 1;" />
+			</view>
+			<view class="option">
+				<!-- 本地视频 -->
+				<view v-if="switchover" class="location" ref="move" @touchstart="drag_start">
+					<AR-CanvasView ref="location" style="flex: 1;" />
+				</view>
+				<view v-else class="location" ref="move" @touchstart="drag_start">
+					<AR-CanvasView ref="remote" style="flex: 1;" />
+				</view>
+				<!-- 计时器 -->
+				<view class="timer">
+					<text class="icon_text">{{timeCall}}</text>
+				</view>
+				<!-- 相关操作 -->
+				<view class="relevant">
+					<view class="relevant_top">
+						<!-- 转语音 -->
+						<view class="icon" @click="toSpeechFn">
+							<image class="icon_img" src="../../../static/icon_switch_voice.png" mode=""></image>
+							<text class="icon_text">语音</text>
+						</view>
+					</view>
+
+					<view class="relevant_bottom">
+						<!-- 音频 -->
+						<view class="icon" @click="enableLocalAudioFn">
+							<image class="icon_img" src="../../../static/icon_openaudio.png" v-if="audio"></image>
+							<image class="icon_img" src="../../../static/icon_closeaudio.png" v-else></image>
+							<text class="icon_text">静音</text>
+						</view>
+						<!-- 挂断 -->
+						<view class="icon" @click="leaveFn">
+							<image class="icon_img" src="../../../static/icon_hangup.png" mode=""></image>
+							<text class="icon_text">挂断</text>
+						</view>
+						<!-- 视频 -->
+						<view class="icon" @click="switchCameraFn">
+							<image class="icon_img" src="../../../static/icon_switch.png" v-if="video"></image>
+							<image class="icon_img" src="../../../static/icon_switchs.png" v-else></image>
+							<text class="icon_text">翻转</text>
+						</view>
+					</view>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import RTC from "../../../until/rtc.js";
+	import {
+		RTCUtils,
+		Utils
+	} from "../../../until/until.js";
+	const BindingX = uni.requireNativePlugin('bindingx');
+	export default {
+		data() {
+			return {
+				show: '',
+				windowWidth: 200,
+				windowHeight: 400,
+
+				audio: true, // 音频开关
+				video: true, // 摄像头前后
+				Speakerphone: true, // 免提
+
+				switchover: true, // 大小切换
+				// 本地视频移动
+				position: { // 记录当前位置
+					x: 0,
+					y: 0
+				},
+
+				timer: false,
+				channel: '', // 频道房间
+				peerId: '', // 远端用户
+				mode: 0, // 0 视频 1 语音
+
+				timeCall: '00:00', // 通话计时
+				timeCallIntil: null, // 计时定时器
+			}
+		},
+		created() {
+
+
+			let _this = this;
+			uni.getSystemInfo({
+				success: function(res) {
+					_this.windowWidth = res.windowWidth;
+					_this.windowHeight = res.windowHeight;
+				}
+			})
+		},
+		mounted() {
+			let oOne = true;
+			// 监测 rtc 模块开启
+			uni.$on('CavasViewRtc', data => {
+				this.show = data.content;
+				if (data.content && oOne) {
+					oOne = false;
+					const info = JSON.parse(data.content);
+					// 远端用户
+					this.peerId = data.callerId || data.calleeId;
+					// 频道房间
+					this.channel = info.ChanId;
+					// 判断语音、视频
+					this.mode = info.Mode;
+					this.init(info);
+				} else {
+					this.timeCallIntil && clearInterval(this.timeCallIntil);
+				}
+			});
+			// 监测 rtc 远端视频通话转语音通话
+			uni.$on("rtc-SwitchAudio", data => {
+				console.log("监测 rtc 远端视频通话转语音通话", data);
+				if (data.message === "SwitchAudio") {
+					RTC.toSpeech();
+					this.$nextTick(() => {
+						this.mode = 1;
+					})
+				}
+			});
+		},
+		methods: {
+			// 本地远端视频切换
+			switchFn() {
+				this.switchover = !this.switchover;
+				this.$nextTick(() => {
+					uni.$emit("location-cavasview", {
+						location: this.$refs.location,
+						remote: this.$refs.remote,
+					});
+					setTimeout(async () => {
+						await RTC.localVideo({
+							channel: this.channel,
+							uid: this.$store.state.uid
+						});
+						await RTC.remotenableVideo({
+							channel: this.channel,
+							uid: this.peerId
+						});
+					}, 500);
+				})
+			},
+			// 免提
+			SpeakerphoneFn() {
+				this.Speakerphone = !this.Speakerphone;
+				RTC.setEnableSpeakerphone(this.Speakerphone);
+			},
+			// 挂断
+			leaveFn() {
+				// 发送挂断信息 （ArCall 逻辑所需）
+				uni.$emit("sendMessageToPeer", {
+					peerid: this.peerId,
+					Cmd: "EndCall",
+				});
+				/**
+				 * 如果你只在一个页面写 可以直接调 destory 
+					如果你是用的单例 离开页面引擎不销毁 就用 leaveChannel
+				 */
+				// RTC.leave();
+				RTC.destroyRtc();
+			},
+			// 音频开关
+			enableLocalAudioFn() {
+				this.audio = !this.audio;
+				RTC.enableLocalAudio(this.audio);
+			},
+			// 转到语音通话
+			toSpeechFn() {
+				uni.$emit("sendMessageToPeer", {
+					peerid: this.peerId,
+					Cmd: "SwitchAudio",
+				})
+				RTC.toSpeech();
+				this.$nextTick(() => {
+					this.mode = 1;
+				})
+			},
+			// 前后摄像头转换
+			switchCameraFn() {
+				this.video = !this.video;
+				RTC.switchCamera();
+			},
+			async init(data) {
+				// 计时
+				this.timerCallFn();
+				this.$nextTick(() => {
+					uni.$emit("location-cavasview", {
+						location: this.$refs.location,
+						remote: this.$refs.remote,
+						VideoConfig: this.$store.state.VideoConfig,
+						mode: this.mode,
+						uid: this.$store.state.uid,
+						channelId: this.channel,
+					});
+				})
+				// 初始化
+				await RTC.init(this.$store.state.etAudioAiNoise);
+				await RTC.joinChannel({
+					"token": "",
+					"channelId": data.ChanId + '',
+					"uid": this.$store.state.uid,
+					mode: this.mode,
+				});
+			},
+			// 计时
+			timerCallFn() {
+				let second = 0;
+				let oM = 0; // 分钟
+				this.timeCallIntil = setInterval(() => {
+					second += 1;
+					if (second >= 60) {
+						second = 0;
+						oM += 1;
+					}
+					this.timeCall = (oM >= 10 ? oM : ('0' + oM)) + ':' + (second >= 10 ? second : ('0' + second));
+				}, 1000)
+			},
+			// 拖动
+			drag_start(e) {
+				// 获取 el
+				const move = Utils.getEl(this.$refs.move);
+				let obj = BindingX.bind({
+					anchor: move,
+					eventType: 'pan',
+					props: [{
+							element: move,
+							property: 'transform.translateX',
+							expression: `x+${this.position.x}`,
+						},
+						{
+							element: move,
+							property: 'transform.translateY',
+							expression: `y+${this.position.y}`, // 
+						}
+					]
+				}, (e) => {
+					if (e.state === 'end') {
+						if (this.timer) { //移动时间特别短暂 视为点击事件
+							clearTimeout(this.timer);
+							this.switchFn();
+						}
+						BindingX.unbind({
+							token: obj.token,
+							eventType: 'pan'
+						})
+						//记录位置 
+						this.position.x += e.deltaX;
+						this.position.y += e.deltaY;
+						// x轴边界
+						if (-this.position.x >= (this.windowWidth - 193)) {
+							this.position.x = 193 - this.windowWidth;
+						}
+						if (this.position.x > 0) {
+							this.position.x = 0;
+						}
+						// y 轴边界 
+						if (this.position.y < 0) {
+							this.position.y = 0;
+						}
+						if (this.position.y >= (this.windowHeight - 244)) {
+							this.position.y = this.windowHeight - 244;
+						}
+						this.endAmaier();
+					} else {
+						this.timer = setTimeout(() => {
+							this.timer = null;
+						}, 50)
+					}
+				});
+			},
+			// 结束动画
+			endAmaier() {
+				const my = Utils.getEl(this.$refs.move);
+				let result = BindingX.bind({
+					eventType: 'timing',
+					exitExpression: 't>200',
+					props: [{
+							element: my,
+							property: 'transform.translateX',
+							expression: "easeOutElastic(t," + this.position.x + "," + 0 +
+								",200)",
+						},
+						{
+							element: my,
+							property: 'transform.translateY',
+							expression: "easeOutElastic(t," + this.position.y + "," + 0 +
+								",200)",
+						}
+					]
+				}, (e) => {
+					if (e.state === 'end' || e.state === 'exit') {
+						BindingX.unbind({
+							token: result.token,
+							eventType: 'timing'
+						})
+					}
+				});
+			},
+		}
+	}
+</script>
+
+<style scoped>
+	.conent {
+		background-color: #333333;
+		position: relative;
+		width: 100%;
+	}
+
+	.option {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+	}
+
+	.location {
+		width: 153px;
+		height: 204px;
+		border-radius: 6px;
+		position: fixed;
+		top: 60px;
+		right: 20px;
+		background-color: #2C405A;
+	}
+
+	.relevant {
+		position: absolute;
+		bottom: 20px;
+		left: 0;
+		right: 0;
+		padding: 0 20px;
+		flex-direction: column;
+		/* justify-content: space-around; */
+	}
+
+	.relevant_top {
+		flex-direction: row;
+		justify-content: flex-end;
+		margin-bottom: 20px;
+	}
+
+	.relevant_bottom {
+		flex-direction: row;
+		justify-content: space-between;
+	}
+
+	.icon {
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.icon_img {
+		width: 60px;
+		height: 60px;
+		border-radius: 60px;
+		margin-bottom: 10px;
+	}
+
+	.icon_text {
+		color: #FFFFFF;
+	}
+
+	.audio_bottom {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 20px;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0 20px;
+	}
+
+	.timer {
+		position: fixed;
+		bottom: 140px;
+		left: 0;
+		right: 0;
+		justify-content: center;
+		align-items: center;
+	}
+</style>
