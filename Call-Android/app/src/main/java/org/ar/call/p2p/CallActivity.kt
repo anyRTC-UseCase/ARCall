@@ -157,16 +157,13 @@ class CallActivity :BaseActivity(){
             }
             val isMultiple = JSONObject(remote?.content)["Conference"]
             Intent().let {
-                if (isMultiple==1&&isMultiple==true){
+                if (isMultiple==1||isMultiple==true){
                     it.setClass(this@CallActivity,MultiCallActivity::class.java)
                 }else{
                     it.setClass(this@CallActivity,VideoActivity::class.java)
                 }
                 it.putExtra("RecCall",true)
                 startActivity(it)
-            }
-            if (isMultiple==1&&isMultiple==true){
-                finish()
             }
         }
     }

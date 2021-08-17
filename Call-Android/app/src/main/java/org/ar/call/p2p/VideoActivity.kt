@@ -181,7 +181,6 @@ class VideoActivity : BaseActivity() {
         isCalling = true
         stopRing()
         if (callMode == Constans.AUDIO_MODE) {
-            RtcManager.instance.getRtcEngine()!!.muteLocalVideoStream(true)
             binding.flVideoGroup.visibility = View.GONE
             binding.flAudioGroup.visibility = View.VISIBLE
             binding.tvRemoteAudioUser!!.text = remoteUserId
@@ -199,7 +198,6 @@ class VideoActivity : BaseActivity() {
         if (callMode == Constans.VIDEO_MODE) {
             binding.rlVideoPreview.removeAllViews()
             Toast.makeText(this@VideoActivity, "声音将通过扬声器播放", Toast.LENGTH_SHORT).show()
-            RtcManager.instance.getRtcEngine()!!.muteLocalVideoStream(false)
             setupLocalVideo()
             RtcManager.instance.getRtcEngine()!!.setEnableSpeakerphone(true)
         } else {
@@ -806,7 +804,7 @@ class VideoActivity : BaseActivity() {
             binding.flVideoGroup.visibility = View.GONE
             binding.flAudioGroup.visibility = View.VISIBLE
             binding.tvRemoteAudioUser.text = remoteUserId
-            RtcManager.instance.getRtcEngine()!!.muteLocalVideoStream(true)
+            RtcManager.instance.getRtcEngine()!!.disableVideo()
             RtcManager.instance.getRtcEngine()!!.setEnableSpeakerphone(false)
             if (EasyFloat.appFloatIsShow()){
                 dismissFloatWindow()
@@ -881,7 +879,7 @@ class VideoActivity : BaseActivity() {
         remoteInvitation!!.response = jsonObject.toString()
         rtmCallManager!!.acceptRemoteInvitation(remoteInvitation!!, null)
         binding.rlVideoPreview!!.removeAllViews()
-        RtcManager.instance.getRtcEngine()!!.muteLocalVideoStream(true)
+        RtcManager.instance.getRtcEngine()!!.disableVideo()
         stopRing()
     }
 

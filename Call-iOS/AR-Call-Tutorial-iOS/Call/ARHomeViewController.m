@@ -54,12 +54,13 @@
 }
 
 - (void)rtmCallKit:(ARtmCallKit * _Nonnull)callKit remoteInvitationReceived:(ARtmRemoteInvitation * _Nonnull)remoteInvitation {
-    //收到一个呼叫邀请
+    // 收到一个呼叫邀请
     [ARCallCommon hideKeyBoard];
     NSDictionary *dic = [ARCallCommon dictionaryWithJSONString:remoteInvitation.content];
     NSString *channelId = [dic objectForKey:@"ChanId"];
+    
     if ([[dic objectForKey:@"Conference"] boolValue]) {
-        //多人呼叫
+        // 多人呼叫
         NSMutableArray *callArr = [NSMutableArray array];
         
         [callArr addObjectsFromArray:[dic objectForKey:@"UserData"]];
@@ -71,15 +72,22 @@
         meetVc.channelId = channelId;
         meetVc.callArr = callArr;
         ARtmManager.rtmWindow.rootViewController = meetVc;
+        
     } else {
-        //点对点呼叫
+        // 点对点呼叫
         ARCallViewController *callVc = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"ARtm_Call"];
         callVc.remoteInvitation = remoteInvitation;
         callVc.calling = NO;
         callVc.callerId = remoteInvitation.callerId;
         callVc.channelId = [dic objectForKey:@"ChanId"];
         callVc.mode =  [[dic objectForKey:@"Mode"] intValue];
+        
+        if ([dic.allKeys containsObject:@"VidCodec"]) {
+            NSArray *videCodecArr = [ARCallCommon fromJsonStringToArr:[dic objectForKey:@"VidCodec"]];
+            (videCodecArr.count == 1) ? (callVc.isWatch = YES) : 0;
+        }
         ARtmManager.rtmWindow.rootViewController = callVc;
+        
     }
 }
 

@@ -507,6 +507,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/AR-Call-Tutorial-iOS",
 					"$(PROJECT_DIR)/AR-Call-Tutorial-iOS/ARtcKit",
+					"$(PROJECT_DIR)",
 				);
 				GCC_PREFIX_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/PrefixHeader.pch";
 				INFOPLIST_FILE = "AR-Call-Tutorial-iOS/Info.plist";
@@ -537,6 +538,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/AR-Call-Tutorial-iOS",
 					"$(PROJECT_DIR)/AR-Call-Tutorial-iOS/ARtcKit",
+					"$(PROJECT_DIR)",
 				);
 				GCC_PREFIX_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/PrefixHeader.pch";
 				INFOPLIST_FILE = "AR-Call-Tutorial-iOS/Info.plist";

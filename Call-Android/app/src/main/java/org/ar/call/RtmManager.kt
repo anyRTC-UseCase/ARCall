@@ -51,6 +51,9 @@ class RtmManager private constructor(){
         rtmClient = RtmClient.createInstance(context, BuildConfig.APPID, RtmEvent())
         callManager = rtmClient?.rtmCallManager
         callManager?.setEventListener(CallEvent())
+
+//        rtmClient?.setParameters("{\"Cmd\":\"ConfPriEventAddr\", \"ServerAdd\": \"pro.gateway.agrtc.cn\", \"Port\": 6089}")
+//        rtmClient?.setParameters("{\"Cmd\":\"ConfPriCloudAddr\", \"ServerAdd\": \"pro.gateway.agrtc.cn\", \"Port\": 7080}")
     }
 
     fun createChannel(channelId: String): RtmChannel? {

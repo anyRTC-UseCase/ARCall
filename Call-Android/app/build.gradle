@@ -10,8 +10,8 @@ android {
         applicationId "org.ar.call"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 28
-        versionName "1.2.7"
+        versionCode 29
+        versionName "1.2.8"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
