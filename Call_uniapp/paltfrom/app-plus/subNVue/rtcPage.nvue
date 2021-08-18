@@ -124,8 +124,6 @@
 			}
 		},
 		created() {
-
-
 			let _this = this;
 			uni.getSystemInfo({
 				success: function(res) {
@@ -226,26 +224,39 @@
 				RTC.switchCamera();
 			},
 			async init(data) {
-				// 计时
-				this.timerCallFn();
-				this.$nextTick(() => {
-					uni.$emit("location-cavasview", {
-						location: this.$refs.location,
-						remote: this.$refs.remote,
-						VideoConfig: this.$store.state.VideoConfig,
+				try {
+					// 分辨率
+					const oDataVideoConfig = uni.getStorageSync('DataVideoConfig');
+					console.log("分辨率", oDataVideoConfig);
+					// 降噪存储
+					const oEtAudioAiNoise = uni.getStorageSync('etAudioAiNoise');
+					console.log("降噪存储", oEtAudioAiNoise);
+					// 计时
+					this.timerCallFn();
+					this.$nextTick(() => {
+						uni.$emit("location-cavasview", {
+							location: this.$refs.location,
+							remote: this.$refs.remote,
+							VideoConfig: Object.assign(oDataVideoConfig, {
+								"bitrate": 0,
+								"orientationMode": 0
+							}),
+							mode: this.mode,
+							uid: this.$store.state.uid,
+							channelId: this.channel,
+						});
+					})
+					// 初始化
+					await RTC.init(oEtAudioAiNoise);
+					await RTC.joinChannel({
+						"token": "",
+						"channelId": data.ChanId + '',
+						"uid": this.$store.state.uid,
 						mode: this.mode,
-						uid: this.$store.state.uid,
-						channelId: this.channel,
 					});
-				})
-				// 初始化
-				await RTC.init(this.$store.state.etAudioAiNoise);
-				await RTC.joinChannel({
-					"token": "",
-					"channelId": data.ChanId + '',
-					"uid": this.$store.state.uid,
-					mode: this.mode,
-				});
+				} catch (e) {
+					// error
+				}
 			},
 			// 计时
 			timerCallFn() {

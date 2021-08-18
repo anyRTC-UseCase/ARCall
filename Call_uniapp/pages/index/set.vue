@@ -20,7 +20,7 @@
 		<!-- AI 智能降噪 -->
 		<view class="type flex">
 			<text>AI 智能降噪</text>
-			<switch @change="switchFn" style="transform:scale(0.7)" />
+			<switch :checked="switchOpen" @change="switchFn" style="transform:scale(0.7)" />
 		</view>
 	</view>
 </template>
@@ -34,13 +34,45 @@
 				resolutionList: ['240 * 320', '480 * 640', '720 * 1280'],
 				// 帧率
 				frameRate: '15',
-				frameRateList: ['15', '24', '30']
+				frameRateList: ['15', '24', '30'],
+				dataVideoConfig: {},
+				switchOpen: false,
 			}
+		},
+		created() {
+			const _this = this;
+			// 获取分辨率存储
+			uni.getStorage({
+				key: 'DataVideoConfig',
+				success: function(res) {
+					if (res.data) {
+						_this.dataVideoConfig = res.data;
+						_this.resolution = res.data.width + ' * ' + res.data.height;
+						if (res.data.frameRate) {
+							_this.frameRate = res.data.frameRate + '';
+						}
+					}
+				}
+			});
+			// 获取降噪存储
+			uni.getStorage({
+				key: 'etAudioAiNoise',
+				success: function(res) {
+					_this.switchOpen = res.data ? res.data : false;
+				}
+			});
 		},
 		methods: {
 			// 开启智能降噪
 			switchFn(e) {
-				this.$store.dispatch('upDataetAudioAiNoise', e.target.value)
+				// 本地存储
+				uni.setStorage({
+					key: 'etAudioAiNoise',
+					data: e.target.value,
+					success: function(res) {
+						console.log('降噪存储成功', e.target.value);
+					}
+				});
 			},
 			// 分辨率
 			async resolutionFn() {
@@ -55,10 +87,17 @@
 				this.resolution = this.resolutionList[oIndex.tapIndex];
 				// 设置 分辨率
 				const oSplit = this.resolution.split('*');
-				this.$store.dispatch('upDataVideoConfig', {
-					width: Number(oSplit[0]),
-					height: Number(oSplit[1])
-				})
+				// 本地存储
+				uni.setStorage({
+					key: 'DataVideoConfig',
+					data: Object.assign(this.dataVideoConfig, {
+						width: Number(oSplit[0]),
+						height: Number(oSplit[1])
+					}),
+					success: function(res) {
+						console.log('本地分辨率存储成功', this.dataVideoConfig);
+					}
+				});
 			},
 			// 帧率
 			async frameRateFn() {
@@ -71,10 +110,16 @@
 					});
 				})
 				this.frameRate = this.frameRateList[oIndex.tapIndex];
-				// 设置帧率
-				this.$store.dispatch('upDataVideoConfig', {
-					frameRate: Number(this.frameRate)
-				})
+				// 本地存储
+				uni.setStorage({
+					key: 'DataVideoConfig',
+					data: Object.assign(this.dataVideoConfig, {
+						frameRate: Number(this.frameRate)
+					}),
+					success: function() {
+						console.log('本地分辨率存储成功',this.dataVideoConfig);
+					}
+				});
 			}
 		}
 	}
