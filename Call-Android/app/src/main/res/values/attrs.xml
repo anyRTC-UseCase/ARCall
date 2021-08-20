@@ -1,45 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="CodeEditText">
-        <attr name="strokeLength" format="integer" />
-        <attr name="strokeWidth" format="dimension" />
-        <attr name="strokeHeight" format="dimension" />
-        <attr name="strokePadding" format="dimension" />
-        <attr name="strokeBackground" format="reference" />
+
+
+
+    <declare-styleable name="SeparatedEditText">
+        <attr name="password" format="boolean" />
+        <attr name="showCursor" format="boolean" />
+        <attr name="highLightEnable" format="boolean" />
+        <attr name="highLightBefore" format="boolean" />
+        <attr name="separateType" format="reference|integer" />
+        <attr name="maxLength" format="integer" />
+        <attr name="corner" format="dimension" />
+        <attr name="borderColor" format="color|reference" />
+        <attr name="blockColor" format="color|reference" />
+        <attr name="textColor" format="color|reference" />
+        <attr name="highlightColor" format="color|reference" />
+        <attr name="highlightStyle" format="reference|integer" />
+        <attr name="blockSpacing" format="dimension" />
+        <attr name="cursorDuration" format="integer" />
+        <attr name="cursorWidth" format="dimension" />
+        <attr name="cursorColor" format="color|reference" />
+        <attr name="borderWidth" format="dimension" />
+        <attr name="showKeyboard" format="boolean" />
+        <attr name="errorColor" format="color|reference" />
     </declare-styleable>
 
-    <declare-styleable name="CodeEditView">
-        <attr name="textColor" format="color"/>
-        <attr name="textSize" format="integer"/>
-        <attr name="borderSize" format="integer"/>
-        <attr name="borderMargin" format="integer"/>
-        <attr name="borderNum" format="integer"/>
-    </declare-styleable>
+    <integer name="type_hollow">1</integer>
+    <integer name="type_solid">2</integer>
+    <integer name="type_underline">3</integer>
 
-    <!-- 自定义输入框-->
-    <declare-styleable name="VerificationCodeView">
-        <!--输入框的数量-->
-        <attr name="icv_et_number" format="integer" />
-        <!--输入框的宽度-->
-        <attr name="icv_et_width" format="dimension|reference" />
-        <!--输入框之间的分割线-->
-        <attr name="icv_et_divider_drawable" format="reference" />
-        <!--输入框文字颜色-->
-        <attr name="icv_et_text_color" format="color|reference" />
-        <!--输入框文字大小-->
-        <attr name="icv_et_text_size" format="dimension|reference" />
-        <!--输入框获取焦点时边框-->
-        <attr name="icv_et_bg_focus" format="reference" />
-        <!--输入框没有焦点时边框-->
-        <attr name="icv_et_bg_normal" format="reference" />
-        <!--是否是密码模式-->
-        <attr name="icv_et_pwd" format="boolean" />
-        <!--密码模式时,圆的半径-->
-        <attr name="icv_et_pwd_radius" format="dimension|reference" />
-        <!--输入框的无焦点时背景颜色-->
-        <attr name="icv_colors_normal" format="reference" />
-        <!--输入框的有焦点时背景颜色-->
-        <attr name="icv_colors_focus" format="reference" />
-    </declare-styleable>
+    <integer name="style_solid">1</integer>
+    <integer name="style_border">2</integer>
 
 </resources>

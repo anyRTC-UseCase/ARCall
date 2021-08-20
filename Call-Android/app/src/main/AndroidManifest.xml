@@ -3,47 +3,49 @@
     package="org.ar.call">
 
     <application
-        android:name=".CallApp"
+        android:name=".CallApplication"
         android:allowBackup="true"
         android:icon="@mipmap/img_launch"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <service android:name=".utils.KeepAliveService"></service>
-        <activity android:name=".multi.MultiVideosActivity"
-            android:screenOrientation="portrait"
-            android:launchMode="singleInstance"></activity>
+        android:theme="@style/Theme.ARCall">
         <activity
-            android:name=".SettingActivity"
-            android:screenOrientation="portrait" />
-
-        <activity android:name=".p2p.CallActivity"
-            android:screenOrientation="portrait"></activity>
+            android:name=".ui.SettingActivity"
+            android:exported="true" />
         <activity
-            android:name=".p2p.VideoActivity"
-            android:screenOrientation="portrait"
-            android:launchMode="singleInstance"/>
-
-        <activity android:name=".multi.MultiCallActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".MainActivity"
-            android:screenOrientation="portrait"
-           >
+            android:name=".ui.GroupVideoActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ui.GroupCallActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ui.P2PVideoActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ui.P2PActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ui.SplashActivity"
+            android:exported="true"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true" />
     </application>
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.REORDER_TASKS" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"></uses-permission>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
 </manifest>

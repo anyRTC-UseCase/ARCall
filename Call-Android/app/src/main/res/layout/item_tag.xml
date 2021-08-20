@@ -2,26 +2,26 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/rl_tag"
-    android:layout_width="@dimen/dp_102"
+    android:layout_width="102dp"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/dp_15"
+    android:layout_marginTop="15dp"
     android:background="@drawable/shape_tag_bg">
 
     <TextView
         android:id="@+id/tv_tag"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/dp_44"
+        android:layout_height="44dp"
         android:layout_centerVertical="true"
         android:gravity="center"
-        android:layout_marginLeft="@dimen/dp_13"
-        android:textSize="@dimen/sp_14"
+        android:layout_marginLeft="13dp"
+        android:textSize="14sp"
         android:textColor="@color/white"
         android:text="1111"/>
 
     <ImageView
         android:id="@+id/iv_delete_tag"
         android:layout_width="wrap_content"
-        android:padding="@dimen/dp_12"
+        android:padding="12dp"
         android:layout_height="wrap_content"
         android:src="@drawable/delete_tag"
         android:layout_centerVertical="true"

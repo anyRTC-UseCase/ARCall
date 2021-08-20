@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="@dimen/dp_125"
-    android:layout_height="@dimen/dp_125">
+    android:layout_width="125dp"
+    android:layout_height="125dp">
 
 
     <RelativeLayout
@@ -44,7 +44,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:textColor="@color/white"
-        android:textSize="@dimen/sp_8"
+        android:textSize="8sp"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/loading"
         android:text="等待接听" />
@@ -53,16 +53,16 @@
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/dp_20"
-        android:background="@color/layout_video_bg"
+        android:layout_height="20dp"
+        android:background="#B2000000"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/iv_audio"
-            android:layout_width="@dimen/dp_11"
-            android:layout_height="@dimen/dp_15"
-            android:layout_marginLeft="@dimen/dp_6"
+            android:layout_width="11dp"
+            android:layout_height="15dp"
+            android:layout_marginLeft="6dp"
             android:layout_gravity="center"
             android:background="@drawable/mic_close"/>
 
@@ -71,9 +71,9 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="00000"
-            android:textSize="@dimen/sp_10"
-            android:layout_marginRight="@dimen/dp_6"
-            android:layout_marginLeft="@dimen/dp_6"
+            android:textSize="10sp"
+            android:layout_marginRight="6dp"
+            android:layout_marginLeft="6dp"
             android:gravity="center"
             android:textColor="@color/white"/>
     </LinearLayout>

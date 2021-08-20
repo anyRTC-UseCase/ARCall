@@ -2,43 +2,52 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_gravity="center"
     android:layout_height="wrap_content">
 
     <LinearLayout
-        android:layout_width="@dimen/dp_270"
-        android:layout_height="@dimen/dp_191"
+        android:layout_width="270dp"
+        android:layout_height="191dp"
+        android:layout_centerInParent="true"
         android:background="@drawable/invite_dialog"
         android:orientation="vertical">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/sp_15"
-            android:layout_marginTop="@dimen/dp_32"
+            android:textSize="15sp"
+            android:layout_marginTop="32dp"
             android:textColor="@color/black"
             android:gravity="center"
             android:text="邀请用户"/>
 
-        <org.ar.call.weight.VerificationCodeView
-            android:id="@+id/et_invite"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/dp_50"
-            android:layout_marginTop="@dimen/dp_24"
-            app:icv_et_bg_focus="@drawable/invite_dialog_bg"
-            app:icv_et_bg_normal="@drawable/invite_dialog_bg"
-            app:icv_et_number="4"
-            app:icv_et_text_color="#606060"
-            app:icv_et_text_size="@dimen/sp_20"
-            app:icv_et_width="@dimen/dp_43"/>
+        <org.ar.call.view.SeparatedEditText
+            android:id="@+id/et_user"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginRight="12dp"
+            android:layout_marginLeft="12dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="24dp"
+            android:inputType="number"
+            app:corner="6dp"
+            app:separateType="@integer/type_hollow"
+            app:maxLength="4"
+            app:showKeyboard="false"
+            app:blockSpacing="12dp"
+            app:borderWidth="1dp"
+            app:blockColor="@color/white"
+            app:borderColor="#606060"
+            app:textColor="#606060"
+            ></org.ar.call.view.SeparatedEditText>
 
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:layout_marginTop="@dimen/dp_20"
+            android:layout_marginTop="20dp"
             android:orientation="horizontal">
 
             <TextView
@@ -47,7 +56,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:textSize="@dimen/sp_17"
+                android:textSize="17sp"
                 android:text="取消"/>
 
             <TextView
@@ -57,11 +66,12 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:textColor="#40A3FB"
-                android:textSize="@dimen/sp_17"
+                android:textSize="17sp"
                 android:text="确定"></TextView>
         </LinearLayout>
 
     </LinearLayout>
+
 
 
 
