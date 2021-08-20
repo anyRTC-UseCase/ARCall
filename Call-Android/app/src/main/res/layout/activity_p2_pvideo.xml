@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="#2C3033"
+    android:paddingTop="24dp"
+    android:layout_height="match_parent">
+
+
+
+
+    <FrameLayout
+        android:id="@+id/fl_audio_group"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:id="@+id/rl_audio"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/iv_user"
+                android:layout_width="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/img_user_icon"
+                android:layout_marginTop="120dp"
+                android:layout_height="wrap_content">
+            </ImageView>
+
+            <TextView
+                android:id="@+id/tv_remote_audio_user"
+                android:layout_width="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textColor="#ffffff"
+                android:textStyle="bold"
+                android:textSize="22sp"
+                android:layout_below="@+id/iv_user"
+                android:layout_marginTop="12dp"
+                android:layout_height="wrap_content"
+                android:text="0000">
+
+            </TextView>
+
+
+
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+
+            <LinearLayout
+                android:id="@+id/ll_audio_btns"
+                android:layout_width="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:gravity="center_horizontal"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="20dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/ibtn_audio_audio"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="静音"
+                    android:textSize="11sp"
+                    android:textColor="@color/white"
+                    android:background="@null"
+                    android:drawablePadding="13dp"
+                    android:drawableTop="@drawable/selector_audio_manager"
+                    android:layout_height="wrap_content">
+                </Button>
+                <Button
+                    android:id="@+id/ibtn_audio_hang_Up"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:text="挂断"
+                    android:textSize="11sp"
+                    android:textColor="@color/white"
+                    android:drawablePadding="13dp"
+                    android:drawableTop="@drawable/img_hang_up"></Button>
+
+                <Button
+                    android:id="@+id/ibtn_audio_speak"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="免提"
+                    android:textSize="11sp"
+                    android:textColor="@color/white"
+                    android:drawablePadding="13dp"
+                    android:background="@null"
+                    android:drawableTop="@drawable/selector_voice"
+                    android:layout_height="wrap_content">
+
+                </Button>
+
+            </LinearLayout>
+            <ImageButton
+                android:id="@+id/btn_audio_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:background="@null"
+                android:visibility="invisible"
+                android:src="@drawable/img_small"
+                ></ImageButton>
+        </RelativeLayout>
+
+    </FrameLayout>
+    <FrameLayout
+        android:id="@+id/fl_video_group"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <org.ar.call.weight.DragViewLayout
+            android:id="@+id/rl_video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <RelativeLayout
+                android:id="@+id/rl_remote_video"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:background="#2C3033"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="center"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/img_logo_dark_big"></ImageView>
+            </RelativeLayout>
+
+
+
+            <RelativeLayout
+                android:id="@+id/rl_local_video"
+                android:layout_width="90dp"
+                android:layout_height="160dp">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#1C1C1C"
+                    android:scaleType="center"
+                    android:src="@drawable/img_logo_dark_small"></ImageView>
+
+            </RelativeLayout>
+
+
+        </org.ar.call.weight.DragViewLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_btn_group"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_marginBottom="22dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_alignParentBottom="true"
+                android:gravity="center_horizontal"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/ibtn_audio"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:text="静音"
+                    android:textColor="@color/white"
+                    android:drawablePadding="13dp"
+                    android:visibility="gone"
+                    android:drawableTop="@drawable/selector_audio_manager"
+                    android:layout_height="wrap_content">
+                </Button>
+
+
+                <Button
+                    android:id="@+id/ibtn_switch_audio"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:drawablePadding="13dp"
+                    android:text="切换至语音"
+                    android:textColor="@color/white"
+                    android:drawableTop="@drawable/img_switch_audio"
+                    android:layout_height="wrap_content">
+                </Button>
+
+
+                <Button
+                    android:id="@+id/ibtn_hang_Up"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="20dp"
+                    android:background="@null"
+                    android:text="挂断"
+                    android:textSize="11sp"
+                    android:textColor="@color/white"
+                    android:drawablePadding="13dp"
+                    android:drawableTop="@drawable/img_hang_up"></Button>
+
+
+
+                <Button
+                    android:id="@+id/ibtn_video"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:visibility="gone"
+                    android:background="@null"
+                    android:drawableTop="@drawable/selector_video_manager"
+                    android:layout_height="wrap_content">
+                </Button>
+
+
+                <Button
+                    android:id="@+id/btn_switch"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:drawablePadding="13dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:background="@null"
+                    android:text="翻转摄像头"
+                    android:drawableTop="@drawable/selector_switch"
+                    ></Button>
+                <Button
+                    android:id="@+id/ibtn_speak"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:drawablePadding="13dp"
+                    android:text="免提"
+                    android:visibility="gone"
+                    android:textColor="@color/white"
+                    android:drawableTop="@drawable/selector_voice"
+                    android:layout_height="wrap_content">
+
+                </Button>
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btn_small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:background="@null"
+                android:visibility="invisible"
+                android:src="@drawable/img_small"
+                ></ImageButton>
+        </RelativeLayout>
+
+    </FrameLayout>
+    <Chronometer
+        android:id="@+id/chronometer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="140dp"
+        android:textColor="#ffffff"
+        android:textSize="15sp" />
+
+
+    <RelativeLayout
+        android:id="@+id/rl_call_pre"
+        android:background="@drawable/img_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:id="@+id/rl_video_preview"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#80000000"></ImageView>
+        </RelativeLayout>
+
+
+        <ImageView
+            android:id="@+id/iv_pre_user"
+            android:layout_width="wrap_content"
+            android:gravity="center"
+            android:textSize="50sp"
+            android:src="@drawable/img_user_icon"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="140dp">
+        </ImageView>
+
+        <TextView
+            android:id="@+id/tv_user_pre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="24dp"
+            android:text="0000"
+            android:textColor="@color/white"
+            android:layout_below="@+id/iv_pre_user"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp"></TextView>
+
+        <TextView
+            android:id="@+id/tv_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="呼叫中"
+            android:textSize="15sp"
+            android:textColor="@color/white"
+            android:layout_marginTop="14dp"
+            android:layout_below="@+id/tv_user_pre"
+            android:layout_centerHorizontal="true">
+        </TextView>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="20dp">
+            <Button
+                android:id="@+id/btn_hangup"
+                android:layout_width="wrap_content"
+                android:drawableTop="@drawable/img_hang_up"
+                android:background="@null"
+                android:visibility="gone"
+                android:textColor="@color/white"
+                android:textSize="11sp"
+                android:layout_alignParentBottom="true"
+                android:drawablePadding="13dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="35dp"
+                android:text="挂断"
+                >
+            </Button>
+            <Button
+                android:id="@+id/btn_accept"
+                android:layout_width="wrap_content"
+                android:drawableTop="@drawable/img_accept"
+                android:text="接听"
+                android:visibility="gone"
+                android:layout_alignParentBottom="true"
+                android:textColor="@color/white"
+                android:textSize="11sp"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="35dp"
+                android:drawablePadding="13dp"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                >
+            </Button>
+
+            <Button
+                android:id="@+id/btn_switch_audio"
+                android:layout_width="wrap_content"
+                android:drawableTop="@drawable/img_switch_audio"
+                android:text="语音接听"
+                android:layout_alignParentRight="true"
+                android:layout_above="@+id/btn_accept"
+                android:layout_marginRight="35dp"
+                android:textColor="@color/white"
+                android:visibility="gone"
+                android:layout_marginBottom="28dp"
+                android:textSize="11sp"
+                android:drawablePadding="13dp"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                >
+            </Button>
+
+        </RelativeLayout>
+
+        <ImageButton
+            android:id="@+id/btn_call_wait_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:visibility="gone"
+            android:background="@null"
+            android:src="@drawable/img_small"
+            ></ImageButton>
+
+
+
+    </RelativeLayout>
+
+
+
+
+
+
+</RelativeLayout>
+

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#3C3C3C"
+    android:paddingTop="24dp"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:background="#FF232426">
+
+        <ImageView
+            android:id="@+id/btn_multi_pack_up"
+            android:layout_width="wrap_content"
+            android:padding="12dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:visibility="invisible"
+            android:src="@drawable/img_small"/>
+
+        <Chronometer
+            android:visibility="gone"
+            android:id="@+id/chronometer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_centerInParent="true"
+            android:textColor="#ffffff"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tv_waiting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="等待接听"
+            android:textColor="#ffffff"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/btn_invite"
+            android:layout_width="wrap_content"
+            android:padding="12dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/dp_10"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/invite"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/ll_btn_devices"
+            android:layout_marginBottom="16dp">
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <LinearLayout
+            android:id="@+id/ll_btn_devices"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:gravity="center_horizontal"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/ll_btn_devices_hang_up"
+            android:layout_marginBottom="26dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_audio"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:text="静音"
+                android:drawablePadding="@dimen/dp_10"
+                android:textSize="11sp"
+                android:textColor="@color/white"
+                android:drawableTop="@drawable/selector_audio_manager"
+                android:layout_height="wrap_content">
+            </Button>
+
+            <Button
+                android:id="@+id/btn_speak"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:textSize="11sp"
+                android:text="免提"
+                android:textColor="@color/white"
+                android:drawablePadding="@dimen/dp_10"
+                android:drawableTop="@drawable/selector_voice"
+                android:layout_height="wrap_content"/>
+            <Button
+                android:id="@+id/btn_video"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:textSize="11sp"
+                android:text="关闭摄像头"
+                android:textColor="@color/white"
+                android:drawablePadding="@dimen/dp_10"
+                android:drawableTop="@drawable/selector_video_manager"
+                android:layout_height="wrap_content">
+            </Button>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/ll_btn_devices_hang_up"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:gravity="center_horizontal"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                android:layout_weight="1"
+                android:background="@null"
+                android:textSize="11sp"
+                android:textColor="@color/white" />
+
+            <Button
+                android:id="@+id/btn_hang_up"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:text="挂断"
+                android:textSize="11sp"
+                android:textColor="@color/white"
+                android:drawablePadding="13dp"
+                android:drawableTop="@drawable/img_hang_up"/>
+
+            <Button
+                android:id="@+id/btn_switch"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:drawablePadding="13dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:background="@null"
+                android:text="翻转摄像头"
+                android:drawableTop="@drawable/selector_switch"/>
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>

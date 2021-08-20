@@ -1,0 +1,122 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/img_bg"
+    tools:context=".ui.P2PActivity">
+    <RelativeLayout
+        android:id="@+id/rl_top"
+        android:layout_width="match_parent"
+        android:layout_marginTop="24dp"
+        android:layout_height="wrap_content">
+        <ImageButton
+            android:id="@+id/btn_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/img_setting"
+            android:background="@null"
+            android:layout_alignParentRight="true"
+            android:padding="12dp"
+            ></ImageButton>
+
+
+        <ImageButton
+            android:id="@+id/iv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:padding="12dp"
+            android:src="@drawable/img_back"></ImageButton>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="点对点呼叫邀请"
+            android:textSize="15sp"
+            android:layout_centerInParent="true"
+            android:textColor="@color/white"
+            android:layout_centerHorizontal="true"></TextView>
+    </RelativeLayout>
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:id="@+id/tv_tip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:layout_marginLeft="35dp"
+                android:layout_marginTop="80dp"
+                android:textSize="14sp"
+                android:text="请输入对方的ID"></TextView>
+
+
+            <org.ar.call.view.SeparatedEditText
+                android:id="@+id/et_user"
+                android:layout_width="match_parent"
+                android:layout_height="43dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="12dp"
+                android:inputType="number"
+                app:corner="6dp"
+                app:separateType="@integer/type_solid"
+                app:maxLength="4"
+                app:showKeyboard="false"
+                app:blockSpacing="12dp"
+                app:blockColor="@color/white"
+                app:textColor="#606060"
+                ></org.ar.call.view.SeparatedEditText>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                ></Space>
+
+            <Button
+                android:id="@+id/btn_call"
+                android:layout_width="301dp"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/tv_user"
+                android:text="开始呼叫"
+                android:layout_gravity="center"
+                android:textColor="#40A3FB"
+                android:background="@drawable/select_btn"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="45dp"></Button>
+
+            <TextView
+                android:id="@+id/tv_user"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="130dp"
+                android:layout_below="@+id/btn_login"
+                android:textSize="14sp"
+                android:textColor="@color/white"
+                android:text="您的呼叫ID:0000"></TextView>
+
+
+        </LinearLayout>
+    </ScrollView>
+
+
+
+
+
+
+</LinearLayout>

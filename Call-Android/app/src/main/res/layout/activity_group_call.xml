@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="24dp"
+    android:background="@drawable/img_bg">
+
+    <RelativeLayout
+        android:id="@+id/rl_input_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+
+        <RelativeLayout
+            android:id="@+id/rl_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/btn_setting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:background="@null"
+                android:padding="12dp"
+                android:src="@drawable/img_setting"></ImageButton>
+
+
+            <ImageButton
+                android:id="@+id/iv_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:padding="12dp"
+                android:src="@drawable/img_back"></ImageButton>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerInParent="true"
+                android:text="多人呼叫邀请"
+                android:textColor="@color/white"
+                android:textSize="15sp"></TextView>
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/text_tip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/et_user"
+            android:layout_marginLeft="35dp"
+            android:layout_marginTop="30dp"
+            android:drawableLeft="@drawable/tip_white"
+            android:drawablePadding="6dp"
+            android:padding="5dp"
+            android:text="点击X图标可删除当前ID"
+            android:textColor="@color/white"
+            android:visibility="invisible"></TextView>
+
+
+        <TextView
+            android:id="@+id/tv_input_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rl_top"
+            android:layout_marginLeft="35dp"
+            android:layout_marginTop="35dp"
+            android:text="请输入对方ID，可输入多个"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_user"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="130dp"
+            android:gravity="center"
+            android:text="您的呼叫ID:0000"
+            android:textColor="@color/white"
+            android:textSize="14sp"></TextView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_tag"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/text_tip"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"></androidx.recyclerview.widget.RecyclerView>
+
+        <org.ar.call.view.SeparatedEditText
+            android:id="@+id/et_user"
+            android:layout_width="match_parent"
+            android:layout_height="43dp"
+            android:layout_below="@+id/tv_input_tip"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="12dp"
+            android:inputType="number"
+            app:blockColor="@color/white"
+            app:blockSpacing="12dp"
+            app:corner="6dp"
+            app:maxLength="4"
+            app:separateType="@integer/type_solid"
+            app:showKeyboard="false"
+            app:textColor="#606060"></org.ar.call.view.SeparatedEditText>
+
+        <Button
+            android:id="@+id/btn_call"
+            android:layout_width="301dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/rv_tag"
+            android:layout_marginTop="45dp"
+            android:layout_marginBottom="45dp"
+            android:background="@drawable/select_btn"
+            android:text="开始呼叫"
+            android:textColor="#40A3FB"></Button>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/rl_wait_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <ImageView
+            android:id="@+id/iv_multi_user"
+            android:layout_width="wrap_content"
+            android:gravity="center"
+            android:src="@drawable/img_user_icon"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="140dp">
+        </ImageView>
+
+        <TextView
+            android:id="@+id/tv_call_user_arr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:text="0000 1111 2222 3333 4444 5555"
+            android:textColor="@color/white"
+            android:layout_below="@+id/iv_multi_user"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp"/>
+
+        <TextView
+            android:id="@+id/tv_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="呼叫中..."
+            android:textSize="15sp"
+            android:textColor="@color/white"
+            android:layout_marginTop="14dp"
+            android:layout_centerHorizontal="true">
+        </TextView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="40dp">
+            <Button
+                android:id="@+id/btn_multi_hangup"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/img_hang_up"
+                android:background="@null"
+                android:textColor="@color/white"
+                android:textSize="11sp"
+                android:drawablePadding="13dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:text="挂断"
+                android:onClick="HangUp"
+                android:layout_marginRight="12dp"/>
+            <Button
+                android:id="@+id/btn_multi_accept"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/img_accept"
+                android:text="接听"
+                android:onClick="Accept"
+                android:textColor="@color/white"
+                android:textSize="11sp"
+                android:drawablePadding="13dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:background="@null"/>
+        </LinearLayout>
+    </RelativeLayout>
+</RelativeLayout>
