@@ -1,4 +1,4 @@
-package org.ar.call.weight;
+package org.ar.call.view;
 
 import android.content.Context;
 import android.util.AttributeSet;

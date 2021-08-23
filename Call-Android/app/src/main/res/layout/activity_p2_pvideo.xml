@@ -122,7 +122,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <org.ar.call.weight.DragViewLayout
+        <org.ar.call.view.DragViewLayout
             android:id="@+id/rl_video"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -157,7 +157,7 @@
             </RelativeLayout>
 
 
-        </org.ar.call.weight.DragViewLayout>
+        </org.ar.call.view.DragViewLayout>
 
         <RelativeLayout
             android:id="@+id/rl_btn_group"

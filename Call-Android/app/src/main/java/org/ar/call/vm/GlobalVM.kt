@@ -2,8 +2,10 @@ package org.ar.call.vm
 
 import androidx.collection.ArraySet
 import androidx.lifecycle.*
-import org.ar.call.BuildConfig
 import kotlinx.coroutines.launch
+import org.ar.call.BuildConfig
+import org.ar.call.BuildConfig.APPID
+import org.ar.call.CallApplication
 import org.ar.call.utils.launch
 import org.ar.rtm.*
 import org.json.JSONObject
@@ -46,7 +48,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
 
     private val rtmClient by lazy {
         RtmClient.createInstance(
-            org.ar.call.CallApplication.callApp.applicationContext,
+            CallApplication.callApp.applicationContext,
             BuildConfig.APPID,
             RtmEvent()
         )

@@ -1,4 +1,4 @@
-package io.anyrtc.arcall
+package org.anyrtc.arcall
 
 import org.junit.Test
 

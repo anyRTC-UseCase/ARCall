@@ -18,7 +18,7 @@ class CallApplication :Application(), ViewModelStoreOwner{
 
     override fun onCreate() {
         super.onCreate()
-       CallApplication.Companion.callApp = this
+        callApp = this
         SpUtil.init(this)
         DialogX.init(this)
         DialogX.cancelButtonText="取消"
