@@ -21,6 +21,7 @@ import org.ar.call.utils.toast
 import org.ar.call.vm.RtcVM
 import org.ar.rtc.Constants
 import org.ar.rtm.LocalInvitation
+import org.ar.rtm.RemoteInvitation
 import org.ar.rtm.RtmChannelMember
 import org.json.JSONArray
 import org.json.JSONObject
@@ -256,7 +257,7 @@ class GroupVideoActivity : BaseActivity() {
             }
         }
         if (leftIndex != -1) {
-            memberAdapter.remove(leftIndex)
+            memberAdapter.removeAt(leftIndex)
         }
         if (callArray?.contains(userId)!!) {
             callArray?.remove(userId)
@@ -267,7 +268,13 @@ class GroupVideoActivity : BaseActivity() {
             finish()
         }
     }
-
+    override fun onRemoteInvitationReceived(var1: RemoteInvitation?) {
+        runOnUiThread {
+            callViewModel.refuse(var1!!,JSONObject().apply {
+                put("Cmd","Calling")
+            }.toString())
+        }
+    }
 
     override fun onLocalInvitationAccepted(var1: LocalInvitation?, var2: String?) {
         super.onLocalInvitationAccepted(var1, var2)

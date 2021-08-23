@@ -197,6 +197,14 @@ class P2PVideoActivity : BaseActivity() {
         }
     }
 
+    override fun onRemoteInvitationReceived(var1: RemoteInvitation?) {
+        runOnUiThread {
+                callViewModel.refuse(var1!!,JSONObject().apply {
+                    put("Cmd","Calling")
+                }.toString())
+        }
+    }
+
 
     override fun onRemoteInvitationRefused(var1: RemoteInvitation?) {
         super.onRemoteInvitationRefused(var1)

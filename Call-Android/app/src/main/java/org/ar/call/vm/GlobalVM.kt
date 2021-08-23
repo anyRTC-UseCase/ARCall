@@ -64,7 +64,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
         events = rtmEvents
     }
 
-    fun unRegister(rtmEvents: RtmEvents) {
+    fun unRegister() {
         events = null
     }
 
@@ -115,6 +115,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
                 block.invoke(onlineArray)
                 }
             }
+
 
             override fun onFailure(var1: ErrorInfo?) {
                 viewModelScope.launch {
@@ -291,12 +292,13 @@ class GlobalVM : ViewModel(), LifecycleObserver {
             }
             remoteInvitationArray.add(var1!!)
             viewModelScope.launch {
-                    events?.onRemoteInvitationReceived(var1)
+                    if (isBackground){//如果是在后台 则不分发这个收到呼叫 因为安卓10或国内一些rom限制后台启动activity
+                        //todo 可以加本地通知
+                        needReCallBack = true
+                    }else{
+                        events?.onRemoteInvitationReceived(var1)
+                    }
             }
-            if (isBackground){
-                needReCallBack = true
-            }
-
         }
         //返回给被叫的回调：接受呼叫邀请成功。
         override fun onRemoteInvitationAccepted(var1: RemoteInvitation?) {

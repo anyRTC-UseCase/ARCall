@@ -81,17 +81,4 @@ open class BaseActivity : AppCompatActivity(), RtmEvents {
         }
     }
 
-    override fun onRemoteInvitationReceived(var1: RemoteInvitation?) {
-        runOnUiThread {
-            if (this is P2PVideoActivity ||this is GroupVideoActivity){
-                callViewModel.refuse(var1!!,JSONObject().apply {
-                    put("Cmd","Calling")
-                }.toString())
-                return@runOnUiThread
-            }
-        }
-    }
-
-
-
 }
