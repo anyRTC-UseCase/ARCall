@@ -66,10 +66,6 @@ open class BaseActivity : AppCompatActivity(), RtmEvents {
         callViewModel.register(this)
     }
 
-    override fun onStop() {
-        super.onStop()
-        callViewModel.unRegister(this)
-    }
     override fun onConnectionStateChanged(state: Int, reason: Int) {
         super.onConnectionStateChanged(state, reason)
         runOnUiThread {

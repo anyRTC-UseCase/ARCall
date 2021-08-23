@@ -90,7 +90,7 @@ class SettingActivity : BaseActivity() {
             val jsonObject = JSONObject(var1?.content)
             val isConference = jsonObject["Conference"]
             Intent().apply {
-                putExtra("RecCall",true)
+                putExtra("isCalled",true)
                 setClass(this@SettingActivity,if (isConference==1||isConference==true){
                     GroupCallActivity::class.java
                 }else{

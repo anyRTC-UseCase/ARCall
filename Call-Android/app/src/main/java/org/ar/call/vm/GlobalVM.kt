@@ -27,9 +27,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
         if (needReCallBack){
             viewModelScope.launch {
                 if (currentRemoteInvitation!=null){
-                    eventsArray.forEach {
-                        it.onRemoteInvitationReceived(currentRemoteInvitation)
-                    }
+                    events?.onRemoteInvitationReceived(currentRemoteInvitation)
                 }
             }
             needReCallBack = false
@@ -43,7 +41,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
 
 
     val userId = ((Math.random() * 9 + 1) * 1000L).toInt().toString()
-    private val eventsArray = mutableListOf<RtmEvents>()
+    private var events:RtmEvents? = null
 
 
     private val rtmClient by lazy {
@@ -63,13 +61,11 @@ class GlobalVM : ViewModel(), LifecycleObserver {
     var rtmChannel: RtmChannel? = null
 
     fun register(rtmEvents: RtmEvents) {
-        if (rtmEvents !in eventsArray) {
-            eventsArray.add(rtmEvents)
-        }
+        events = rtmEvents
     }
 
     fun unRegister(rtmEvents: RtmEvents) {
-        eventsArray.remove(rtmEvents)
+        events = null
     }
 
     suspend fun login() = suspendCoroutine<Boolean> {
@@ -226,7 +222,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
     }
 
     fun release() {
-        eventsArray.clear()
+        events = null
         rtmClient.logout(null)
         rtmClient.release()
     }
@@ -247,24 +243,18 @@ class GlobalVM : ViewModel(), LifecycleObserver {
 
     private inner class RtmEvent : RtmClientListener {
         override fun onConnectionStateChanged(state: Int, reason: Int) {
-            eventsArray.forEach {
-                it.onConnectionStateChanged(state, reason)
-            }
+                events?.onConnectionStateChanged(state, reason)
         }
 
         override fun onMessageReceived(var1: RtmMessage?, var2: String?) {
-            eventsArray.forEach {
-                it.onMessageReceived(var1)
-            }
+            events?.onMessageReceived(var1)
         }
 
         override fun onTokenExpired() {
         }
 
         override fun onPeersOnlineStatusChanged(var1: MutableMap<String, Int>?) {
-            eventsArray.forEach {
-                it.onPeersOnlineStatusChanged(var1)
-            }
+                events?.onPeersOnlineStatusChanged(var1)
         }
 
     }
@@ -272,37 +262,27 @@ class GlobalVM : ViewModel(), LifecycleObserver {
     private inner class CallEvent : RtmCallEventListener{
         //返回给主叫的回调：被叫已收到呼叫邀请。
         override fun onLocalInvitationReceivedByPeer(var1: LocalInvitation?) {
-            eventsArray.forEach {
-                it.onLocalInvitationReceivedByPeer(var1)
-            }
+            events?.onLocalInvitationReceivedByPeer(var1)
 
         }
 
         //返回给主叫的回调：被叫已接受呼叫邀请
         override fun onLocalInvitationAccepted(var1: LocalInvitation?, var2: String?) {
-            eventsArray.forEach {
-                it.onLocalInvitationAccepted(var1, var2)
-            }
+                events?.onLocalInvitationAccepted(var1, var2)
         }
 
         //返回给主叫的回调：被叫已拒绝呼叫邀请。
         override fun onLocalInvitationRefused(var1: LocalInvitation?, var2: String?) {
-            eventsArray.forEach {
-                it.onLocalInvitationRefused(var1, var2)
-            }
+                events?.onLocalInvitationRefused(var1, var2)
         }
 
         //返回给主叫的回调：呼叫邀请已被成功取消。
         override fun onLocalInvitationCanceled(var1: LocalInvitation?) {
-            eventsArray.forEach {
-                it.onLocalInvitationCanceled(var1)
-            }
+                events?.onLocalInvitationCanceled(var1)
         }
         //返回给主叫的回调：发出的呼叫邀请过程失败。
         override fun onLocalInvitationFailure(var1: LocalInvitation?, var2: Int) {
-            eventsArray.forEach {
-                it.onLocalInvitationFailure(var1, var2)
-            }
+                events?.onLocalInvitationFailure(var1, var2)
         }
         //返回给被叫的回调：收到一条呼叫邀请。SDK 会同时返回一个 RemoteInvitation 对象供被叫管理。
         override fun onRemoteInvitationReceived(var1: RemoteInvitation?) {
@@ -311,9 +291,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
             }
             remoteInvitationArray.add(var1!!)
             viewModelScope.launch {
-                eventsArray.forEach {
-                    it.onRemoteInvitationReceived(var1)
-                }
+                    events?.onRemoteInvitationReceived(var1)
             }
             if (isBackground){
                 needReCallBack = true
@@ -322,9 +300,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
         }
         //返回给被叫的回调：接受呼叫邀请成功。
         override fun onRemoteInvitationAccepted(var1: RemoteInvitation?) {
-            eventsArray.forEach {
-                it.onRemoteInvitationAccepted(var1)
-            }
+                events?.onRemoteInvitationAccepted(var1)
             if (currentRemoteInvitation?.callerId.equals(var1!!.callerId)){
                 currentRemoteInvitation = null
             }
@@ -336,9 +312,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
 
         //返回给被叫的回调：拒绝呼叫邀请成功
         override fun onRemoteInvitationRefused(var1: RemoteInvitation?) {
-            eventsArray.forEach {
-                it.onRemoteInvitationRefused(var1)
-            }
+                events?.onRemoteInvitationRefused(var1)
             if (currentRemoteInvitation?.callerId.equals(var1!!.callerId)){
                 currentRemoteInvitation = null
             }
@@ -349,9 +323,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
         }
 
         override fun onRemoteInvitationCanceled(var1: RemoteInvitation?) {
-            eventsArray.forEach {
-                it.onRemoteInvitationCanceled(var1)
-            }
+            events?.onRemoteInvitationCanceled(var1)
             if (currentRemoteInvitation?.callerId.equals(var1!!.callerId)){
                 currentRemoteInvitation = null
             }
@@ -362,9 +334,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
         }
 
         override fun onRemoteInvitationFailure(var1: RemoteInvitation?, var2: Int) {
-            eventsArray.forEach {
-                it.onRemoteInvitationFailure(var1, var2)
-            }
+                events?.onRemoteInvitationFailure(var1, var2)
             if (currentRemoteInvitation?.callerId.equals(var1!!.callerId)){
                 currentRemoteInvitation = null
             }
@@ -384,25 +354,19 @@ class GlobalVM : ViewModel(), LifecycleObserver {
         }
 
         override fun onMessageReceived(var1: RtmMessage?, var2: RtmChannelMember?) {
-            eventsArray.forEach {
-                it.onMessageReceived(var1)
-            }
+                events?.onMessageReceived(var1)
         }
 
         override fun onMemberJoined(var1: RtmChannelMember?) {
             viewModelScope.launch {
-                eventsArray.forEach {
-                    it.onMemberJoined(var1)
-                }
+                    events?.onMemberJoined(var1)
             }
 
         }
 
         override fun onMemberLeft(var1: RtmChannelMember?) {
             viewModelScope.launch {
-                eventsArray.forEach {
-                    it.onMemberLeft(var1)
-                }
+                    events?.onMemberLeft(var1)
             }
         }
     }
