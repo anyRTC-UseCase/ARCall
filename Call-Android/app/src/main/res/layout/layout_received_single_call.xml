@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@+id/rl_call_pre"
+    android:background="@drawable/img_bg"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout
+        android:id="@+id/rl_video_preview"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#80000000"></ImageView>
+    </RelativeLayout>
+
+
+    <ImageView
+        android:id="@+id/iv_pre_user"
+        android:layout_width="wrap_content"
+        android:gravity="center"
+        android:textSize="50sp"
+        android:src="@drawable/img_user_icon"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="140dp">
+    </ImageView>
+
+    <TextView
+        android:id="@+id/tv_user_pre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="24dp"
+        android:text="0000"
+        android:textColor="@color/white"
+        android:layout_below="@+id/iv_pre_user"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"></TextView>
+
+    <TextView
+        android:id="@+id/tv_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="呼叫中"
+        android:textSize="15sp"
+        android:textColor="@color/white"
+        android:layout_marginTop="14dp"
+        android:layout_below="@+id/tv_user_pre"
+        android:layout_centerHorizontal="true">
+    </TextView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/space">
+        <Button
+            android:id="@+id/btn_hangup"
+            android:layout_width="wrap_content"
+            android:drawableTop="@drawable/img_hang_up"
+            android:background="@null"
+            android:visibility="gone"
+            android:textColor="@color/white"
+            android:layout_marginBottom="28dp"
+            android:textSize="11sp"
+            android:layout_alignParentBottom="true"
+            android:drawablePadding="13dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="35dp"
+            android:text="挂断"
+            >
+        </Button>
+        <Button
+            android:id="@+id/btn_accept"
+            android:layout_width="wrap_content"
+            android:drawableTop="@drawable/img_accept"
+            android:text="接听"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="35dp"
+            android:drawablePadding="13dp"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            >
+        </Button>
+
+        <Button
+            android:id="@+id/btn_switch_audio"
+            android:layout_width="wrap_content"
+            android:drawableTop="@drawable/img_switch_audio"
+            android:text="语音接听"
+            android:layout_alignParentRight="true"
+            android:layout_above="@+id/btn_accept"
+            android:layout_marginRight="35dp"
+            android:textColor="@color/white"
+            android:visibility="gone"
+            android:layout_marginBottom="28dp"
+            android:textSize="11sp"
+            android:drawablePadding="13dp"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            >
+        </Button>
+
+    </RelativeLayout>
+
+    <Space
+        android:id="@+id/space"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"></Space>
+
+    <ImageButton
+        android:id="@+id/btn_call_wait_small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:visibility="gone"
+        android:background="@null"
+        android:src="@drawable/img_small"
+        ></ImageButton>
+
+
+
+</RelativeLayout>

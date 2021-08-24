@@ -12,6 +12,9 @@ import androidx.activity.viewModels
 import com.gyf.immersionbar.ImmersionBar
 import org.ar.call.*
 import org.ar.call.databinding.ActivityP2PvideoBinding
+import org.ar.call.databinding.LayoutAudioBinding
+import org.ar.call.databinding.LayoutReceivedSingleCallBinding
+import org.ar.call.databinding.LayoutVideoBinding
 import org.ar.call.utils.*
 import org.ar.call.vm.RtcVM
 import org.ar.rtc.RtcEngine
@@ -25,6 +28,9 @@ import java.util.HashMap
 
 class P2PVideoActivity : BaseActivity() {
     private val binding by lazy { ActivityP2PvideoBinding.inflate(layoutInflater) }
+    private val bindingReceive by lazy { LayoutReceivedSingleCallBinding.inflate(layoutInflater) }
+    private val bindingAudio by lazy { LayoutAudioBinding.inflate(layoutInflater) }
+    private val bindingVideo by lazy { LayoutVideoBinding.inflate(layoutInflater) }
 
     private val rtcVM: RtcVM by viewModels()
 
@@ -44,7 +50,7 @@ class P2PVideoActivity : BaseActivity() {
         ImmersionBar.with(this).statusBarDarkFont(false, 0.2f).keyboardEnable(true).init()
 
         isCalled = intent.getBooleanExtra("isCalled",false)
-
+        binding.root.addView(bindingReceive.root)
         if (!isCalled){//如果是主动呼叫
             callViewModel.localInvitation?.let {
                 val contentJSON = JSONObject(it.content)
@@ -64,7 +70,7 @@ class P2PVideoActivity : BaseActivity() {
                 callMode = contentJSON.getInt("Mode")
                 remoteUserId = it.callerId
                 rtcVM.initRTC(this,callMode,contentJSON.getString("ChanId"),callViewModel.userId)
-                binding.tvState.text=(if (callMode == Constans.AUDIO_MODE) "收到语音呼叫邀请" else "收到视频呼叫邀请")
+                bindingReceive.tvState.text=(if (callMode == Constans.AUDIO_MODE) "收到语音呼叫邀请" else "收到视频呼叫邀请")
                 callViewModel.subscribe(remoteUserId)
                 showCallLayout()
             }?:run {
@@ -82,7 +88,7 @@ class P2PVideoActivity : BaseActivity() {
 
 
     private fun showCallLayout(){
-        binding.run {
+        bindingReceive.run {
             tvUserPre.text = remoteUserId
             btnHangup.show()
             if (isCalled){
@@ -96,7 +102,7 @@ class P2PVideoActivity : BaseActivity() {
                 layoutParams.removeRule(RelativeLayout.CENTER_HORIZONTAL)
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
                 layoutParams.setMargins(35f.dp2px(), 0, 0, 0)
-                binding.btnHangup.layoutParams = layoutParams
+                btnHangup.layoutParams = layoutParams
 
             }else{
                 btnAccept.gone()
@@ -112,8 +118,6 @@ class P2PVideoActivity : BaseActivity() {
                 val localPreview = RtcEngine.CreateRendererView(this@P2PVideoActivity)
                 rtcVM.setupLocalVideo(localPreview)
                 rlVideoPreview.addView(localPreview,0)
-
-
             }
         }
         startRing()
@@ -167,7 +171,6 @@ class P2PVideoActivity : BaseActivity() {
         runOnUiThread {
             val infoJSON = JSONObject(var2)
             callMode = infoJSON.getInt("Mode")//这里还需要获取一下通话模式 因为对方可以语音接听
-            binding.rlCallPre.gone()
             joinRTC(infoJSON)
 
         }
@@ -193,7 +196,6 @@ class P2PVideoActivity : BaseActivity() {
     override fun onRemoteInvitationAccepted(var1: RemoteInvitation?) {
         super.onRemoteInvitationAccepted(var1)
         runOnUiThread {
-            binding.rlCallPre.gone()
             joinRTC(JSONObject(var1?.content))
         }
     }
@@ -281,6 +283,12 @@ class P2PVideoActivity : BaseActivity() {
         }
     }
     private fun joinRTC(infoJSON:JSONObject){
+        binding.root.removeView(bindingReceive.root)
+        if (callMode == Constans.AUDIO_MODE){
+            binding.root.addView(bindingAudio.root)
+        }else{
+            binding.root.addView(bindingVideo.root)
+        }
         var watchParams = ""
         var vidCodec = ""
         var audCodec = ""
@@ -300,91 +308,92 @@ class P2PVideoActivity : BaseActivity() {
         isWaiting = false
         isCalling = true
         stopRing()
-        binding.run {
             if (callMode == Constans.AUDIO_MODE) {
-                flVideoGroup.visibility = View.GONE
-                flAudioGroup.visibility = View.VISIBLE
-                tvRemoteAudioUser.text = remoteUserId
+                bindingAudio.run {
+                   tvRemoteAudioUser.text = remoteUserId
+                }
                 Toast.makeText(this@P2PVideoActivity, "声音将通过听筒播放", Toast.LENGTH_SHORT).show()
                 rtcVM.setEnableSpeakerphone(false)
             } else {
-                flVideoGroup.visibility = View.VISIBLE
-                flAudioGroup.visibility = View.GONE
-                val outMetrics = DisplayMetrics()
-                windowManager.defaultDisplay.getMetrics(outMetrics)
-                val widthPixels = outMetrics.widthPixels
-                val marginLayoutParams = binding.rlLocalVideo.layoutParams as ViewGroup.MarginLayoutParams
-                marginLayoutParams.topMargin = 12f.dp2px()
-                marginLayoutParams.leftMargin = widthPixels - 102f.dp2px() //90是View的宽  12 是margin
-                binding.rlLocalVideo.layoutParams = marginLayoutParams
-                rlVideoPreview.removeAllViews()
-                setupLocalVideo()
-                Toast.makeText(this@P2PVideoActivity, "声音将通过扬声器播放", Toast.LENGTH_SHORT).show()
-                rtcVM.setEnableSpeakerphone(true)
-                if (!isAppOrWeb){//如果是⌚️
-                    rtcVM.rtcEngine?.setParameters("{\"Cmd\":\"SetEncoderType\", \"VidCodecType\": 5, \"AudCodecType\": 3}")
-                    watchParams?.let {
-                        val json = JSONObject(it)
-                        val width = json.getInt("Width")
-                        val height = json.getInt("Height")
-                        val fps = json.getInt("Fps")
-                        val configuration = VideoEncoderConfiguration()
-                        configuration.dimensions =
-                            VideoEncoderConfiguration.VideoDimensions(width, height)
-                        configuration.bitrate = 128
-                        configuration.minBitrate = 128
-                        configuration.frameRate = fps
-                        configuration.minFrameRate = 1
-                        rtcVM.rtcEngine?.setVideoEncoderConfiguration(configuration)
+                bindingVideo.run {
+                    val outMetrics = DisplayMetrics()
+                    windowManager.defaultDisplay.getMetrics(outMetrics)
+                    val widthPixels = outMetrics.widthPixels
+                    val marginLayoutParams = rlLocalVideo.layoutParams as ViewGroup.MarginLayoutParams
+                    marginLayoutParams.topMargin = 12f.dp2px()
+                    marginLayoutParams.leftMargin = widthPixels - 102f.dp2px() //90是View的宽  12 是margin
+                   rlLocalVideo.layoutParams = marginLayoutParams
+                    setupLocalVideo()
+                    Toast.makeText(this@P2PVideoActivity, "声音将通过扬声器播放", Toast.LENGTH_SHORT).show()
+                    rtcVM.setEnableSpeakerphone(true)
+                    if (!isAppOrWeb){//如果是⌚️
+                        rtcVM.rtcEngine?.setParameters("{\"Cmd\":\"SetEncoderType\", \"VidCodecType\": 5, \"AudCodecType\": 3}")
+                        watchParams?.let {
+                            val json = JSONObject(it)
+                            val width = json.getInt("Width")
+                            val height = json.getInt("Height")
+                            val fps = json.getInt("Fps")
+                            val configuration = VideoEncoderConfiguration()
+                            configuration.dimensions =
+                                VideoEncoderConfiguration.VideoDimensions(width, height)
+                            configuration.bitrate = 128
+                            configuration.minBitrate = 128
+                            configuration.frameRate = fps
+                            configuration.minFrameRate = 1
+                            rtcVM.rtcEngine?.setVideoEncoderConfiguration(configuration)
+                        }
                     }
                 }
             }
             rtcVM.joinChannel()
-        }
 
 
     }
 
     private fun setupLocalVideo() {
         val mLocalView = RtcEngine.CreateRendererView(this)
-        if (binding.rlLocalVideo.childCount == 2) {
-            binding.rlLocalVideo.removeViewAt(1)
+        if (bindingVideo.rlLocalVideo.childCount == 2) {
+            bindingVideo.rlLocalVideo.removeViewAt(1)
         }
         if (videoList.containsKey("local")) {
             videoList.remove("local")
         }
-        binding.rlLocalVideo.addView(mLocalView, 1)
-        binding.rlLocalVideo.tag = "local"
+        bindingVideo.rlLocalVideo.addView(mLocalView, 1)
+        bindingVideo.rlLocalVideo.tag = "local"
         videoList["local"] = mLocalView
         rtcVM.setupLocalVideo(mLocalView)
     }
 
     private fun setupRemoteVideo(uid: String) {
         val mRemoteView = RtcEngine.CreateRendererView(this)
-        if (binding.rlRemoteVideo.childCount == 2) {
-            binding.rlRemoteVideo.removeViewAt(1)
+        if (bindingVideo.rlRemoteVideo.childCount == 2) {
+            bindingVideo.rlRemoteVideo.removeViewAt(1)
         }
         if (videoList.containsKey("remote")) {
             videoList.remove("remote")
         }
-        binding.rlRemoteVideo.addView(mRemoteView, 1)
+        bindingVideo.rlRemoteVideo.addView(mRemoteView, 1)
         videoList["remote"] = mRemoteView
        rtcVM.setupRemoteVideo(uid,mRemoteView)
     }
 
     private fun initOnclick(){
-        binding.run {
-            ibtnAudioAudio.setOnClickListener {
+
+        bindingAudio.run {
+            btnAudio.setOnClickListener {
                 it.isSelected=!it.isSelected
                 rtcVM.muteLocalAudioStream(it.isSelected)
             }
-            ibtnAudioHangUp.setOnClickListener {
+            btnHangUp.setOnClickListener {
                 leave()
             }
-            ibtnAudioSpeak.setOnClickListener {
-                ibtnAudioSpeak.isSelected = !ibtnAudioSpeak.isSelected
-                rtcVM.setEnableSpeakerphone(ibtnAudioSpeak.isSelected)
+            btnSpeak.setOnClickListener {
+                btnSpeak.isSelected = ! btnSpeak.isSelected
+                rtcVM.setEnableSpeakerphone(btnSpeak.isSelected)
             }
+        }
+
+        bindingVideo.run {
             rlRemoteVideo.setOnClickListener {
                 if (rlBtnGroup.visibility == View.VISIBLE) {
                     rlBtnGroup.gone()
@@ -395,11 +404,11 @@ class P2PVideoActivity : BaseActivity() {
             rlLocalVideo.setOnClickListener {
                 switchVideo()
             }
-            ibtnAudio.setOnClickListener {
-                ibtnAudio.isSelected = !ibtnAudio.isSelected
-                rtcVM.muteLocalAudioStream(ibtnAudio.isSelected)
+            btnAudio.setOnClickListener {
+                btnAudio.isSelected = ! btnAudio.isSelected
+                rtcVM.muteLocalAudioStream(btnAudio.isSelected)
             }
-            ibtnSwitchAudio.setOnClickListener {
+            btnSwitchAudio.setOnClickListener {
                 callViewModel.sendMessage(remoteUserId,JSONObject().apply {
                     put("Cmd","SwitchAudio")
                 }.toString()){
@@ -410,31 +419,35 @@ class P2PVideoActivity : BaseActivity() {
                     }
                 }
             }
-            ibtnHangUp.setOnClickListener {
+            btnHangUp.setOnClickListener {
                 leave()
             }
-            ibtnVideo.setOnClickListener {
-                ibtnVideo.isSelected = ibtnVideo.isSelected
-                rtcVM.muteLocalVideoStream(ibtnVideo.isSelected)
+            btnVideo.setOnClickListener {
+                btnVideo.isSelected = btnVideo.isSelected
+                rtcVM.muteLocalVideoStream(btnVideo.isSelected)
                 if (rlLocalVideo.tag == "local") {
-                    rlLocalVideo.getChildAt(1).visibility = if (!ibtnVideo.isSelected) View.VISIBLE else View.INVISIBLE
+                   rlLocalVideo.getChildAt(1).visibility = if (!btnVideo.isSelected) View.VISIBLE else View.INVISIBLE
                 } else {
-                    binding.rlRemoteVideo.getChildAt(1).visibility = if (!ibtnVideo.isSelected) View.VISIBLE else View.INVISIBLE
+                   rlRemoteVideo.getChildAt(1).visibility = if (!btnVideo.isSelected) View.VISIBLE else View.INVISIBLE
                 }
             }
-            btnSwitch.setOnClickListener { 
+            btnSwitchCamera.setOnClickListener {
                 rtcVM.rtcEngine?.switchCamera()
             }
-            ibtnSpeak.setOnClickListener {
-                ibtnSpeak.isSelected = !ibtnSpeak.isSelected
-                rtcVM.setEnableSpeakerphone(ibtnSpeak.isSelected)
+            btnSpeak.setOnClickListener {
+                btnSpeak.isSelected = !btnSpeak.isSelected
+                rtcVM.setEnableSpeakerphone(btnSpeak.isSelected)
             }
-            btnHangup.setOnClickListener { 
+
+        }
+
+        bindingReceive.run {
+           btnHangup.setOnClickListener {
                 rtcVM.inMeeting = false
                 isWaiting = false
                 isCalling = false
                 if (!isCalled) {
-                  callViewModel.cancle()
+                    callViewModel.cancle()
                 } else {
                     callViewModel.currentRemoteInvitation?.let {
                         callViewModel.refuse(it)
@@ -442,7 +455,7 @@ class P2PVideoActivity : BaseActivity() {
                 }
                 stopRing()
             }
-            btnAccept.setOnClickListener {
+           btnAccept.setOnClickListener {
                 callViewModel.currentRemoteInvitation?.let {
                     callViewModel.accept(it,JSONObject().apply {
                         put("Mode", callMode) //收到的是什么类型就回什么类型
@@ -464,12 +477,13 @@ class P2PVideoActivity : BaseActivity() {
                     }.toString())
                 }
 
-                rlVideoPreview.removeAllViews()
+                bindingReceive.rlVideoPreview.removeAllViews()
                 rtcVM.disableVideo()
                 stopRing()
             }
 
         }
+
     }
 
     private fun initLiveData() {
@@ -484,16 +498,16 @@ class P2PVideoActivity : BaseActivity() {
         })
 
         rtcVM.remoteVideoState.observe(this,{
-                if (binding.rlLocalVideo.tag == null) {
+                if (bindingVideo.rlLocalVideo.tag == null) {
                     return@observe
                 }
-                if (binding.rlLocalVideo.tag == "remote") {
-                    if (binding.rlLocalVideo.getChildAt(1) != null) {
-                        binding.rlLocalVideo.getChildAt(1).visibility = if (it.second == 6) View.VISIBLE else View.INVISIBLE
+                if (bindingVideo.rlLocalVideo.tag == "remote") {
+                    if (bindingVideo.rlLocalVideo.getChildAt(1) != null) {
+                        bindingVideo.rlLocalVideo.getChildAt(1).visibility = if (it.second == 6) View.VISIBLE else View.INVISIBLE
                     }
                 } else {
-                    if (binding.rlRemoteVideo.getChildAt(1) != null) {
-                        binding.rlRemoteVideo.getChildAt(1).visibility = if (it.second == 6) View.VISIBLE else View.INVISIBLE
+                    if (bindingVideo.rlRemoteVideo.getChildAt(1) != null) {
+                        bindingVideo.rlRemoteVideo.getChildAt(1).visibility = if (it.second == 6) View.VISIBLE else View.INVISIBLE
                     }
                 }
         })
@@ -506,8 +520,8 @@ class P2PVideoActivity : BaseActivity() {
         if (videoList.size < 2) {
             return
         }
-        binding.rlRemoteVideo.removeViewAt(1)
-        binding.rlLocalVideo.removeViewAt(1)
+        bindingVideo.rlRemoteVideo.removeViewAt(1)
+        bindingVideo.rlLocalVideo.removeViewAt(1)
         val mLocalView = RtcEngine.CreateRendererView(this)
         if (videoList.containsKey("local")) {
             (videoList["local"] as TextureViewRenderer).release()
@@ -515,41 +529,37 @@ class P2PVideoActivity : BaseActivity() {
         }
         videoList["local"] = mLocalView
        rtcVM.setupLocalVideo(mLocalView)
-        if (binding.rlVideo.lastLeft != -1) {
-            val marginLayoutParams = binding.rlLocalVideo.layoutParams as ViewGroup.MarginLayoutParams
-            marginLayoutParams.leftMargin = binding.rlVideo.lastLeft
-            marginLayoutParams.topMargin = binding.rlVideo.lastTop
-            binding.rlLocalVideo.layoutParams = marginLayoutParams
+        if (bindingVideo.rlVideo.lastLeft != -1) {
+            val marginLayoutParams = bindingVideo.rlLocalVideo.layoutParams as ViewGroup.MarginLayoutParams
+            marginLayoutParams.leftMargin = bindingVideo.rlVideo.lastLeft
+            marginLayoutParams.topMargin = bindingVideo.rlVideo.lastTop
+            bindingVideo.rlLocalVideo.layoutParams = marginLayoutParams
         }
-        if (binding.rlLocalVideo.tag.toString() == "local") {
-            binding.rlRemoteVideo.addView(videoList["local"], 1)
-            binding.rlLocalVideo.addView(videoList["remote"], 1)
-            binding.rlLocalVideo.tag = "remote"
+        if (bindingVideo.rlLocalVideo.tag.toString() == "local") {
+            bindingVideo.rlRemoteVideo.addView(videoList["local"], 1)
+            bindingVideo.rlLocalVideo.addView(videoList["remote"], 1)
+            bindingVideo.rlLocalVideo.tag = "remote"
         } else {
-            binding.rlRemoteVideo.addView(videoList["remote"], 1)
-            binding.rlLocalVideo.addView(videoList["local"], 1)
-            binding.rlLocalVideo.tag = "local"
+            bindingVideo.rlRemoteVideo.addView(videoList["remote"], 1)
+            bindingVideo.rlLocalVideo.addView(videoList["local"], 1)
+            bindingVideo.rlLocalVideo.tag = "local"
         }
     }
     
     private fun showAudioModel(){
-        binding.run {
-            if (flAudioGroup.visibility == View.GONE) { //防止2个人一起切换的时候 重复走
-                flVideoGroup.gone()
-                flAudioGroup.show()
-                tvRemoteAudioUser.text = remoteUserId
-                rtcVM.disableVideo()
-                rtcVM.setEnableSpeakerphone(false)
-                rlVideo.removeAllViews()
-                callMode = Constans.AUDIO_MODE
-                Toast.makeText(this@P2PVideoActivity, "声音将通过听筒播放", Toast.LENGTH_SHORT).show()
-            }
-        }
+        binding.root.removeView(bindingVideo.root)
+        binding.root.addView(bindingAudio.root)
+        bindingAudio.tvRemoteAudioUser.text = remoteUserId
+        rtcVM.disableVideo()
+        rtcVM.setEnableSpeakerphone(false)
+        bindingVideo.rlVideo.removeAllViews()
+        callMode = Constans.AUDIO_MODE
+        Toast.makeText(this@P2PVideoActivity, "声音将通过听筒播放", Toast.LENGTH_SHORT).show()
     }
     private fun leave(needSendMessage:Boolean = true){
         rtcVM.inMeeting = false
         if (callMode == Constans.VIDEO_MODE){
-            binding.rlVideo.removeAllViews()
+            bindingVideo.rlVideo.removeAllViews()
         }
         if (needSendMessage) {
             callViewModel.sendMessage(remoteUserId, JSONObject().apply {
