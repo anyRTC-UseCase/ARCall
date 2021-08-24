@@ -41,7 +41,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
 
     private var isBackground = false //是否处于后台
     private var needReCallBack = false //从后台回到前台 期间如果有人呼叫 需要将呼叫重新回调出去
-
+    private var isShowNotify = false
     init {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     }
@@ -53,6 +53,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
             viewModelScope.launch {
                 if (currentRemoteInvitation!=null){
                     events?.onRemoteInvitationReceived(currentRemoteInvitation)
+                    cancleNotify()
                 }
             }
             needReCallBack = false
@@ -342,6 +343,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
                                notify(1000,builder.build().apply {
                                    flags = Notification.FLAG_INSISTENT
                                })
+                               isShowNotify = true
                            }
 
                         }
@@ -352,8 +354,8 @@ class GlobalVM : ViewModel(), LifecycleObserver {
         }
         //返回给被叫的回调：接受呼叫邀请成功。
         override fun onRemoteInvitationAccepted(var1: RemoteInvitation?) {
-            Notify.cancelNotification(1000)
-                events?.onRemoteInvitationAccepted(var1)
+            cancleNotify()
+            events?.onRemoteInvitationAccepted(var1)
             if (currentRemoteInvitation?.callerId.equals(var1!!.callerId)){
                 currentRemoteInvitation = null
             }
@@ -365,7 +367,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
 
         //返回给被叫的回调：拒绝呼叫邀请成功
         override fun onRemoteInvitationRefused(var1: RemoteInvitation?) {
-            Notify.cancelNotification(1000)
+            cancleNotify()
             events?.onRemoteInvitationRefused(var1)
             if (currentRemoteInvitation?.callerId.equals(var1!!.callerId)){
                 currentRemoteInvitation = null
@@ -377,7 +379,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
         }
 
         override fun onRemoteInvitationCanceled(var1: RemoteInvitation?) {
-            Notify.cancelNotification(1000)
+            cancleNotify()
             events?.onRemoteInvitationCanceled(var1)
             if (currentRemoteInvitation?.callerId.equals(var1!!.callerId)){
                 currentRemoteInvitation = null
@@ -389,7 +391,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
         }
 
         override fun onRemoteInvitationFailure(var1: RemoteInvitation?, var2: Int) {
-            Notify.cancelNotification(1000)
+            cancleNotify()
              events?.onRemoteInvitationFailure(var1, var2)
             if (currentRemoteInvitation?.callerId.equals(var1!!.callerId)){
                 currentRemoteInvitation = null
@@ -427,4 +429,10 @@ class GlobalVM : ViewModel(), LifecycleObserver {
         }
     }
 
+    private fun cancleNotify(){
+        if (isShowNotify){
+            Notify.cancelNotification(1000)
+            isShowNotify = false
+        }
+    }
 }

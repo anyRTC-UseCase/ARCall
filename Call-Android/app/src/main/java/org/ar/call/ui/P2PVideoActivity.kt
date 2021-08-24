@@ -20,6 +20,7 @@ import org.ar.rtm.LocalInvitation
 import org.ar.rtm.RemoteInvitation
 import org.ar.rtm.RtmMessage
 import org.json.JSONObject
+import org.webrtc.TextureViewRenderer
 import java.util.HashMap
 
 class P2PVideoActivity : BaseActivity() {
@@ -509,6 +510,7 @@ class P2PVideoActivity : BaseActivity() {
         binding.rlLocalVideo.removeViewAt(1)
         val mLocalView = RtcEngine.CreateRendererView(this)
         if (videoList.containsKey("local")) {
+            (videoList["local"] as TextureViewRenderer).release()
             videoList.remove("local")
         }
         videoList["local"] = mLocalView
