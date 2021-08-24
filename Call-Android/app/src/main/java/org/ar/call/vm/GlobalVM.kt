@@ -326,7 +326,6 @@ class GlobalVM : ViewModel(), LifecycleObserver {
                             val intent = getAppOpenIntentByPackageName(it,BuildConfig.APPLICATION_ID)
                             val builder = Notify.with(CallApplication.callApp.applicationContext)
                                 .alerting("sound",{
-                                    channelImportance =  NotificationManager.IMPORTANCE_HIGH
                                     sound = Uri.parse("android.resource://" + BuildConfig.APPLICATION_ID + "/" +R.raw.video_request)
                                 })
                                 .meta {
