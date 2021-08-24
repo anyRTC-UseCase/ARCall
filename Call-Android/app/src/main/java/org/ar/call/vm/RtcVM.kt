@@ -14,6 +14,7 @@ import org.ar.rtc.Constants
 import org.ar.rtc.IRtcEngineEventHandler
 import org.ar.rtc.RtcEngine
 import org.ar.rtc.VideoEncoderConfiguration
+import org.ar.rtc.video.CameraCapturerConfiguration
 import org.ar.rtc.video.VideoCanvas
 import org.json.JSONObject
 
@@ -41,6 +42,7 @@ class RtcVM :ViewModel(){
                 }.toString())
             }
             if (callType == Constans.VIDEO_MODE){//如果是视频模式
+                it.setCameraCapturerConfiguration(CameraCapturerConfiguration(CameraCapturerConfiguration.CD_1280x720,CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_FRONT))
                 val videoEncoderConfiguration = VideoEncoderConfiguration()
                 when (SpUtil.get().getInt("frame",1)) {
                     1 -> {

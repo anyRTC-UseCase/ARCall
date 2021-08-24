@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModel
 import android.app.Activity
 import android.app.Application
+import android.content.pm.ActivityInfo
 import android.view.WindowManager
 import com.google.gson.Gson
 import com.kongzue.dialogx.dialogs.TipDialog
@@ -31,6 +32,7 @@ open class BaseActivity : AppCompatActivity(), RtmEvents {
     override fun onCreate(savedInstanceState: Bundle?) {
         ScreenUtils.adapterScreen(this, 375, false)
         super.onCreate(savedInstanceState)
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         applicationProvider = ViewModelProvider(
             this.applicationContext as org.ar.call.CallApplication,
