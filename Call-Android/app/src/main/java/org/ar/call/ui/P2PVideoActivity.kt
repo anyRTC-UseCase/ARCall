@@ -1,14 +1,20 @@
 package org.ar.call.ui
 
+import android.app.PictureInPictureParams
+import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.media.MediaPlayer
+import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
+import android.util.Rational
 import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import com.gyf.immersionbar.ImmersionBar
 import org.ar.call.*
 import org.ar.call.databinding.ActivityP2PvideoBinding
@@ -19,6 +25,7 @@ import org.ar.call.utils.*
 import org.ar.call.vm.RtcVM
 import org.ar.rtc.RtcEngine
 import org.ar.rtc.VideoEncoderConfiguration
+import org.ar.rtc.video.VideoCanvas
 import org.ar.rtm.LocalInvitation
 import org.ar.rtm.RemoteInvitation
 import org.ar.rtm.RtmMessage
@@ -48,7 +55,6 @@ class P2PVideoActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         ImmersionBar.with(this).statusBarDarkFont(false, 0.2f).keyboardEnable(true).init()
-
         isCalled = intent.getBooleanExtra("isCalled",false)
         binding.root.addView(bindingReceive.root)
         if (!isCalled){//如果是主动呼叫
@@ -285,9 +291,9 @@ class P2PVideoActivity : BaseActivity() {
     private fun joinRTC(infoJSON:JSONObject){
         binding.root.removeView(bindingReceive.root)
         if (callMode == Constans.AUDIO_MODE){
-            binding.root.addView(bindingAudio.root)
+            binding.root.addView(bindingAudio.root,0)
         }else{
-            binding.root.addView(bindingVideo.root)
+            binding.root.addView(bindingVideo.root,0)
         }
         var watchParams = ""
         var vidCodec = ""
@@ -378,7 +384,6 @@ class P2PVideoActivity : BaseActivity() {
     }
 
     private fun initOnclick(){
-
         bindingAudio.run {
             btnAudio.setOnClickListener {
                 it.isSelected=!it.isSelected
@@ -407,6 +412,7 @@ class P2PVideoActivity : BaseActivity() {
             btnAudio.setOnClickListener {
                 btnAudio.isSelected = ! btnAudio.isSelected
                 rtcVM.muteLocalAudioStream(btnAudio.isSelected)
+
             }
             btnSwitchAudio.setOnClickListener {
                 callViewModel.sendMessage(remoteUserId,JSONObject().apply {
@@ -438,7 +444,6 @@ class P2PVideoActivity : BaseActivity() {
                 btnSpeak.isSelected = !btnSpeak.isSelected
                 rtcVM.setEnableSpeakerphone(btnSpeak.isSelected)
             }
-
         }
 
         bindingReceive.run {
@@ -578,5 +583,8 @@ class P2PVideoActivity : BaseActivity() {
         super.onResume()
         isWaiting = true
     }
+
+
+
 
 }
