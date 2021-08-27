@@ -5,7 +5,8 @@ import android.os.Bundle
 import android.view.KeyEvent
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.lifecycleScope
-import com.gyf.immersionbar.ImmersionBar
+import com.drake.statusbar.darkMode
+import com.drake.statusbar.immersive
 import com.kongzue.dialogx.dialogs.MessageDialog
 import com.kongzue.dialogx.dialogs.WaitDialog
 import org.ar.call.*
@@ -28,7 +29,6 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         ViewCompat.setTransitionName(binding.ivLogo, "logo")
-        ImmersionBar.with(this).statusBarDarkFont(false, 0.2f).init()
         lifecycleScope.launchWhenResumed {
             WaitDialog.show("正在登录...")
             delay(1000)

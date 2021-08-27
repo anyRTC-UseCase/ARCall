@@ -3,7 +3,8 @@ package org.ar.call.ui
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import com.gyf.immersionbar.ImmersionBar
+import com.drake.statusbar.immersive
+import com.drake.statusbar.immersiveRes
 import com.kongzue.dialogx.dialogs.BottomMenu
 import com.kongzue.dialogx.interfaces.OnMenuItemClickListener
 import org.ar.call.utils.Constans
@@ -20,7 +21,8 @@ class SettingActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        ImmersionBar.with(this).statusBarDarkFont(true, 0.2f).statusBarColor(R.color.white).init()
+        immersive()
+        immersiveRes(R.color.white,true)
         isP2PActivity = intent.getBooleanExtra(Constans.KEY_SINGLE_CALL,false)
         init()
         binding.swCamera.setOnCheckedChangeListener { _, isChecked ->

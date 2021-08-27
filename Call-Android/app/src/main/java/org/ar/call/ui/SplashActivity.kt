@@ -6,7 +6,7 @@ import android.os.Bundle
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.util.Pair
 import androidx.core.view.ViewCompat
-import com.gyf.immersionbar.ImmersionBar
+import com.drake.statusbar.immersive
 import com.permissionx.guolindev.PermissionX
 import org.ar.call.R
 import org.ar.call.databinding.ActivitySplashBinding
@@ -24,7 +24,6 @@ class SplashActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
-        ImmersionBar.with(this).init()
         PermissionX.init(this).permissions(permissions)
             .onExplainRequestReason { scope, deniedList ->
                 scope.showRequestReasonDialog(deniedList, "请同意所有权限", "好的", "取消")

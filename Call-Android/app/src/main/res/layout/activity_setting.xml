@@ -8,7 +8,6 @@
     android:background="#F5F5F5"
     >
     <RelativeLayout
-        android:layout_marginTop="25dp"
         android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="44dp">

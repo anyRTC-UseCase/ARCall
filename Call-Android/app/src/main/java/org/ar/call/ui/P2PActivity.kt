@@ -2,7 +2,8 @@ package org.ar.call.ui
 
 import android.content.Intent
 import android.os.Bundle
-import com.gyf.immersionbar.ImmersionBar
+import com.drake.statusbar.darkMode
+import com.drake.statusbar.immersive
 import com.kongzue.dialogx.dialogs.BottomMenu
 import com.kongzue.dialogx.interfaces.OnMenuItemClickListener
 import org.ar.call.*
@@ -19,7 +20,6 @@ class P2PActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        ImmersionBar.with(this).statusBarDarkFont(false, 0.2f).keyboardEnable(false).init()
         initView()
 
     }

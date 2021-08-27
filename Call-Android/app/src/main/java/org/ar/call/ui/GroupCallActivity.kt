@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.gyf.immersionbar.ImmersionBar
+import com.drake.statusbar.darkMode
 import org.ar.call.*
 import org.ar.call.databinding.ActivityGroupCallBinding
 import org.ar.call.ui.adapter.TagAdapter
@@ -28,7 +28,6 @@ class GroupCallActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        ImmersionBar.with(this).statusBarDarkFont(false, 0.2f).keyboardEnable(false).init()
         initView()
     }
 

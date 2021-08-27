@@ -9,6 +9,8 @@ import android.app.Activity
 import android.app.Application
 import android.content.pm.ActivityInfo
 import android.view.WindowManager
+import com.drake.statusbar.darkMode
+import com.drake.statusbar.immersive
 import com.google.gson.Gson
 import com.kongzue.dialogx.dialogs.TipDialog
 import com.kongzue.dialogx.dialogs.WaitDialog
@@ -32,6 +34,8 @@ open class BaseActivity : AppCompatActivity(), RtmEvents {
     override fun onCreate(savedInstanceState: Bundle?) {
         ScreenUtils.adapterScreen(this, 375, false)
         super.onCreate(savedInstanceState)
+        immersive()
+        darkMode(false)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         applicationProvider = ViewModelProvider(

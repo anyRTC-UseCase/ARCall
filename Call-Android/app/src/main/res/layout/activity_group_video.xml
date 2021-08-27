@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#3C3C3C"
-    android:paddingTop="24dp"
     android:orientation="vertical">
 
     <RelativeLayout

@@ -15,7 +15,8 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import com.gyf.immersionbar.ImmersionBar
+import com.drake.statusbar.darkMode
+import com.drake.statusbar.immersive
 import org.ar.call.*
 import org.ar.call.databinding.ActivityP2PvideoBinding
 import org.ar.call.databinding.LayoutAudioBinding
@@ -54,7 +55,6 @@ class P2PVideoActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        ImmersionBar.with(this).statusBarDarkFont(false, 0.2f).keyboardEnable(true).init()
         isCalled = intent.getBooleanExtra("isCalled",false)
         binding.root.addView(bindingReceive.root)
         if (!isCalled){//如果是主动呼叫

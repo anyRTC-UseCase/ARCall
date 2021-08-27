@@ -7,7 +7,7 @@ import android.view.KeyEvent
 import android.view.View
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
-import com.gyf.immersionbar.ImmersionBar
+import com.drake.statusbar.immersive
 import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.interfaces.OnBindView
 import org.ar.call.*
@@ -41,7 +41,7 @@ class GroupVideoActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        ImmersionBar.with(this).statusBarColor("#FF232426").statusBarDarkFont(false, 0.2f).keyboardEnable(true).init()
+        immersive(Color.parseColor("#FF232426"),false)
         callArray = intent.getStringArrayListExtra("callArray")
         channelId = intent.getStringExtra("channelId").toString()
         isCalled = intent.getBooleanExtra("isCalled", false)

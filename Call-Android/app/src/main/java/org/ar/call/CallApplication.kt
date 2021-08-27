@@ -11,11 +11,11 @@ import android.os.Build
 import android.os.Bundle
 import androidx.lifecycle.*
 import com.kongzue.dialogx.DialogX
-import com.kongzue.dialogx.style.IOSStyle
 import org.ar.call.utils.SpUtil
 import kotlin.properties.Delegates
 import android.media.AudioAttributes
 import android.net.Uri
+import com.kongzue.dialogx.style.IOSStyle
 
 
 class CallApplication :Application(), ViewModelStoreOwner,Application.ActivityLifecycleCallbacks{
