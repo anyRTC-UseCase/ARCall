@@ -16,6 +16,7 @@ import kotlin.properties.Delegates
 import android.media.AudioAttributes
 import android.net.Uri
 import com.kongzue.dialogx.style.IOSStyle
+import com.tencent.bugly.crashreport.CrashReport
 
 
 class CallApplication :Application(), ViewModelStoreOwner,Application.ActivityLifecycleCallbacks{
@@ -35,6 +36,7 @@ class CallApplication :Application(), ViewModelStoreOwner,Application.ActivityLi
         DialogX.cancelButtonText="取消"
         DialogX.globalStyle = IOSStyle.style();
         registerActivityLifecycleCallbacks(this)
+        CrashReport.initCrashReport(this.applicationContext, "939abb0f89", BuildConfig.DEBUG)
     }
 
     override fun getViewModelStore(): ViewModelStore {

@@ -159,15 +159,17 @@ class P2PVideoActivity : BaseActivity() {
     override fun onLocalInvitationRefused(var1: LocalInvitation?, var2: String?) {
         super.onLocalInvitationRefused(var1, var2)
         runOnUiThread {
+            if(var2.isNullOrEmpty()){
+                toast("对方拒绝通话")
+            }else{
                 val reasonJSON = JSONObject(var2)
                 if (reasonJSON.has("Cmd")){
                     val reason = reasonJSON.getString("Cmd")
                     if (reason=="Calling"){
                         showError("对方正忙")
                     }
-                }else{
-                    toast("对方拒绝通话")
                 }
+            }
             finish()
         }
     }
