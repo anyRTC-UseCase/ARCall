@@ -16,7 +16,7 @@ let Store = {
 const RTM = {
   // 初始化
   init: async () => {
-    if (Config.RTM_APPID && Config.RTC_APPID) {
+    if (Config.APPID) {
       // 生成本地用户标识 Uid
       let oUid = "" + Utils.generateNumber(4);
       // 初始化回调
@@ -26,7 +26,7 @@ const RTM = {
       // 初始化实例
       await rtmModule.createInstance(
         {
-          appId: Config.RTM_APPID,
+          appId: Config.APPID,
         },
         (res) => {
           console.log(res);

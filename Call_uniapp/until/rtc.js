@@ -22,7 +22,7 @@ const RTC = {
 		});
 		// 初始化实例 RTC_APPID
 		await rtcModule.create({
-			"appId": Config.RTC_APPID
+			"appId": Config.APPID
 		}, res => {
 			console.log('初始化实例 rtc', res);
 		});
