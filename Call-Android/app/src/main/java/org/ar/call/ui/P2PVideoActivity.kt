@@ -15,6 +15,7 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.lifecycleScope
 import com.drake.statusbar.darkMode
 import com.drake.statusbar.immersive
 import org.ar.call.*
@@ -48,8 +49,6 @@ class P2PVideoActivity : BaseActivity() {
     private var callMode = 0 //通话模式 0视频 1音频
     private var remoteUserId = ""
 
-    private var isWaiting = false
-    private var isCalling = false
     private val videoList = HashMap<String, TextureView?>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,7 +83,7 @@ class P2PVideoActivity : BaseActivity() {
                 finish()
             }
         }
-
+        callViewModel.callingUid = remoteUserId
         initOnclick()
         initLiveData()
 
@@ -220,7 +219,7 @@ class P2PVideoActivity : BaseActivity() {
     override fun onRemoteInvitationRefused(var1: RemoteInvitation?) {
         super.onRemoteInvitationRefused(var1)
         runOnUiThread {
-            if (isCalling||isWaiting){
+            if (callViewModel.isCalling||callViewModel.isWaiting){
 
             }else{
                 rtcVM.inMeeting = false
@@ -250,21 +249,22 @@ class P2PVideoActivity : BaseActivity() {
         runOnUiThread {
             map?.let {
                 if (map.containsKey(remoteUserId)) {
-                    if (map[remoteUserId] != 0) { //离线了
+                    if (map[remoteUserId] != 0) {
+                        //离线了 -- sdk bug 会收到对方先离线再上线 --
+                        // 临时解决办法 收到离线 主动查询是否真的离线
                         //如果正在呼叫界面
-                        if (isWaiting) {
-                            if (!isCalled) { //如果是主动呼叫
-                                callViewModel.cancle()
-                            } else {
-                                callViewModel.currentRemoteInvitation?.let {
-                                    callViewModel.refuse(it)
+                        callViewModel.queryOnline(remoteUserId){
+                            if (it==false){
+                                if (callViewModel.isWaiting) {
+                                    callViewModel.finishCall()
                                 }
+                                callViewModel.unSubscribe(remoteUserId)
+                                rtcVM.inMeeting = false
+                                toast("对方已离线")
+                                finish()
                             }
                         }
-                        callViewModel.unSubscribe(remoteUserId)
-                        rtcVM.inMeeting = false
-                        toast("对方已离线")
-                        finish()
+
                     }
                 }
             }
@@ -273,10 +273,11 @@ class P2PVideoActivity : BaseActivity() {
     }
 
 
-    override fun onMessageReceived(message: RtmMessage?) {
-        super.onMessageReceived(message)
+    override fun onMessageReceived(message: RtmMessage?,uid: String?) {
+        super.onMessageReceived(message,uid)
         runOnUiThread {
             message?.let {
+                if (JSONObject(it.text).has("Cmd")){
                 when(JSONObject(it.text).getString("Cmd")){
                     "EndCall"->{
                         toast("对方已挂断")
@@ -285,6 +286,7 @@ class P2PVideoActivity : BaseActivity() {
                     "SwitchAudio"->{
                         showAudioModel()
                     }
+                }
                 }
             }
 
@@ -297,6 +299,7 @@ class P2PVideoActivity : BaseActivity() {
         }else{
             binding.root.addView(bindingVideo.root,0)
         }
+        callViewModel.callType=callMode
         var watchParams = ""
         var vidCodec = ""
         var audCodec = ""
@@ -313,8 +316,8 @@ class P2PVideoActivity : BaseActivity() {
         }
         var isAppOrWeb = vidCodec.isNullOrEmpty()||vidCodec.contains("H264")||audCodec.isNullOrEmpty()||audCodec.contains("Opus")
         //-----------------这一堆是为了适配手表⌚️---------------
-        isWaiting = false
-        isCalling = true
+        callViewModel.isWaiting = false
+        callViewModel.isCalling = true
         stopRing()
             if (callMode == Constans.AUDIO_MODE) {
                 bindingAudio.run {
@@ -450,9 +453,9 @@ class P2PVideoActivity : BaseActivity() {
 
         bindingReceive.run {
            btnHangup.setOnClickListener {
-                rtcVM.inMeeting = false
-                isWaiting = false
-                isCalling = false
+               rtcVM.inMeeting = false
+               callViewModel.isWaiting = false
+               callViewModel.isCalling = false
                 if (!isCalled) {
                     callViewModel.cancle()
                 } else {
@@ -561,6 +564,7 @@ class P2PVideoActivity : BaseActivity() {
         rtcVM.setEnableSpeakerphone(false)
         bindingVideo.rlVideo.removeAllViews()
         callMode = Constans.AUDIO_MODE
+        callViewModel.callType=callMode
         Toast.makeText(this@P2PVideoActivity, "声音将通过听筒播放", Toast.LENGTH_SHORT).show()
     }
     private fun leave(needSendMessage:Boolean = true){
@@ -573,17 +577,24 @@ class P2PVideoActivity : BaseActivity() {
                 put("Cmd", "EndCall")
             }.toString()) {}
         }
+        if (!isCalled) {//这里本可以不调用 但如果是断网重连进来的就需要再取消一下 否则下次无法再呼叫
+            callViewModel.cancle()
+        }
         finish()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        callViewModel.isCalling = false
+        callViewModel.callType=-1
+        callViewModel.callingUid = ""
         stopRing()
     }
 
     override fun onResume() {
         super.onResume()
-        isWaiting = true
+        callViewModel.isWaiting = true
+
     }
 
 

@@ -7,7 +7,7 @@ import org.ar.rtm.RtmMessage
 
  interface RtmEvents {
     fun onConnectionStateChanged(state:Int,reason:Int){}
-    fun onMessageReceived(message:RtmMessage?){}
+    fun onMessageReceived(message:RtmMessage?,uid:String?){}
     fun onPeersOnlineStatusChanged(map:MutableMap<String,Int>?){}
     fun onMemberJoined(member:RtmChannelMember?){}
     fun onMemberLeft(member:RtmChannelMember?){}

@@ -4,12 +4,14 @@ import android.widget.RelativeLayout
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import org.ar.call.R
+import org.ar.call.bean.MemberAVStatus
+import org.ar.call.bean.RtcMember
 
-class MemberAdapter :BaseQuickAdapter<org.ar.call.bean.RtcMember, BaseViewHolder>(R.layout.item_member) {
+class MemberAdapter :BaseQuickAdapter<RtcMember, BaseViewHolder>(R.layout.item_member) {
 
 
 
-    override fun convert(holder: BaseViewHolder, item: org.ar.call.bean.RtcMember) {
+    override fun convert(holder: BaseViewHolder, item: RtcMember) {
         val videoGroup = holder.getView<RelativeLayout>(R.id.rl_video)
         videoGroup.removeAllViews()
         val canvans = holder.itemView.context.let { item.getVideoCanvas(it) }
@@ -35,14 +37,14 @@ class MemberAdapter :BaseQuickAdapter<org.ar.call.bean.RtcMember, BaseViewHolder
             return
         }
         payloads.forEach {
-            when(val payload = it as org.ar.call.bean.MemberAVStatus){
-                org.ar.call.bean.MemberAVStatus.VIDEO ->{
+            when(val payload = it as MemberAVStatus){
+                MemberAVStatus.VIDEO ->{
                     holder.setVisible(R.id.iv_video_close,!(payload.data as Boolean))
                 }
-                org.ar.call.bean.MemberAVStatus.WAITING ->{
+                MemberAVStatus.WAITING ->{
                     holder.setVisible(R.id.rl_wait,(payload.data as Boolean))
                 }
-                org.ar.call.bean.MemberAVStatus.AUDIO ->{
+                MemberAVStatus.AUDIO ->{
                     if ((payload.data as Boolean)){
                         holder.setBackgroundResource(R.id.iv_audio, R.drawable.mic_open)
                     }else{

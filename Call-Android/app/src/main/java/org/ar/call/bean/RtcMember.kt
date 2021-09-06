@@ -44,7 +44,7 @@ class RtcMember private constructor(val userId:String){
         }
 
         private fun create(userId: String, isOpenAudio: Boolean, isOpenVideo: Boolean, isWaiting:Boolean): org.ar.call.bean.RtcMember {
-            val member = org.ar.call.bean.RtcMember(userId)
+            val member = RtcMember(userId)
             member.isOpenAudio = isOpenAudio
             member.isOpenVideo = isOpenVideo
             member.isWaiting = isWaiting

@@ -42,6 +42,10 @@ class GlobalVM : ViewModel(), LifecycleObserver {
     private var isBackground = false //是否处于后台
     private var needReCallBack = false //从后台回到前台 期间如果有人呼叫 需要将呼叫重新回调出去
     private var isShowNotify = false
+    var isWaiting = false //是否正处于呼叫/被叫接听等待中...
+    var isCalling = false// 是否正在通话中...
+    var callType = -1//呼叫类型
+    var callingUid = ""//p2p正在通话中的人的UID
     init {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     }
@@ -49,9 +53,9 @@ class GlobalVM : ViewModel(), LifecycleObserver {
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onForeground() {
         isBackground = false
-        if (needReCallBack){
+        if (needReCallBack) {
             viewModelScope.launch {
-                if (currentRemoteInvitation!=null){
+                if (currentRemoteInvitation != null) {
                     events?.onRemoteInvitationReceived(currentRemoteInvitation)
                     cancleNotify()
                 }
@@ -67,7 +71,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
 
 
     val userId = ((Math.random() * 9 + 1) * 1000L).toInt().toString()
-    private var events:RtmEvents? = null
+    private var events: RtmEvents? = null
 
 
     private val rtmClient by lazy {
@@ -78,9 +82,10 @@ class GlobalVM : ViewModel(), LifecycleObserver {
         )
     }
     val rtmCallManager by lazy { rtmClient.rtmCallManager }
-    var localInvitation:LocalInvitation? = null
-    var remoteInvitationArray = mutableListOf<RemoteInvitation>()//如果有多个人呼叫 必须将所有对象存起来 而不是直接覆盖之前的 不然会出各种奇怪的问题
-    var currentRemoteInvitation:RemoteInvitation? = null //当前的通话对象
+    var localInvitation: LocalInvitation? = null
+    var remoteInvitationArray =
+        mutableListOf<RemoteInvitation>()//如果有多个人呼叫 必须将所有对象存起来 而不是直接覆盖之前的 不然会出各种奇怪的问题
+    var currentRemoteInvitation: RemoteInvitation? = null //当前的通话对象
 
     var isLoginSuccess = false
     var channelId = ""
@@ -92,6 +97,59 @@ class GlobalVM : ViewModel(), LifecycleObserver {
 
     fun unRegister() {
         events = null
+    }
+
+    //当前通话是否是被叫
+    private fun currentIsCalled(): Boolean {
+        return currentRemoteInvitation != null
+    }
+    //发送查询对方呼叫状态信令
+    fun sendCallStateMsg() {
+        sendMessage(
+            callingUid, JSONObject().apply {
+                put("Cmd", "CallState")
+            }.toString(), {
+
+            })
+    }
+
+    //不在呼叫页面了
+    fun finishCall(){
+        if (currentIsCalled()){
+            currentRemoteInvitation?.let { rtmCallManager.refuseRemoteInvitation(it,null) }
+        }else{
+            localInvitation?.let { rtmCallManager.cancelLocalInvitation(it,null)}
+        }
+    }
+
+    //发送是否还在呼叫回执信令
+    fun sendCallStateResponseMsg(uid:String) {
+        sendMessage(
+           uid, JSONObject().apply {
+                if (isWaiting){
+                    put("CallState", 1)
+                }else if (isCalling){
+                    //如果发消息的id和当前通话id不一致则直接发CallState =0
+                        if (uid!=callingUid){
+                            put("CallState", 0)
+                        }else{
+                            put("CallState", 2)
+                            put("Mode",callType)
+                        }
+                }else{
+                    put("CallState", 0)
+                }
+            }.toString(), {
+
+            })
+    }
+
+    //重新分发对方已同意呼叫回调
+
+    fun reSendAcceptCallback(callType:Int){
+        events?.onLocalInvitationAccepted(localInvitation,JSONObject().apply {
+            put("Mode",callType)
+        }.toString())
     }
 
     suspend fun login() = suspendCoroutine<Boolean> {
@@ -109,12 +167,12 @@ class GlobalVM : ViewModel(), LifecycleObserver {
         })
     }
 
-    fun queryOnline(peerId: String,block: (Boolean) -> Unit) {
+    fun queryOnline(peerId: String, block: (Boolean) -> Unit) {
         queryOnline(HashSet<String>().apply {
             add(peerId)
         }) {
-            it?.let {map->
-               launch({
+            it?.let { map ->
+                launch({
                     if (map.containsKey(peerId) && map.get(peerId)!!) {
                         block.invoke(true)
                     } else {
@@ -127,42 +185,43 @@ class GlobalVM : ViewModel(), LifecycleObserver {
 
     }
 
-    fun queryOnline(list:MutableList<String>,block: (ArrayList<String>) -> Unit){
+    fun queryOnline(list: MutableList<String>, block: (ArrayList<String>) -> Unit) {
         val onlineArray = arrayListOf<String>()
-        rtmClient.queryPeersOnlineStatus(list.toSet(),object :ResultCallback<MutableMap<String,Boolean>>{
+        rtmClient.queryPeersOnlineStatus(list.toSet(),
+            object : ResultCallback<MutableMap<String, Boolean>> {
 
-            override fun onSuccess(var1: MutableMap<String, Boolean>?) {
-                viewModelScope.launch {
-                var1?.forEach {
-                    if (it.value) {
-                        onlineArray.add(it.key)
+                override fun onSuccess(var1: MutableMap<String, Boolean>?) {
+                    viewModelScope.launch {
+                        var1?.forEach {
+                            if (it.value) {
+                                onlineArray.add(it.key)
+                            }
+                        }
+                        block.invoke(onlineArray)
                     }
                 }
-                block.invoke(onlineArray)
+
+
+                override fun onFailure(var1: ErrorInfo?) {
+                    viewModelScope.launch {
+                        block.invoke(onlineArray)
+                    }
                 }
-            }
 
-
-            override fun onFailure(var1: ErrorInfo?) {
-                viewModelScope.launch {
-                    block.invoke(onlineArray)
-                }
-            }
-
-        })
+            })
     }
 
-    fun createLocalInvitation(peerId: String,type:Int,block:()->Unit){
+    fun createLocalInvitation(peerId: String, type: Int, block: () -> Unit) {
         localInvitation = rtmCallManager.createLocalInvitation(peerId)
         localInvitation?.let {
             it.content = JSONObject().apply {
-                put("Mode",type)//音频 or 视频
-                put("Conference",false)//是否多人
-                put("ChanId",((Math.random()*9+1)*100000000L).toLong().toString())//频道号
-                put("UserData","")
-                put("SipData","")
-                put("VidCodec","[\"H264\",\"MJpeg\"]")//适配linux手表端
-                put("AudCodec","[\"Opus\",\"G711\"]")//适配linux手表端
+                put("Mode", type)//音频 or 视频
+                put("Conference", false)//是否多人
+                put("ChanId", ((Math.random() * 9 + 1) * 100000000L).toLong().toString())//频道号
+                put("UserData", "")
+                put("SipData", "")
+                put("VidCodec", "[\"H264\",\"MJpeg\"]")//适配linux手表端
+                put("AudCodec", "[\"Opus\",\"G711\"]")//适配linux手表端
             }.toString()
         }
         block.invoke()
@@ -186,64 +245,71 @@ class GlobalVM : ViewModel(), LifecycleObserver {
     }
 
 
-    fun subscribe(peerId:String){
+    fun subscribe(peerId: String) {
         val list: MutableSet<String> = ArraySet()
         list.add(peerId)
-        rtmClient.subscribePeersOnlineStatus(list,null)
+        rtmClient.subscribePeersOnlineStatus(list, null)
     }
 
-    fun call(){
+    fun call() {
         localInvitation?.let {
-            rtmCallManager.sendLocalInvitation(it,null)
+            rtmCallManager.sendLocalInvitation(it, null)
         }
     }
-    fun call(localInvitation: LocalInvitation){
-        rtmCallManager.sendLocalInvitation(localInvitation,null)
+
+    fun call(localInvitation: LocalInvitation) {
+        rtmCallManager.sendLocalInvitation(localInvitation, null)
     }
 
-    fun unSubscribe(peerId:String){
+    fun unSubscribe(peerId: String) {
         val list: MutableSet<String> = ArraySet()
         list.add(peerId)
-        rtmClient.unsubscribePeersOnlineStatus(list,null)
+        rtmClient.unsubscribePeersOnlineStatus(list, null)
     }
 
-    fun sendMessage(userId:String,msg:String,block: (Boolean) -> Unit){
-        rtmClient.sendMessageToPeer(userId,rtmClient.createMessage(msg), SendMessageOptions(),object :ResultCallback<Void>{
-            override fun onSuccess(var1: Void?) {
-                viewModelScope.launch {
-                    block.invoke(true)
+    fun sendMessage(userId: String, msg: String, block: (Boolean) -> Unit) {
+        rtmClient.sendMessageToPeer(
+            userId,
+            rtmClient.createMessage(msg),
+            SendMessageOptions(),
+            object : ResultCallback<Void> {
+                override fun onSuccess(var1: Void?) {
+                    viewModelScope.launch {
+                        block.invoke(true)
+                    }
+
                 }
 
-            }
-
-            override fun onFailure(var1: ErrorInfo?) {
-                viewModelScope.launch {
-                    block.invoke(false)
+                override fun onFailure(var1: ErrorInfo?) {
+                    viewModelScope.launch {
+                        block.invoke(false)
+                    }
                 }
-            }
-        })
+            })
     }
 
-    fun cancle(){
+    fun cancle() {
         localInvitation?.let {
-            rtmCallManager.cancelLocalInvitation(it,null)
+            rtmCallManager.cancelLocalInvitation(it, null)
         }
     }
-    fun cancle(localInvitation: LocalInvitation){
-            rtmCallManager.cancelLocalInvitation(localInvitation,null)
+
+    fun cancle(localInvitation: LocalInvitation) {
+        rtmCallManager.cancelLocalInvitation(localInvitation, null)
     }
-    fun refuse(remoteInvitation: RemoteInvitation,response: String=""){
+
+    fun refuse(remoteInvitation: RemoteInvitation, response: String = "") {
         remoteInvitationArray.find { it.callerId == remoteInvitation.callerId }?.let {
             it.response = response
-            rtmCallManager.refuseRemoteInvitation(it,null)
+            rtmCallManager.refuseRemoteInvitation(it, null)
             remoteInvitationArray.remove(it)
         }
     }
 
-    fun accept(remoteInvitation:RemoteInvitation,response:String=""){
+    fun accept(remoteInvitation: RemoteInvitation, response: String = "") {
         remoteInvitationArray.find { it.callerId == remoteInvitation.callerId }?.let {
             it.response = response
-            rtmCallManager.acceptRemoteInvitation(it,null)
+            rtmCallManager.acceptRemoteInvitation(it, null)
             remoteInvitationArray.remove(it)
         }
     }
@@ -253,14 +319,14 @@ class GlobalVM : ViewModel(), LifecycleObserver {
         rtmClient.logout(null)
         rtmClient.release()
     }
-    
-    fun joinRTMChannel(chanID:String){
+
+    fun joinRTMChannel(chanID: String) {
         channelId = chanID
-        rtmChannel = rtmClient.createChannel(chanID,ChannelEvent())
+        rtmChannel = rtmClient.createChannel(chanID, ChannelEvent())
         rtmChannel?.join(null)
     }
 
-    fun leaveRtmChannel(){
+    fun leaveRtmChannel() {
         rtmChannel?.let {
             it.leave(null)
             it.release()
@@ -270,23 +336,23 @@ class GlobalVM : ViewModel(), LifecycleObserver {
 
     private inner class RtmEvent : RtmClientListener {
         override fun onConnectionStateChanged(state: Int, reason: Int) {
-                events?.onConnectionStateChanged(state, reason)
+            events?.onConnectionStateChanged(state, reason)
         }
 
         override fun onMessageReceived(var1: RtmMessage?, var2: String?) {
-            events?.onMessageReceived(var1)
+            events?.onMessageReceived(var1,var2)
         }
 
         override fun onTokenExpired() {
         }
 
         override fun onPeersOnlineStatusChanged(var1: MutableMap<String, Int>?) {
-                events?.onPeersOnlineStatusChanged(var1)
+            events?.onPeersOnlineStatusChanged(var1)
         }
 
     }
 
-    private inner class CallEvent : RtmCallEventListener{
+    private inner class CallEvent : RtmCallEventListener {
         //返回给主叫的回调：被叫已收到呼叫邀请。
         override fun onLocalInvitationReceivedByPeer(var1: LocalInvitation?) {
             events?.onLocalInvitationReceivedByPeer(var1)
@@ -295,70 +361,78 @@ class GlobalVM : ViewModel(), LifecycleObserver {
 
         //返回给主叫的回调：被叫已接受呼叫邀请
         override fun onLocalInvitationAccepted(var1: LocalInvitation?, var2: String?) {
-                events?.onLocalInvitationAccepted(var1, var2)
+            events?.onLocalInvitationAccepted(var1, var2)
         }
 
         //返回给主叫的回调：被叫已拒绝呼叫邀请。
         override fun onLocalInvitationRefused(var1: LocalInvitation?, var2: String?) {
-                events?.onLocalInvitationRefused(var1, var2)
+            events?.onLocalInvitationRefused(var1, var2)
         }
 
         //返回给主叫的回调：呼叫邀请已被成功取消。
         override fun onLocalInvitationCanceled(var1: LocalInvitation?) {
-                events?.onLocalInvitationCanceled(var1)
+            events?.onLocalInvitationCanceled(var1)
         }
+
         //返回给主叫的回调：发出的呼叫邀请过程失败。
         override fun onLocalInvitationFailure(var1: LocalInvitation?, var2: Int) {
-                events?.onLocalInvitationFailure(var1, var2)
+            events?.onLocalInvitationFailure(var1, var2)
         }
+
         //返回给被叫的回调：收到一条呼叫邀请。SDK 会同时返回一个 RemoteInvitation 对象供被叫管理。
         override fun onRemoteInvitationReceived(var1: RemoteInvitation?) {
-            if (currentRemoteInvitation == null){//如果当前没有通话ID 就给它赋值
+            if (currentRemoteInvitation == null) {//如果当前没有通话ID 就给它赋值
                 currentRemoteInvitation = var1
             }
             remoteInvitationArray.add(var1!!)
             viewModelScope.launch {
-                    if (isBackground){//如果是在后台 则不分发这个收到呼叫 因为安卓10或国内一些rom限制后台启动activity
-                        //todo 可以加本地通知
-                        needReCallBack = true
-                        val pakContext = getPackageContext(CallApplication.callApp.applicationContext,BuildConfig.APPLICATION_ID)
-                        pakContext?.let {
-                            val intent = getAppOpenIntentByPackageName(it,BuildConfig.APPLICATION_ID)
-                            val builder = Notify.with(CallApplication.callApp.applicationContext)
-                                .alerting("sound",{
-                                    sound = Uri.parse("android.resource://" + BuildConfig.APPLICATION_ID + "/" +R.raw.video_request)
-                                })
-                                .meta {
-                                    clickIntent = PendingIntent.getActivity(CallApplication.callApp.applicationContext,0,
-                                        intent,0
-                                    )
-                                    cancelOnClick = true
-                                }
-                                .content {
-                                    title = "收到呼叫"
-                                    text = "收到来自${var1.callerId}的呼叫邀请"
-                                }.asBuilder().setOnlyAlertOnce(false)
-                           with(NotificationManagerCompat.from(CallApplication.callApp.applicationContext)){
-                               notify(1000,builder.build().apply {
-                                   flags = Notification.FLAG_INSISTENT
-                               })
-                               isShowNotify = true
-                           }
-
+                if (isBackground) {//如果是在后台 则不分发这个收到呼叫 因为安卓10或国内一些rom限制后台启动activity
+                    //todo 可以加本地通知
+                    needReCallBack = true
+                    val pakContext = getPackageContext(
+                        CallApplication.callApp.applicationContext,
+                        BuildConfig.APPLICATION_ID
+                    )
+                    pakContext?.let {
+                        val intent = getAppOpenIntentByPackageName(it, BuildConfig.APPLICATION_ID)
+                        val builder = Notify.with(CallApplication.callApp.applicationContext)
+                            .alerting("sound", {
+                                sound =
+                                    Uri.parse("android.resource://" + BuildConfig.APPLICATION_ID + "/" + R.raw.video_request)
+                            })
+                            .meta {
+                                clickIntent = PendingIntent.getActivity(
+                                    CallApplication.callApp.applicationContext, 0,
+                                    intent, 0
+                                )
+                                cancelOnClick = true
+                            }
+                            .content {
+                                title = "收到呼叫"
+                                text = "收到来自${var1.callerId}的呼叫邀请"
+                            }.asBuilder().setOnlyAlertOnce(false)
+                        with(NotificationManagerCompat.from(CallApplication.callApp.applicationContext)) {
+                            notify(1000, builder.build().apply {
+                                flags = Notification.FLAG_INSISTENT
+                            })
+                            isShowNotify = true
                         }
-                    }else{
-                        events?.onRemoteInvitationReceived(var1)
+
                     }
+                } else {
+                    events?.onRemoteInvitationReceived(var1)
+                }
             }
         }
+
         //返回给被叫的回调：接受呼叫邀请成功。
         override fun onRemoteInvitationAccepted(var1: RemoteInvitation?) {
             cancleNotify()
             events?.onRemoteInvitationAccepted(var1)
-            if (currentRemoteInvitation?.callerId.equals(var1!!.callerId)){
+            if (currentRemoteInvitation?.callerId.equals(var1!!.callerId)) {
                 currentRemoteInvitation = null
             }
-            remoteInvitationArray.find { it.callerId==var1?.callerId }?.let {
+            remoteInvitationArray.find { it.callerId == var1?.callerId }?.let {
                 remoteInvitationArray.remove(it)
             }
 
@@ -368,10 +442,10 @@ class GlobalVM : ViewModel(), LifecycleObserver {
         override fun onRemoteInvitationRefused(var1: RemoteInvitation?) {
             cancleNotify()
             events?.onRemoteInvitationRefused(var1)
-            if (currentRemoteInvitation?.callerId.equals(var1!!.callerId)){
+            if (currentRemoteInvitation?.callerId.equals(var1!!.callerId)) {
                 currentRemoteInvitation = null
             }
-            remoteInvitationArray.find { it.callerId==var1?.callerId }?.let {
+            remoteInvitationArray.find { it.callerId == var1?.callerId }?.let {
                 remoteInvitationArray.remove(it)
             }
 
@@ -380,10 +454,10 @@ class GlobalVM : ViewModel(), LifecycleObserver {
         override fun onRemoteInvitationCanceled(var1: RemoteInvitation?) {
             cancleNotify()
             events?.onRemoteInvitationCanceled(var1)
-            if (currentRemoteInvitation?.callerId.equals(var1!!.callerId)){
+            if (currentRemoteInvitation?.callerId.equals(var1!!.callerId)) {
                 currentRemoteInvitation = null
             }
-            remoteInvitationArray.find { it.callerId==var1?.callerId }?.let {
+            remoteInvitationArray.find { it.callerId == var1?.callerId }?.let {
                 remoteInvitationArray.remove(it)
             }
 
@@ -391,11 +465,11 @@ class GlobalVM : ViewModel(), LifecycleObserver {
 
         override fun onRemoteInvitationFailure(var1: RemoteInvitation?, var2: Int) {
             cancleNotify()
-             events?.onRemoteInvitationFailure(var1, var2)
-            if (currentRemoteInvitation?.callerId.equals(var1!!.callerId)){
+            events?.onRemoteInvitationFailure(var1, var2)
+            if (currentRemoteInvitation?.callerId.equals(var1!!.callerId)) {
                 currentRemoteInvitation = null
             }
-            remoteInvitationArray.find { it.callerId==var1?.callerId }?.let {
+            remoteInvitationArray.find { it.callerId == var1?.callerId }?.let {
                 remoteInvitationArray.remove(it)
             }
 
@@ -403,7 +477,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
 
     }
 
-    private inner class ChannelEvent : RtmChannelListener{
+    private inner class ChannelEvent : RtmChannelListener {
         override fun onMemberCountUpdated(var1: Int) {
         }
 
@@ -411,25 +485,25 @@ class GlobalVM : ViewModel(), LifecycleObserver {
         }
 
         override fun onMessageReceived(var1: RtmMessage?, var2: RtmChannelMember?) {
-                events?.onMessageReceived(var1)
+            events?.onMessageReceived(var1,var2?.userId)
         }
 
         override fun onMemberJoined(var1: RtmChannelMember?) {
             viewModelScope.launch {
-                    events?.onMemberJoined(var1)
+                events?.onMemberJoined(var1)
             }
 
         }
 
         override fun onMemberLeft(var1: RtmChannelMember?) {
             viewModelScope.launch {
-                    events?.onMemberLeft(var1)
+                events?.onMemberLeft(var1)
             }
         }
     }
 
-    private fun cancleNotify(){
-        if (isShowNotify){
+    private fun cancleNotify() {
+        if (isShowNotify) {
             Notify.cancelNotification(1000)
             isShowNotify = false
         }
