@@ -249,13 +249,13 @@ class P2PVideoActivity : BaseActivity() {
         runOnUiThread {
             map?.let {
                 if (map.containsKey(remoteUserId)) {
-                    if (map[remoteUserId] != 0) {
-                        //离线了 -- sdk bug 会收到对方先离线再上线 --
-                        // 临时解决办法 收到离线 主动查询是否真的离线
-                        //如果正在呼叫界面
+                    if (map[remoteUserId] != 0) {//离线了
+                        //****sdk bug 会收到对方先离线再上线****
+                        //****临时解决办法 收到离线 主动查询是否真的离线****
                         callViewModel.queryOnline(remoteUserId){
-                            if (it==false){
+                            if (!it){
                                 if (callViewModel.isWaiting) {
+                                    //如果正在呼叫界面
                                     callViewModel.finishCall()
                                 }
                                 callViewModel.unSubscribe(remoteUserId)
