@@ -227,6 +227,13 @@
 				try {
 					// 分辨率
 					const oDataVideoConfig = uni.getStorageSync('DataVideoConfig');
+					if(!oDataVideoConfig) {
+						oDataVideoConfig = {
+							width: 720,
+							height: 1280,
+							frameRate: 15
+						}
+					}
 					console.log("分辨率", oDataVideoConfig);
 					// 降噪存储
 					const oEtAudioAiNoise = uni.getStorageSync('etAudioAiNoise');
