@@ -204,7 +204,16 @@ const RTC = {
 		Store.existTimer && clearInterval(Store.existTimer)
 		Store.existTimer = setInterval(async () => {
 			if (Store.VideoConfig) {
-				clearInterval(Store.existTimer)
+				clearInterval(Store.existTimer);
+				if (!Store.VideoConfig.width) {
+					Store.VideoConfig = {
+						"width": 720,
+						"height": 1280,
+						"frameRate": 15,
+						"bitrate": 2000,
+						"orientationMode": 2
+					}
+				}
 				// 设置视频编码属性
 				await rtcModule.setVideoEncoderConfiguration(Store.VideoConfig, (res) => {
 					console.log('RTC 设置视频编码属性 setVideoEncoderConfiguration 方法调用', res
