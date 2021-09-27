@@ -18,7 +18,6 @@
 						uni.showLoading({
 							title: '联网中'
 						});
-
 					}
 				}
 			});
@@ -28,7 +27,7 @@
 					if (oa) {
 						this.$RTM.init();
 						oa = false;
-					}
+					} 
 				} else {
 					uni.showLoading({
 						title: '联网中',

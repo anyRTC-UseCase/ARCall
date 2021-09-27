@@ -11,6 +11,12 @@ let Store = {
 	existTimer: null,
 	destroyRtcTimer: null,
 	channel: "", // 频道
+	// 对方网络异常定时器（10s后关闭通话）
+	networkAnomaly: null,
+	networkAnomalyTime: 10000,
+	// 加入频道后，频道无其他用户，通话异常定时器
+	joinChannelUser: null,
+	joinChannelUserTime: 10000,
 };
 // rtc 实时音频通话
 const RTC = {
@@ -37,6 +43,7 @@ const RTC = {
 	// 相关回调(仅列举常用回调)
 	callBack: function(res) {
 		switch (res.engineEvent) {
+			// 网络连接中断
 			case "onConnectionLost":
 				console.log("onConnectionLost", res);
 				break;
@@ -59,16 +66,37 @@ const RTC = {
 					"channel": Store.channelId + '',
 					"uid": Store.uid + '',
 				});
+				// 10s内无用户加入频道
+				Store.joinChannelUser = setTimeout(() => {
+					Utils.hintRTCInfo('对方网络异常', 'warn');
+					setTimeout(() => {
+						RTC.destroyRtc(1);
+					}, 2000);
+				}, Store.joinChannelUserTime)
+				break;
+			case "onRejoinChannelSuccess":
+				console.log("重新加入频道回调 onRejoinChannelSuccess", res);
 				break;
 				// 远端用户加入当前频道回调
 			case "onUserJoined":
+				console.log("远端用户加入当前频道回调", res);
+				// 清除异常定时器
+				Store.networkAnomaly && clearTimeout(Store.networkAnomaly);
+				// 清除无远端用户加入
+				Store.joinChannelUser && clearTimeout(Store.joinChannelUser);
 				Utils.hintRTCInfo('用户' + res.uid + '加入频道', 'info');
 				break;
 				// 远端用户离开当前频道回调
 			case "onUserOffline":
 				console.log("远端用户离开当前频道回调", res);
 				// RTC.leave();
-				RTC.destroyRtc();
+				if (res.reason != 0) {
+					Utils.hintRTCInfo('对方网络异常', 'warn');
+					// 异常（如果时间限制下还没有再次进入,结束当前通话)
+					Store.networkAnomaly = setTimeout(() => {
+						RTC.destroyRtc(res.reason);
+					}, Store.networkAnomalyTime);
+				}
 				break;
 				// 网络连接状态已改变回调
 			case "onConnectionStateChanged":
@@ -87,13 +115,6 @@ const RTC = {
 			case "onRemoteVideoStateChanged":
 				RTCUtils.RemoteVideoStateChanged(res);
 				break;
-				// 	// 本地网络类型发生改变回调
-				// case "onNetworkTypeChanged":
-				// 	break;
-				// 	// 网络连接中断
-				// case "onConnectionLost":
-				// 	break;
-
 				// 	// 远端音频状态发生改变回调
 				// case "onRemoteAudioStateChanged":
 				// 	break;
@@ -103,9 +124,8 @@ const RTC = {
 				// 	// 本地视频状态发生改变回调
 				// case "onLocalVideoStateChanged":
 				// 	break;
-				// 	// 重新加入频道回调
-				// case "onRejoinChannelSuccess":
-				// 	break;
+				// 重新加入频道回调
+
 				// 	// 离开频道回调
 				// case "onLeaveChannel":
 				// 	break;
@@ -149,6 +169,8 @@ const RTC = {
 	},
 	// 加入频道
 	joinChannel: async function(info) {
+		// 通话中
+		uni.$emit('isCalling', true);
 		Store.channel = info.channelId;
 		// 开启视频
 		Store.mode = info.mode;
@@ -193,18 +215,20 @@ const RTC = {
 	},
 	// 转语音
 	toSpeech: function() {
-		// 关闭视频模块
-		rtcModule.disableVideo((res) => {
-			console.log('RTC 关闭视频模块 disableVideo 方法调用', res.code === 0 ? '成功' : '失败：' +
-				res);
-		})
+		if (rtcModule && rtcModule.disableVideo) {
+			// 关闭视频模块
+			rtcModule.disableVideo((res) => {
+				console.log('RTC 关闭视频模块 disableVideo 方法调用', res.code === 0 ? '成功' : '失败：' +
+					res);
+			})
+		}
 	},
 	// 启用视频（加入房间后自动发布）
 	enableVideo: function() {
 		Store.existTimer && clearInterval(Store.existTimer)
 		Store.existTimer = setInterval(async () => {
 			if (Store.VideoConfig) {
-				clearInterval(Store.existTimer);
+				clearInterval(Store.existTimer)
 				if (!Store.VideoConfig.width) {
 					Store.VideoConfig = {
 						"width": 720,
@@ -230,21 +254,23 @@ const RTC = {
 		}, 50)
 	},
 	// 本地启用视频后
-	localVideo: async function(data) {
-		// console.log("本地启用视频后",data);
-		// // 渲染视频
-		await Store.location.setupLocalVideo({
-			"renderMode": 1,
-			"channelId": data.channel,
-			"uid": data.uid,
-			"mirrorMode": 0
-		}, (res) => {
-			console.log('渲染视频', res);
-		});
-		// 本地预览
-		await Store.location.startPreview((res) => {
-			console.log('本地预览', res);
-		})
+	localVideo: function(data) {
+		setTimeout(async () => {
+			// console.log("本地启用视频后",data);
+			// // 渲染视频
+			await Store.location.setupLocalVideo({
+				"renderMode": 1,
+				"channelId": data.channel,
+				"uid": data.uid,
+				"mirrorMode": 0
+			}, (res) => {
+				console.log('渲染视频', res);
+			});
+			// 本地预览
+			await Store.location.startPreview((res) => {
+				console.log('本地预览', res);
+			})
+		}, 200)
 	},
 	// 远端加入房间后进行
 	remotenableVideo: async function(data) {
@@ -273,18 +299,17 @@ const RTC = {
 		});
 	},
 	// 销毁实例
-	destroyRtc: function() {
+	destroyRtc: function(data) {
 		if (rtcModule && rtcModule.destroyRtc) {
 			// 销毁实例
 			rtcModule.destroyRtc((res) => {
 				console.log("销毁实例", res);
 				if (res.code === 0) {
-					RTCUtils.destroyRtc();
+					RTCUtils.destroyRtc(data);
 				}
 			});
 			// 销毁 rtc 监听函数;
 			uni.$off('location-cavasview');
-			uni.$off('PeersOnlineStatusChanged');
 			uni.$off('rtc-endcall');
 		}
 	}
@@ -296,44 +321,12 @@ uni.$on("location-cavasview", data => {
 		Store = Object.assign(Store, data);
 	}
 })
-// 监测用户在线状态（一旦断网就挂断）
-uni.$on('PeersOnlineStatusChanged', data => {
-	if (data) {
-		const oStatus = data.peersStatus[0];
-		if (oStatus && oStatus.state === 2) {
-			// 用户离线
-			Utils.hintRTCInfo('远端用户离线', 'error');
-			// 判断在 rtm 还是在 rtc
-			if (!Store.channel && !Store.uid) {
-				// // 清除(呼叫时取消呼叫)
-				uni.$emit("sendMessageToPeer", {
-					Cmd: "InitiativeCall",
-					peerid: oStatus.peerId
-				});
-				uni.$emit("sendMessageToPeer", {
-					peerid: oStatus.peerId,
-					Cmd: "EndCall",
-				});
-			} else if (Store.channel) {
-				setTimeout(() => {
-					// 发送挂断信息 （ArCall 逻辑所需）
-					uni.$emit("sendMessageToPeer", {
-						peerid: oStatus.peerId,
-						Cmd: "EndCall",
-					});
-					// 清除
-					RTC.destroyRtc(oStatus.peerId);
-				}, 1000);
-			}
-		}
-	}
-})
 
 // 监测 rtc 收到的挂断信息
 uni.$on("rtc-endcall", data => {
 	// 挂断
 	if (data.message === "EndCall") {
-		console.log("监测 rtc 收到的挂断信息", data);
+		console.log("监测 rtc 收到的挂断信息", data,Store);
 		Utils.restoreAll();
 		if (!Store.channel && !Store.uid) {
 			// // 清除(呼叫时取消呼叫)
@@ -342,7 +335,7 @@ uni.$on("rtc-endcall", data => {
 				peerid: data.peerId
 			});
 		} else if (Store.channel) {
-			RTC.destroyRtc();
+			data.abnormal == "异常" ? RTC.destroyRtc(1) : RTC.destroyRtc();
 		}
 	}
 })

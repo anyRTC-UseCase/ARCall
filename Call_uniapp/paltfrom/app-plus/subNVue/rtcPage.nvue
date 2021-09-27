@@ -134,6 +134,7 @@
 		},
 		mounted() {
 			let oOne = true;
+
 			// 监测 rtc 模块开启
 			uni.$on('CavasViewRtc', data => {
 				this.show = data.content;
@@ -142,6 +143,7 @@
 					const info = JSON.parse(data.content);
 					// 远端用户
 					this.peerId = data.callerId || data.calleeId;
+					console.log("监测 rtc 模块开启", data);
 					// 频道房间
 					this.channel = info.ChanId;
 					// 判断语音、视频
@@ -190,6 +192,7 @@
 			},
 			// 挂断
 			leaveFn() {
+				console.log("发送挂断信息", this.peerId);
 				// 发送挂断信息 （ArCall 逻辑所需）
 				uni.$emit("sendMessageToPeer", {
 					peerid: this.peerId,
@@ -209,6 +212,7 @@
 			},
 			// 转到语音通话
 			toSpeechFn() {
+				console.log("转到语音通话", this.peerId);
 				uni.$emit("sendMessageToPeer", {
 					peerid: this.peerId,
 					Cmd: "SwitchAudio",

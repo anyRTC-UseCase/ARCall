@@ -80,14 +80,8 @@
 					uni.showLoading({
 						title: '加载中，请稍后'
 					});
-					// 查看呼叫用户是否存在
-					const queryPeersOnline = await this.$RTM.queryPeersOnlineStatus([this.peeerUid]);
 					await uni.hideLoading();
-					// this.$Utils.hintInfo("查看呼叫用户是否存在" + JSON.stringify(queryPeersOnline));
-					console.log("查看呼叫用户是否存在", queryPeersOnline);
-					if (queryPeersOnline.code === 0 && queryPeersOnline.peerOnlineStatus[0].state != 2) {
-						// 订阅呼叫用户在线状态
-						this.$RTM.subscribePeersOnlineStatus([this.peeerUid]);
+					if (await this.PeersOnlineStatusFn()) {
 						const oIndex = await new Promise((resolve, reject) => {
 							uni.showActionSheet({
 								itemList: this.callTypeList,
@@ -101,41 +95,53 @@
 							this.callFn(oIndex.tapIndex);
 						}
 					} else {
-						this.$Utils.hintInfo(queryPeersOnline.code === 0 ? '呼叫用户不在线' :
-							'queryPeersOnlineStatus 方法调用失败：' +
-							queryPeersOnline.code, 'error');
+						this.$Utils.hintInfo('呼叫用户不在线', 'error');
 						this.disabledCall = true;
 					}
-
 				} else {
 					this.$Utils.hintInfo("请输入正确的用户，呼叫对象不能为自己", "error");
 				}
 			},
 			// 发起呼叫
 			async callFn(num) {
-				// 生成随机频道Id
-				this.channelId = await this.$Utils.generateNumber(9);
-				// 携带信息
-				const oTnfo = {
-					Mode: num, // 呼叫类型 视频通话 0 语音通话 1
-					Conference: false, // 是否是多人会议
-					ChanId: this.channelId + '', // 频道房间
-					UserData: "",
-					SipData: "",
-					VidCodec: ["H264"],
-					AudCodec: ["Opus"],
-				}
-				// 发起呼叫
-				const code = await this.$RTM.sendLocalInvitation(this.peeerUid, oTnfo);
-				console.log("发起呼叫", code);
-				if (code != 0 && code != 5) {
-					console.log(code);
-					this.$Utils.hintInfo('调用 sendLocalInvitation 发送呼叫失败');
-					this.disabledCall = true;
+				if (await this.PeersOnlineStatusFn()) {
+					// 生成随机频道Id
+					this.channelId = await this.$Utils.generateNumber(9);
+					// 携带信息
+					const oTnfo = {
+						Mode: num, // 呼叫类型 视频通话 0 语音通话 1
+						Conference: false, // 是否是多人会议
+						ChanId: this.channelId + '', // 频道房间
+						UserData: "",
+						SipData: "",
+						VidCodec: ["H264"],
+						AudCodec: ["Opus"],
+					}
+					// 发起呼叫
+					const code = await this.$RTM.sendLocalInvitation(this.peeerUid, oTnfo);
+					console.log("发起呼叫", code);
+					if (code != 0 && code != 5) {
+						console.log(code);
+						this.$Utils.hintInfo('调用 sendLocalInvitation 发送呼叫失败');
+						this.disabledCall = true;
+					} else {
+						this.disabledCall = false;
+					}
 				} else {
-					this.disabledCall = false;
+					this.$Utils.hintInfo('呼叫用户已离线', 'error');
+					this.disabledCall = true;
 				}
-
+			},
+			// 判断呼叫对象人员在线
+			async PeersOnlineStatusFn() {
+				// 查看呼叫用户是否存在
+				const queryPeersOnline = await this.$RTM.queryPeersOnlineStatus([this.peeerUid]);
+				console.log("查看呼叫用户是否存在",queryPeersOnline);
+				if (queryPeersOnline.code === 0 && queryPeersOnline.peerOnlineStatus[0].state != 2) {
+					return true
+				} else {
+					return false
+				}
 			}
 		}
 	}

@@ -67,27 +67,29 @@
 				current: 'rtm',
 				network: false,
 
+				networkEnd: null
 			}
 		},
 		created() {
-			// 断网后主动挂断
+			// 断网后处理
 			uni.onNetworkStatusChange((res) => {
-				if (!res.isConnected && this.current == 'rtm') {
-					setTimeout(() => {
-						this.network = true;
-					})
+				if (res.isConnected) {
+					clearTimeout(this.networkEnd);
+					let oTime = setInterval(() => {
+						// RTM 重连后发送
+						const od = this.$RTM.getLoginStatu();
+						if (od.state == 3 && od.reason == 2) {
+							clearInterval(oTime);
+							// 断网重连发送状态信息
+							console.log("断网重连发送状态信息");
+							this.$RTM.networkReconnection();
+						}
+					}, 500)
 				} else {
-					if (this.network = true) {
-						this.network = false;
-						let oTime = setInterval(() => {
-							const od = this.$RTM.getLoginStatu();
-							if (od.state == 3 && od.reason == 2) {
-								// uni.hideLoading();
-								this.cancelFn();
-								clearInterval(oTime);
-							}
-						}, 500)
-					}
+					this.networkEnd = setTimeout(() => {
+						// 30s 无网络连接结束当前通话
+						this.$RTM.networkEndCall();
+					}, 30000);
 				}
 			});
 		},

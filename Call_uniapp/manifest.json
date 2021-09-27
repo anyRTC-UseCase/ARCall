@@ -1,6 +1,6 @@
 {
-    "name" : "anyRTC_arCall",
-    "appid" : "__UNI__95B1178",
+    "name" : "arcall_uni",
+    "appid" : "__UNI__1EC9225",
     "description" : "",
     "versionName" : "1.0.0",
     "versionCode" : "100",
@@ -82,30 +82,30 @@
         "nativePlugins" : {
             "AR-RtcModule" : {
                 "__plugin_info__" : {
-                    "name" : "AR-RtcModule",
-                    "description" : "anyRTC音视频插件提供音视频功能，支持Android、iOS。",
+                    "name" : "anyRTC音视频SDK插件",
+                    "description" : "anyRTC音视频SDK插件提供音视频功能，支持Android、iOS。",
                     "platforms" : "Android,iOS",
-                    "url" : "",
-                    "android_package_name" : "",
+                    "url" : "https://ext.dcloud.net.cn/plugin?id=3661",
+                    "android_package_name" : "anyrtc.io",
                     "ios_bundle_id" : "",
-                    "isCloud" : false,
-                    "bought" : -1,
-                    "pid" : "",
+                    "isCloud" : true,
+                    "bought" : 1,
+                    "pid" : "3661",
                     "parameters" : {}
                 }
             },
             "AR-RtmModule" : {
                 "android_appid" : "",
                 "__plugin_info__" : {
-                    "name" : "AR-RtmModule",
-                    "description" : "anyRTC实时消息插件提供音视频功能，支持Android、iOS。",
+                    "name" : "anyRTC实时消息SDK插件",
+                    "description" : "anyRTC实时消息插件提供实时消息功能，支持Android、iOS。",
                     "platforms" : "Android,iOS",
-                    "url" : "",
-                    "android_package_name" : "",
+                    "url" : "https://ext.dcloud.net.cn/plugin?id=3777",
+                    "android_package_name" : "anyrtc.io",
                     "ios_bundle_id" : "",
-                    "isCloud" : false,
-                    "bought" : -1,
-                    "pid" : "",
+                    "isCloud" : true,
+                    "bought" : 1,
+                    "pid" : "3777",
                     "parameters" : {
                         "android_appid" : {
                             "des" : "",

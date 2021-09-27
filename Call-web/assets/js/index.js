@@ -33,6 +33,7 @@ var Config = {
     // },
   },
 };
+
 // 页面工具类
 var Utils = {
   // 生成uid
@@ -42,6 +43,38 @@ var Utils = {
     return generateNum < Math.pow(10, numLen - 1)
       ? Utils.generateNumber(numLen)
       : generateNum;
+  },
+  // 断网处理
+  updateOnlineStatus(e) {
+    // 仅p2p
+    if (!Store.Conference && Store.network.status != 0) {
+      const { type } = e;
+      Store.localwork = type === "online";
+      if (navigator.onLine) {
+        Store.networkSet && clearTimeout(Store.networkSet);
+        console.log("重连后查询对方状态信息", Store);
+        // 重连后查询对方状态信息
+        OperationPackge.p2p.networkSendInfo();
+        // 连网
+      } else {
+        Store.networkSet && clearTimeout(Store.networkSet);
+        Utils.alertWhole("网络异常");
+        // 断网 30s 无网络连接自动挂断
+        Store.networkSet = setTimeout(() => {
+          console.log("断网 30s 无网络连接自动挂断", Store);
+          Store.lineworkRTC = false;
+          OperationPackge.p2p.cancelCall(3);
+        }, 22000);
+        let oTimr = 0;
+        let onTimr = setInterval(() => {
+          oTimr++;
+          if (navigator.onLine || oTimr >= 22) {
+            clearInterval(onTimr);
+            Store.networkSet && clearTimeout(Store.networkSet);
+          }
+        }, 1000);
+      }
+    }
   },
   // 事件打印
   printLog() {
@@ -385,6 +418,7 @@ var Utils = {
 
 // 本地数据存储
 var Store = {
+  repetitionClick: false, // 按钮重复点击标记
   Conference: false, // 选择的呼叫模式  false: p2p呼叫  true: 多人呼叫
   Calling: false, // 正在通话中(标识)
   JoinRTCChannel: false, // 加入 RTC 频道(标识)
@@ -409,10 +443,12 @@ var Store = {
     videoTrack: null,
     audioTrack: null,
   },
+  // RTC 远端视频轨道
+  remoteVideoTracks: null,
   // 设置
   setting: {
     // p2p设置
-    videoSize: [320, 180], //设置视频采集的分辨率大小
+    videoSize: [1920, 1080], //设置视频采集的分辨率大小
     audioDevice: "default", // 设置音频设备ID
     videoDevice: "default", // 设置视频设备ID
     // 多人设置
@@ -420,8 +456,27 @@ var Store = {
     enableVideo: true, // 视频开关
   },
   invitationUserIds: [], // 存放多人通话的用户id
-};
+  // 接听后频道无人
+  callChannelPro: null,
+  callChannelProTime: 15000,
 
+  localwork: true, // 本地网络
+  lineworkRTM: true, // RTM网络连接状态
+  lineworkRTC: true, // RTC网络连接状态
+  // 断网相关(p2p)
+  network: {
+    // type: "rtm", // 断网时所在页面 rtm rtc
+    calltype: 0, // 呼叫类型 0:主叫 1:被叫
+    status: 0, // 当前状态 呼叫中:1 已接受:2 挂断:0
+    Mode: 0, // 通话类型 语音、视频
+  },
+  networkSet: null, // 断网定时挂断
+  networkTime: 30000, // 断网定时挂断时间
+  remodVideoEnd: null, // 远端断网定时器
+  remodVideoEndTime: 10000,
+  networkReconnection: null, // 断网重连后发送信息无响应
+  networkReconnectionTime: 10000,
+};
 // 页面隐藏显示操作类
 var PageShow = {
   // 显示首页
@@ -465,6 +520,17 @@ var PageShow = {
       $("#MultipleCalls").addClass("disabled");
     $("#loginMutiSetting").hasClass("show") &&
       $("#loginMutiSetting").removeClass("show");
+  },
+  // 断网重连(p2p)
+  networkP2P: function () {
+    $("#peerVideoPreview").html($("#peerVideoPreview_bg"));
+  },
+  // 断网远端显示/隐藏(p2p)
+  networkRemoShow: function (fase = true) {
+    $("#peerVideoPreview").html("");
+    fase
+      ? $("#peerVideoPreview").addClass("video-preview_big_network")
+      : $("#peerVideoPreview").removeClass("video-preview_big_network");
   },
   // 初始设置 (多人)
   initSetingMulti: function () {
@@ -686,7 +752,10 @@ var SdkPackge = {
       // RTC SDK 监听用户离开频道
       Store.rtcClient.on("user-left", SdkPackge.RTC.userLeft);
       // RTC SDK 连接状态
-      // Store.rtcClient.on("connection-state-change", SdkPackge.RTC.connectionStateChange);
+      Store.rtcClient.on(
+        "connection-state-change",
+        SdkPackge.RTC.connectionStateChange
+      );
     },
     // 用户发布
     userPublished: async function (user, mediaType) {
@@ -714,6 +783,8 @@ var SdkPackge = {
       if (Store.Conference) {
         // 更新视图
         Utils.updateUserViewStatus(user.uid, 1);
+      } else {
+        OperationPackge.p2p.userJoined(user);
       }
     },
     // 用户离开频道
@@ -725,11 +796,16 @@ var SdkPackge = {
         : OperationPackge.p2p.userLeft(user, reason);
     },
     // SDK 与服务器的连接状态发生改变
-    // connectionStateChange: async function (curState, revState, reason) {
-    //   console.log("SDK 与服务器的连接状态发生改变1", curState);
-    //   console.log("SDK 与服务器的连接状态发生改变2", revState);
-    //   console.log("SDK 与服务器的连接状态发生改变3", reason);
-    // },
+    connectionStateChange: async function (curState, revState, reason) {
+      Store.lineworkRTC =
+        curState == "CONNECTED" || curState == "DISCONNECTED" ? true : false;
+      if (curState != "DISCONNECTED") {
+        Utils.alertWhole(
+          Store.lineworkRTC ? "RTC 连接成功" : "RTC 连接中",
+          Store.lineworkRTC ? "alert-success" : "alert-info"
+        );
+      }
+    },
 
     // 本地采集用户音视频
     getUserMedia: async function () {
@@ -879,7 +955,6 @@ var SdkPackge = {
         await OperationPackge.p2p.closeSeting();
         // 标识为正在通话中
         Store.Calling = true;
-        console.log(invitationContent);
         if (
           !invitationContent.VidCodec ||
           !invitationContent.AudCodec ||
@@ -889,6 +964,8 @@ var SdkPackge = {
             invitationContent.AudCodec.indexOf("Opus") !== -1)
         ) {
           Store.Conference = invitationContent.Conference;
+          // 远端
+          Store.peerUserId = remoteInvitation.callerId;
           Store.Conference // 多人逻辑操作
             ? OperationPackge.multi.RemoteInvitationReceived(invitationContent) // p2p逻辑操作
             : OperationPackge.p2p.RemoteInvitationReceived(invitationContent);
@@ -902,38 +979,57 @@ var SdkPackge = {
     MessageFromPeer: function (message, peerId, messageProps) {
       message.text = JSON.parse(message.text);
       // console.log("收到来自对端的点对点消息", message);
-      // 视频转语音
-      if (message.text.Cmd === "SwitchAudio") {
-        var oTime = setInterval(async function () {
-          if (Store.localTracks.videoTrack) {
-            clearInterval(oTime);
-            // 语音通话
-            await PageShow.showVoicePage();
-            // 关闭视频并释放
-            (await Store.localTracks.videoTrack) &&
-              (Store.localTracks.videoTrack.close(),
-              (Store.localTracks.videoTrack = null));
-            // console.log("关闭视频并释放", Store.localTracks.videoTrack);
-            // 显示音频通话时长
-            OperationPackge.public.communicationDuration("audioDuration");
-            Utils.alertWhole("视频通话转为音频通话", "alert-success");
+      switch (message.text.Cmd) {
+        case "SwitchAudio":
+          // 视频转语音
+          var oTime = setInterval(async function () {
+            if (Store.localTracks.videoTrack) {
+              clearInterval(oTime);
+              // 语音通话
+              await PageShow.showVoicePage();
+              // 关闭视频并释放
+              (await Store.localTracks.videoTrack) &&
+                (Store.localTracks.videoTrack.close(),
+                (Store.localTracks.videoTrack = null));
+              // console.log("关闭视频并释放", Store.localTracks.videoTrack);
+              // 显示音频通话时长
+              OperationPackge.public.communicationDuration("audioDuration");
+              Utils.alertWhole("视频通话转为音频通话", "alert-success");
+            }
+          }, 500);
+          break;
+        case "EndCall":
+          if (Store.localTracks.audioTrack || Store.localTracks.videoTrack) {
+            OperationPackge.p2p.hangupInfo();
           }
-        }, 500);
-      } else if (message.text.Cmd === "EndCall") {
-        if (Store.localTracks.audioTrack || Store.localTracks.videoTrack) {
-          OperationPackge.p2p.hangupInfo();
-        }
+          break;
+        case "CallState":
+          // 收到此信令返回给对方状态
+          if (peerId === Store.peerUserId) {
+            Store.networkReconnection &&
+              clearTimeout(Store.networkReconnection);
+          }
+          // 回复
+          OperationPackge.p2p.replySendInfo(peerId);
+          break;
+        case "CallStateResult":
+          Store.networkReconnection && clearTimeout(Store.networkReconnection);
+          console.log("本地断网重连后对方状态", message, peerId);
+          break;
+        default:
+          break;
       }
     },
     // SDK 与 RTM 系统的连接状态
     ConnectionStateChanged: async function (newState, reason) {
-      // console.log("SDK 与 RTM 系统的连接状态", newState);
-      if (newState === "RECONNECTING") {
+      Store.lineworkRTM = newState == "CONNECTED" ? true : false;
+      Utils.alertWhole(
+        Store.lineworkRTM ? "RTM 连接成功" : "RTM 连接中",
+        Store.lineworkRTM ? "alert-success" : "alert-info"
+      );
+      console.log("SDK 与 RTM 系统的连接状态", newState, reason);
+      if (newState === "RECONNECTING" && Store.network.status != 0) {
         Utils.alertWhole("网络异常");
-        // 刷新页面
-        setTimeout(function () {
-          window.location.reload();
-        }, 1000);
       }
     },
   },
@@ -953,9 +1049,7 @@ var SdkPackge = {
     },
   },
 };
-
 // 此应用使用的相关逻辑操作封装
-
 var OperationPackge = {
   // 公共的操作
   public: {
@@ -994,6 +1088,8 @@ var OperationPackge = {
       Store.callDurationClearInterval &&
         (clearInterval(Store.callDurationClearInterval),
         (Store.callDurationClearInterval = null));
+      Store.networkSet && clearTimeout(Store.networkSet);
+      Store.remodVideoEnd && clearTimeout(Store.remodVideoEnd);
       // 恢复
       Object.assign(Store, {
         Conference: false, // 选择的呼叫模式  false: p2p呼叫  true: 多人呼叫
@@ -1015,6 +1111,15 @@ var OperationPackge = {
           videoTrack: null,
           audioTrack: null,
         },
+        // 断网相关(p2p)
+        network: {
+          // type: "rtm", // 断网时所在页面 rtm rtc
+          calltype: 0, // 呼叫类型 0:主叫 1:被叫
+          status: 0, // 当前状态 呼叫中:1 已接受:2 挂断:0
+          Mode: 0, // 通话类型 语音、视频
+        },
+        networkSet: null,
+        remodVideoEnd: null,
       });
     },
     // 正在通话中
@@ -1045,14 +1150,24 @@ var OperationPackge = {
     makeVoiceCall: async function () {
       // 关闭设置
       await OperationPackge.p2p.closeSeting();
+      // 获取输入的用户
       var oPeerId = await OperationPackge.p2p.getPeerUserId();
+      // 查询输入用户合法性
       Store.peerUserId = await OperationPackge.p2p.peerUserVaplidity(oPeerId);
       if (Store.peerUserId) {
+        Store.repetitionClick = true;
+        Store.network = Object.assign(Store.network, {
+          // type: "rtm",
+          calltype: 0, // 主叫
+          status: 1, // 呼叫中
+          Mode: 1,
+        });
         await OperationPackge.p2p.createLocalInvitationAndSend(1);
         // 恢复初始设置
         await PageShow.initSetingP2P();
         // 显示呼叫邀请页面
         await PageShow.makeVideoCall();
+        Store.repetitionClick = false;
       }
     },
     // 视频呼叫
@@ -1062,19 +1177,35 @@ var OperationPackge = {
       var oPeerId = await OperationPackge.p2p.getPeerUserId();
       Store.peerUserId = await OperationPackge.p2p.peerUserVaplidity(oPeerId);
       if (Store.peerUserId) {
+        Store.repetitionClick = true;
+        Store.network = Object.assign(Store.network, {
+          // type: "rtm",
+          calltype: 0, // 主叫
+          status: 1, // 呼叫中
+          Mode: 1,
+        });
         await OperationPackge.p2p.createLocalInvitationAndSend(0);
         // 恢复初始设置
         await PageShow.initSetingP2P();
         // 显示呼叫邀请页面
         await PageShow.makeVideoCall();
+        Store.repetitionClick = false;
       }
     },
     // 接受呼叫
-    acceptCall: function (type) {
-      var invitationContent = JSON.parse(Store.remoteInvitation.content);
+    acceptCall: async function (type) {
+      // console.log("接受呼叫");
+      var invitationContent = await JSON.parse(Store.remoteInvitation.content);
+      Store.network = await Object.assign(Store.network, {
+        // type: "rtm",
+        calltype: 1, // 被叫
+        status: 2, // 呼叫中
+        Mode: invitationContent.Mode,
+      });
+
       if (invitationContent.Mode === 1 || type === "语音呼叫") {
         // 设置响应模式
-        Store.remoteInvitation.response = JSON.stringify({
+        Store.remoteInvitation.response = await JSON.stringify({
           Mode: 1,
           Conference: false,
           UserData: "",
@@ -1093,33 +1224,78 @@ var OperationPackge = {
         PageShow.showVideoPage();
       }
       // 接受呼叫
-      Store.remoteInvitation.accept();
-      PageShow.hiddenCalledPage();
+      await Store.remoteInvitation.accept();
+      await PageShow.hiddenCalledPage();
     },
     // 取消当前通话
-    cancelCall: async function () {
-      if (Store.localTracks.audioTrack || Store.localTracks.videoTrack) {
-        // 发送挂断信息
-        Store.rtmClient &&
-          (await Store.rtmClient.sendMessageToPeer(
-            {
-              text: JSON.stringify({
-                Cmd: "EndCall",
-              }),
-            },
-            Store.peerUserId // 对端用户的 uid。
-          ));
-        // Store.peerUserIdRTM ? Store.peerUserIdRTM :
-        Utils.alertWhole("通话已结束", "alert-success");
-        // 释放采集设备
-        await SdkPackge.RTC.LocalTracksClose();
-        // 本地存储恢复
-        await OperationPackge.public.restoreDefault();
-        // 页面恢复初始
-        await PageShow.initSetingP2P();
-        // 回到首页
-        await PageShow.showIndex();
+    cancelCall: async function (type = 0) {
+      Store.invitationClearTimeout &&
+        clearTimeout(Store.invitationClearTimeout);
+      // 隐藏被呼叫页面
+      await PageShow.hiddenCallPage();
+      // 页面恢复初始
+      await PageShow.initSetingP2P();
+      // 回到首页
+      await PageShow.showIndex();
+      switch (type) {
+        case 0:
+          Utils.alertWhole("通话已结束", "alert-success");
+          break;
+        case 1:
+          Utils.alertWhole("网络异常，结束通话", "alert-warning");
+          break;
+        case 2:
+          // Utils.alertWhole("已拒绝邀请", "alert-info");
+          break;
+        case 3:
+          Utils.alertWhole("网络连接断开", "alert-warning");
+          break;
+        default:
+          break;
       }
+      Store.network = await Object.assign(Store.network, {
+        status: 0,
+      });
+
+      // 网络正常后
+      let oNormal = setInterval(() => {
+        if (navigator.onLine) {
+          if (Store.lineworkRTC && Store.lineworkRTM) {
+            clearInterval(oNormal);
+            if (Store.localTracks.audioTrack || Store.localTracks.videoTrack) {
+              // Store.peerUserIdRTM ? Store.peerUserIdRTM :
+              // 发送挂断信息
+              Store.rtmClient &&
+                Store.rtmClient
+                  .sendMessageToPeer(
+                    {
+                      text: JSON.stringify({
+                        Cmd: "EndCall",
+                      }),
+                    },
+                    Store.peerUserId // 对端用户的 uid。
+                  )
+                  .catch((err) => {
+                    // 你的代码：点对点消息发送失败。
+                    // console.log(err);
+                  });
+              //  释放采集设备
+              SdkPackge.RTC.LocalTracksClose();
+              OperationPackge.public.restoreDefault();
+            } else if (type != 2) {
+              if (Store.network.calltype == 0) {
+                // 挂断
+                Store.localInvitation && Store.localInvitation.cancel();
+              } else {
+                // 拒绝接听
+                Store.remoteInvitation && Store.remoteInvitation.refuse();
+              }
+            } else {
+              OperationPackge.public.restoreDefault();
+            }
+          }
+        }
+      }, 200);
     },
 
     // 音视频设置
@@ -1258,6 +1434,8 @@ var OperationPackge = {
     },
     // p2p 远端音视频渲染
     createPeerVideoAdd: function (peer) {
+      // 清除容器内其他内容
+      $("#peerVideoPreview").html($("#peerVideoPreview_bg"));
       // console.log("p2p 远端音视频渲染");
       var videoBox = document.createElement("div");
       videoBox.id = peer.uid;
@@ -1285,19 +1463,10 @@ var OperationPackge = {
       Store.Calling = true;
       // 呼叫邀请有效期开始计时
       OperationPackge.p2p.localInvitationValidity();
-      // 对方收到邀请，说明对方已经上线，这个时候应该监听对方的在线状态，如果对方离线 主动取消邀请（防止对方刷新或掉线时无法通知服务端）
-      Store.rtmClient.subscribePeersOnlineStatus([
-        Store.localInvitation.calleeId,
-      ]);
-      Store.rtmClient.on("PeersOnlineStatusChanged", (userOnlineStatus) => {
-        // console.log("对方收到邀请", Store.localInvitation);
-        if (
-          Store.localInvitation &&
-          userOnlineStatus[Store.localInvitation.calleeId] === "OFFLINE"
-        ) {
-          Utils.alertWhole("用户离线，取消呼叫");
-          Store.localInvitation.cancel();
-        }
+      Store.network = Object.assign(Store.network, {
+        Mode: 0,
+        status: 1,
+        calltype: 0,
       });
     },
     // RTM 主叫: 被叫已接受呼叫邀请
@@ -1316,6 +1485,11 @@ var OperationPackge = {
       await SdkPackge.RTC.getUserMedia();
       // 隐藏邀请页面
       PageShow.hiddenCallPage();
+      Store.network = Object.assign(Store.network, {
+        Mode: invitationResponse.Mode,
+        status: 2,
+        calltype: 0,
+      });
       if (invitationResponse.Mode == 1) {
         // 语音通话
         PageShow.showVoicePage();
@@ -1363,7 +1537,6 @@ var OperationPackge = {
     },
     // RTM 主叫: 呼叫邀请进程失败
     localInvitationFailure: async function (response) {
-      // console.log("p2p 呼叫邀请进程失败", response);
       // 呼叫邀请有效期清除计时
       Store.invitationClearTimeout &&
         clearTimeout(Store.invitationClearTimeout);
@@ -1382,15 +1555,14 @@ var OperationPackge = {
 
     // RTM 被叫: p2p 收到来自主叫的呼叫邀请
     RemoteInvitationReceived: async function (invitationContent) {
-      // console.log("p2p 收到来自主叫的呼叫邀请");
-      // RTC 加入房间
-      Store.ownUserId = await Store.rtcClient.join(
-        Config.RTC_APPID,
-        invitationContent.ChanId,
-        null,
-        Store.ownUserId
-      );
-      Store.JoinRTCChannel = true;
+      Store.channelId = invitationContent.ChanId;
+      Store.network = await Object.assign(Store.network, {
+        // type: "rtm",
+        calltype: 1, // 被叫
+        status: 1, // 呼叫中
+        Mode: invitationContent.Mode,
+      });
+      // console.log("p2p 收到来自主叫的呼叫邀请", Store);
       // 被呼叫页面 转换语音按钮是否显示
       PageShow.toSpeech(invitationContent.Mode);
       // 被呼叫页面展示
@@ -1419,11 +1591,28 @@ var OperationPackge = {
     // RTM 被叫: 接受呼叫邀请成功
     RemoteInvitationAccepted: async function () {
       var invitationContent = JSON.parse(Store.remoteInvitation.response);
-      // console.log("接受呼叫邀请成功", invitationContent);
+      // 接受邀请进入计时，如果频道一定时间内无人加入取消
+      Store.callChannelPro = setTimeout(() => {
+        console.log("接受邀请进入计时，如果频道一定时间内无人加入取消");
+        OperationPackge.p2p.cancelCall(1);
+      }, Store.callChannelProTime);
+      // RTC 加入房间
+      Store.ownUserId = await Store.rtcClient.join(
+        Config.RTC_APPID,
+        Store.channelId + "",
+        null,
+        Store.ownUserId
+      );
+      Store.JoinRTCChannel = true;
       // 采集音视频
       await SdkPackge.RTC.getUserMedia();
       // 隐藏被呼叫页面
       await PageShow.hiddenCalledPage();
+      Store.network = Object.assign(Store.network, {
+        Mode: invitationContent.Mode,
+        status: 2,
+        calltype: 1,
+      });
       if (invitationContent.Mode == 1) {
         // 语音通话
         await PageShow.showVoicePage();
@@ -1448,39 +1637,38 @@ var OperationPackge = {
     },
     // RTM 被叫: 拒绝呼叫邀请成功
     RemoteInvitationRefused: async function () {
+      // console.log("RTM 被叫: 拒绝呼叫邀请成功", Store);
       Utils.printLog("[info]", "RemoteInvitationRefused");
-      // 恢复默认
-      await OperationPackge.public.restoreDefault();
-      // 隐藏被呼叫页面
-      await PageShow.hiddenCallPage();
-      // 页面提示
-      Utils.alertWhole("已拒绝邀请", "alert-info");
-      // 显示首页
-      PageShow.showIndex();
+      OperationPackge.p2p.cancelCall(2);
     },
     // RTM 被叫: 主叫取消呼叫邀请
     RemoteInvitationCanceled: async function () {
-      Utils.printLog("[info]", "RemoteInvitationCanceled");
-      // 恢复默认
-      await OperationPackge.public.restoreDefault();
-      // 隐藏被呼叫页面
-      await PageShow.hiddenCallPage();
-      // 页面提示
-      Utils.alertWhole("主叫取消呼叫邀请");
-      // 显示首页
-      PageShow.showIndex();
+      // console.log("RTM 被叫: 主叫取消呼叫邀请", Store.network);
+      if (Store.network.status == 1) {
+        Utils.printLog("[info]", "RemoteInvitationCanceled");
+        // 恢复默认
+        await OperationPackge.public.restoreDefault();
+        // 隐藏被呼叫页面
+        await PageShow.hiddenCallPage();
+        // 页面提示
+        Utils.alertWhole("主叫取消呼叫邀请");
+        // 显示首页
+        PageShow.showIndex();
+      }
     },
     // RTM 被叫: 呼叫邀请进程失败
     RemoteInvitationFailure: async function () {
-      Utils.printLog("[info]", "RemoteInvitationFailure");
-      // 恢复默认
-      await OperationPackge.public.restoreDefault();
-      // 隐藏被呼叫页面
-      await PageShow.hiddenCallPage();
-      // 页面提示
-      Utils.alertWhole("呼叫邀请进程失败");
-      // 显示首页
-      PageShow.showIndex();
+      if (Store.network.status == 1) {
+        Utils.printLog("[info]", "RemoteInvitationFailure");
+        // 恢复默认
+        await OperationPackge.public.restoreDefault();
+        // 隐藏被呼叫页面
+        await PageShow.hiddenCallPage();
+        // 页面提示
+        Utils.alertWhole("呼叫邀请进程失败");
+        // 显示首页
+        PageShow.showIndex();
+      }
     },
 
     // RTM 收到挂断信息
@@ -1501,6 +1689,7 @@ var OperationPackge = {
       // console.log("p2p 用户" + user.uid + "发布" + mediaType);
       Store.peerUserId = user.uid; // 存储远端用户uid
       if (mediaType === "video") {
+        PageShow.networkRemoShow(false);
         // 远端用户发布的视频渲染
         OperationPackge.p2p.createPeerVideoAdd(user);
       } else {
@@ -1509,26 +1698,130 @@ var OperationPackge = {
     },
     // RTC 用户取消发布
     userUnpublished: async function (user, mediaType) {
+      if (mediaType === "video") {
+        PageShow.networkRemoShow(true);
+      }
       // console.log("用户" + user.uid + "取消发布" + mediaType);
+    },
+    // RTC 用户加入频道
+    userJoined: function (user) {
+      console.log("RTC 用户加入频道", user, Store.peerUserId);
+      if (user.uid == Store.peerUserId) {
+        Store.callChannelPro && clearTimeout(Store.callChannelPro);
+        Store.remodVideoEnd && clearTimeout(Store.remodVideoEnd);
+      }
     },
     // RTC 用户离开频道
     userLeft: async function (user, reason) {
-      // console.log("RTC 用户离开频道", reason);
+      console.log("RTC 用户离开频道", user, reason);
       //因网络断线离开
       if (reason == "ServerTimeOut") {
-        Utils.alertWhole("用户" + user.uid + "网络断线离开");
+        Utils.alertWhole("对方网络异常", "alert-warning");
+        // await PageShow.networkP2P();
+        // 10s 远端不在加入离开
+        Store.remodVideoEnd = setTimeout(async () => {
+          Utils.alertWhole("通话异常", "alert-warning");
+          // 释放采集设备
+          await SdkPackge.RTC.LocalTracksClose();
+          // 本地存储恢复
+          await OperationPackge.public.restoreDefault();
+          // 页面恢复初始
+          await PageShow.initSetingP2P();
+          // 回到首页
+          await PageShow.showIndex();
+        }, Store.remodVideoEndTime);
+        // 保留页面
       } else {
         Utils.alertWhole("通话已结束", "alert-success");
+        // 释放采集设备
+        await SdkPackge.RTC.LocalTracksClose();
+        // 本地存储恢复
+        await OperationPackge.public.restoreDefault();
+        // 页面恢复初始
+        await PageShow.initSetingP2P();
+        // 回到首页
+        await PageShow.showIndex();
       }
-      // 释放采集设备
-      await SdkPackge.RTC.LocalTracksClose();
-      // 本地存储恢复
-      await OperationPackge.public.restoreDefault();
-      // 页面恢复初始
-      await PageShow.initSetingP2P();
-      // 回到首页
-      await PageShow.showIndex();
     },
+
+    // p2p 断网重连后发送查询信息
+    networkSendInfo: function () {
+      let oSend = setInterval(() => {
+        if (Store.lineworkRTC && Store.lineworkRTM) {
+          clearInterval(oSend);
+          // 发送查询信息
+          Store.rtmClient &&
+            Store.rtmClient
+              .sendMessageToPeer(
+                {
+                  text: JSON.stringify({
+                    Cmd: "CallState",
+                  }),
+                },
+                Store.peerUserId // 对端用户的 uid。
+              )
+              .catch((err) => {
+                // 你的代码：点对点消息发送失败。
+                // console.log(err);
+              });
+          // 一定时间无响应取消
+          Store.networkReconnection = setTimeout(() => {
+            console.log("发送查询信息,一定时间无响应取消");
+            OperationPackge.p2p.cancelCall(1);
+          }, Store.networkReconnectionTime);
+        }
+      }, 500);
+    },
+    // p2p 回复远端断网重连所需信息
+    replySendInfo: function (peerId) {
+      let oSend = setInterval(() => {
+        if (Store.lineworkRTC && Store.lineworkRTM) {
+          clearInterval(oSend);
+          // 发送查询信息
+          Store.rtmClient &&
+            Store.rtmClient
+              .sendMessageToPeer(
+                {
+                  text: JSON.stringify({
+                    Cmd: "CallStateResult",
+                    state: Store.network.status,
+                    Mode: Store.network.Mode,
+                  }),
+                },
+                peerId // 对端用户的 uid。
+              )
+              .catch((err) => {
+                // 你的代码：点对点消息发送失败。
+                // console.log(err);
+              });
+        }
+      }, 500);
+    },
+    // // p2p 断网处理
+    // networkP2P: function () {
+    //   // if (Store.network.type == "rtm") {
+    //   // 在呼叫中断网
+    //   if (Store.network.calltype == 0) {
+    //     // 主叫取消
+    //     // 挂断
+    //     Store.localInvitation && Store.localInvitation.cancel();
+    //     // 隐藏呼叫邀请页面
+    //     PageShow.hiddenCallPage();
+    //     // 本地存储恢复
+    //     OperationPackge.public.restoreDefault();
+    //   } else {
+    //     // 被叫取消
+    //     Store.remoteInvitation.response = JSON.stringify({
+    //       refuseId: Store.ownUserId,
+    //     });
+    //     // 拒绝接听
+    //     Store.remoteInvitation && Store.remoteInvitation.refuse();
+    //   }
+    //   // } else {
+    //   // 在视频通话中断网
+    //   //
+    //   // }
+    // },
   },
   multi: {
     // 频道消息
@@ -1775,7 +2068,7 @@ var OperationPackge = {
     // RTM 主叫: 被叫拒绝呼叫邀请
     LocalInvitationRefused: async function (response) {
       // console.log("被叫拒绝呼叫邀请",response);
-      response = response ? JSON.parse(response) : '';
+      response = response ? JSON.parse(response) : "";
       // 更新用户状态及窗口显示 - 对方已拒绝
       await Utils.updateUserViewStatus(response.refuseId, 2);
       if (response.Cmd == "Calling") {
@@ -1986,11 +2279,25 @@ var OperationPackge = {
   Utils.inputChangId("#userInputs > input");
   // 语音呼叫
   $("#p2pAudioMakeCall").click(function () {
-    OperationPackge.p2p.makeVoiceCall();
+    if (navigator.onLine && Store.lineworkRTC && Store.lineworkRTM) {
+      if (!Store.repetitionClick) {
+        OperationPackge.p2p.makeVoiceCall();
+      }
+    } else {
+      // 页面提示
+      Utils.alertWhole("当前网络不可用");
+    }
   });
   // 视频呼叫
   $("#p2pVideoMakeCall").click(function () {
-    OperationPackge.p2p.makeVideoCall();
+    if (navigator.onLine && Store.lineworkRTC && Store.lineworkRTM) {
+      if (!Store.repetitionClick) {
+        OperationPackge.p2p.makeVideoCall();
+      }
+    } else {
+      // 页面提示
+      Utils.alertWhole("当前网络不可用");
+    }
   });
   // 主叫-呼叫页面 挂断
   $("#cancelCallBtn").click(function () {
@@ -2182,3 +2489,7 @@ var OperationPackge = {
     Store.remoteInvitation && Store.remoteInvitation.refuse();
   });
 }
+
+// 断网
+window.addEventListener("online", Utils.updateOnlineStatus);
+window.addEventListener("offline", Utils.updateOnlineStatus);

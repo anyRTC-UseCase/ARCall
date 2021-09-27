@@ -382,6 +382,10 @@ p {
   position: relative;
 }
 
+.video-preview_big_network {
+  background: #000;
+}
+
 .video-preview_box {
   position: relative;
   width: 100%;
