@@ -11,7 +11,6 @@ import SVProgressHUD
 import Alamofire
 
 class ARMainViewController: ARBaseViewController {
-    
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var stackView: UIStackView!
     @IBOutlet weak var calleeIdLabel: UILabel!
@@ -134,18 +133,29 @@ class ARMainViewController: ARBaseViewController {
     }
     
     func startSignalCall() {
+        let calleeId = calleeIdTextField.text!
         ARAlertActionSheet.showAlert(titleStr: nil, msgStr: nil, style: .actionSheet, currentVC: self, cancelBtn: "取消", cancelHandler: nil, otherBtns: ["视频呼叫", "音频呼叫"]) {
             (index) in
             let manager = NetworkReachabilityManager()
             if manager?.networkReachabilityStatus != .notReachable {
-                let storyboard = UIStoryboard.init(name: "Main", bundle: nil)
-                let signalVc = storyboard.instantiateViewController(withIdentifier: "Call_SignalVC") as! ARSignalVideoController
-                
-                infoModel = ARCallInfoModel(callMode: (index == 0 ? .video : .audio), channelId: "\(self.generateRandomNumber(num: 9))", callType: .calling, callerId: self.calleeIdTextField.text!)
+                SVProgressHUD.show(UIImage(named: "icon_loadings")!, status: "呼叫中...")
+                ARCallRtmManager.rtmKit?.queryPeersOnlineStatus([calleeId], completion: { (peerOnlineStatus, errorCode) in
+                    for onlineStatus in peerOnlineStatus! {
+                        if onlineStatus.state == .online {
+                            let storyboard = UIStoryboard.init(name: "Main", bundle: nil)
+                            let signalVc = storyboard.instantiateViewController(withIdentifier: "Call_SignalVC") as! ARSignalVideoController
+                            
+                            infoModel = ARCallInfoModel(callMode: (index == 0 ? .video : .audio), channelId: "\(self.generateRandomNumber(num: 9))", callType: .calling, callerId: calleeId)
 
-                let rootVc = UIApplication.shared.keyWindow?.rootViewController
-                signalVc.modalPresentationStyle = .overCurrentContext
-                rootVc?.present(signalVc, animated: true, completion: nil)
+                            let rootVc = UIApplication.shared.keyWindow?.rootViewController
+                            signalVc.modalPresentationStyle = .overCurrentContext
+                            rootVc?.present(signalVc, animated: true, completion: nil)
+                        } else {
+                            self.showToast(text: "对方不在线，请稍后再试！", image: "icon_warning")
+                        }
+                    }
+                    SVProgressHUD.dismiss(withDelay: 0.3)
+                })
             } else {
                 self.showToast(text: "当前网络较差，请检查你的网络设置", image: "icon_warning")
             }
@@ -178,21 +188,12 @@ class ARMainViewController: ARBaseViewController {
             if callWay == .single {
                 let calleeId = calleeIdTextField.text!
                 if calleeId != UserDefaults.string(forKey: .uid) {
-                    SVProgressHUD.show(UIImage(named: "icon_loadings")!, status: "呼叫中...")
-                    ARCallRtmManager.rtmKit?.queryPeersOnlineStatus([calleeId], completion: { (peerOnlineStatus, errorCode) in
-                        for onlineStatus in peerOnlineStatus! {
-                            if onlineStatus.state == .online {
-                                self.startSignalCall()
-                            } else {
-                                self.showToast(text: "对方不在线，请稍后再试！", image: "icon_warning")
-                            }
-                        }
-                        SVProgressHUD.dismiss(withDelay: 0.3)
-                    })
+                    startSignalCall()
                 } else {
                     showToast(text: "不能呼叫自己，请重新输入！", image: "icon_warning")
                 }
             } else {
+                SVProgressHUD.show(UIImage(named: "icon_loadings")!, status: "呼叫中...")
                 ARCallRtmManager.rtmKit?.queryPeersOnlineStatus(calleeIdArr, completion: { (peerOnlineStatus, errorCode) in
                     var arr = [String]()
                     var text = ""
@@ -209,10 +210,11 @@ class ARMainViewController: ARBaseViewController {
                     }
                     
                     if arr.count != 0 {
-                        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
+                        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
                             self.startGroupCall(arr: arr as NSArray)
                         }
                     }
+                    SVProgressHUD.dismiss(withDelay: 0.3)
                 })
             }
         } else {

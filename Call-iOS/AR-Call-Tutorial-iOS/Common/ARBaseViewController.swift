@@ -11,6 +11,7 @@ import ARtcKit
 
 var rtcKit: ARtcEngineKit!
 var infoModel: ARCallInfoModel!
+var exceptionPeerId: String?
 
 class ARBaseViewController: UIViewController {
 
@@ -18,6 +19,7 @@ class ARBaseViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        NotificationCenter.default.addObserver(self, selector: #selector(sendCallState), name: UIResponder.callNotificationException, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -37,6 +39,19 @@ class ARBaseViewController: UIViewController {
         }
     }
     
+    @objc func sendCallState(nofi: Notification) {
+        let peerId: String = nofi.userInfo!["peerId"] as! String
+        sendPeerMessage(peerId: peerId)
+    }
+    
+    func sendPeerMessage(peerId: String) {
+        let responseDic = ["Cmd": "CallStateResult", "state": 0] as [String : Any]
+        let message = ARtmMessage(text: getJSONStringFromDictionary(dictionary: responseDic as NSDictionary))
+        ARCallRtmManager.rtmKit?.send(message, toPeer: peerId, sendMessageOptions: ARtmSendMessageOptions(), completion: { (errorCode) in
+            print("CallState errCode = \(errorCode)")
+        })
+    }
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
@@ -53,11 +68,7 @@ extension ARBaseViewController: ARtmDelegate, ARtmCallDelegate {
         let dic = getDictionaryFromJSONString(jsonString: message.text)
         let value = dic.object(forKey: "Cmd") as! String
         if value == "CallState" && windowView == nil {
-            let responseDic = ["Cmd": "CallStateResult", "state": 0] as [String : Any]
-            let message = ARtmMessage(text: getJSONStringFromDictionary(dictionary: responseDic as NSDictionary))
-            ARCallRtmManager.rtmKit?.send(message, toPeer: peerId, sendMessageOptions: ARtmSendMessageOptions(), completion: { (errorCode) in
-                print("CallState errCode = \(errorCode)")
-            })
+            sendPeerMessage(peerId: peerId)
         }
     }
     
@@ -76,39 +87,47 @@ extension ARBaseViewController: ARtmDelegate, ARtmCallDelegate {
     
     func rtmCallKit(_ callKit: ARtmCallKit, remoteInvitationReceived remoteInvitation: ARtmRemoteInvitation) {
         // 收到呼叫邀请
-        let dic = getDictionaryFromJSONString(jsonString: remoteInvitation.content!)
-        let conference: Bool = dic.object(forKey: "Conference") as! Bool
-        
-        let storyboard = UIStoryboard.init(name: "Main", bundle: nil)
-        let videoVc: UIViewController = storyboard.instantiateViewController(withIdentifier: conference ? "Call_GroupVC" : "Call_SignalVC")
-        infoModel = ARCallInfoModel(callMode: (dic.object(forKey: "Mode") as! Int == 0) ? .video : .audio, channelId: dic.object(forKey: "ChanId") as? String, callType: .passive, callerId: remoteInvitation.callerId)
-        
-        if conference {
-            let groupVc = videoVc as! ARGroupVideoController
-            var arr = dic.object(forKey: "UserData") as! [String]
-            arr.remove(UserDefaults.string(forKey: .uid)!)
-            groupVc.callerIdArr = arr
-            groupVc.remoteInvitation = remoteInvitation
-        } else {
-            let signalVc = videoVc as! ARSignalVideoController
-            signalVc.remoteInvitation = remoteInvitation
+        if infoModel == nil {
+            // 异常处理 -- 同时收到两个呼叫邀请
+            let dic = getDictionaryFromJSONString(jsonString: remoteInvitation.content!)
+            let conference: Bool = dic.object(forKey: "Conference") as! Bool
             
-            let arr: NSArray = dic.allKeys as NSArray
-            if arr.contains("VidCodec"){
-                let object = dic.object(forKey: "VidCodec")
+            let storyboard = UIStoryboard.init(name: "Main", bundle: nil)
+            let videoVc: UIViewController = storyboard.instantiateViewController(withIdentifier: conference ? "Call_GroupVC" : "Call_SignalVC")
+            infoModel = ARCallInfoModel(callMode: (dic.object(forKey: "Mode") as! Int == 0) ? .video : .audio, channelId: dic.object(forKey: "ChanId") as? String, callType: .passive, callerId: remoteInvitation.callerId)
+            
+            if conference {
+                let groupVc = videoVc as! ARGroupVideoController
+                var arr = dic.object(forKey: "UserData") as! [String]
+                arr.remove(UserDefaults.string(forKey: .uid)!)
+                groupVc.callerIdArr = arr
+                groupVc.remoteInvitation = remoteInvitation
+            } else {
+                let signalVc = videoVc as! ARSignalVideoController
+                signalVc.remoteInvitation = remoteInvitation
                 
-                var vidArr = NSArray()
-                if object is String {
-                    vidArr = getArrayFromJSONString(jsonString: dic.object(forKey: "VidCodec") as! String)
-                } else {
-                    vidArr = dic.object(forKey: "VidCodec") as! NSArray
+                let arr: NSArray = dic.allKeys as NSArray
+                if arr.contains("VidCodec"){
+                    let object = dic.object(forKey: "VidCodec")
+                    
+                    var vidArr = NSArray()
+                    if object is String {
+                        vidArr = getArrayFromJSONString(jsonString: dic.object(forKey: "VidCodec") as! String)
+                    } else {
+                        vidArr = dic.object(forKey: "VidCodec") as! NSArray
+                    }
+                    signalVc.isWatches = (vidArr.count == 1) ? true : false
                 }
-                signalVc.isWatches = (vidArr.count == 1) ? true : false
+            }
+
+            let rootVc = UIApplication.shared.keyWindow?.rootViewController
+            videoVc.modalPresentationStyle = .overCurrentContext
+            rootVc?.present(videoVc, animated: true, completion: nil)
+        } else {
+            remoteInvitation.response = getJSONStringFromDictionary(dictionary: ["Cmd": "Calling"])
+            callKit.refuse(remoteInvitation) { (errorCode) in
+                print("refuse errorCode = \(errorCode)")
             }
         }
-
-        let rootVc = UIApplication.shared.keyWindow?.rootViewController
-        videoVc.modalPresentationStyle = .overCurrentContext
-        rootVc?.present(videoVc, animated: true, completion: nil)
     }
 }

@@ -86,10 +86,13 @@ class ARWindowView: ARDragView {
             if containVc is ARSignalVideoController {
                 let signalVc = containVc as! ARSignalVideoController
                 signalVc.setupRemoteVideo()
+                
+                var currentFrame = frame
+                currentFrame.size = CGSize(width: 95, height: 157)
                 if signalVc.localVideo.frame.width == ARScreenWidth {
-                    signalVc.remoteVideo.frame = frame
+                    signalVc.remoteVideo.frame = currentFrame
                 } else {
-                    signalVc.localVideo.frame = frame
+                    signalVc.localVideo.frame = currentFrame
                 }
             }
             rootVc?.present(containVc!, animated: true, completion: {

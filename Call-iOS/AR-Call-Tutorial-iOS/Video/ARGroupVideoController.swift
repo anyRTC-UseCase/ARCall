@@ -39,6 +39,9 @@ class ARGroupVideoController: ARBaseViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        initializeEngine()
+        playCallBell(isOpen: true)
+        
         if infoModel.callType == .calling {
             cancleArr = callerIdArr
             callingView.isHidden = true
@@ -59,11 +62,9 @@ class ARGroupVideoController: ARBaseViewController {
     
     private func joinGroupChannel() {
         initializeUI()
-        initializeEngine()
         setVideoConfiguration()
         joinChannel()
         videoLayout()
-        playCallBell(isOpen: true)
     }
     
     private func initializeUI() {
