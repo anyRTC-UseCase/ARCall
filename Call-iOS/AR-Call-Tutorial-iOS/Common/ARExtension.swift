@@ -1059,6 +1059,7 @@ extension UITextField {
 
 extension UIResponder {
     static let callNotificationNoise = Notification.Name(rawValue: "callNotificationNoise")
+    static let callNotificationException = Notification.Name(rawValue: "callNotificationException")
 }
 
 

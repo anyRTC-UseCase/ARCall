@@ -74,6 +74,7 @@ class ARSignalVideoController: ARBaseViewController {
     }
     
     private func initializeUI() {
+        exceptionPeerId = infoModel.callerId
         callerIdLabel.text = infoModel.callerId
         
         if infoModel.callType == .calling {
@@ -142,6 +143,7 @@ class ARSignalVideoController: ARBaseViewController {
     }
     
     func setupRemoteVideo() {
+        remoteVideo.placeholderView.isHidden = false
         let videoCanvas = ARtcVideoCanvas()
         videoCanvas.uid = infoModel.callerId!
         videoCanvas.view = remoteVideo
@@ -149,9 +151,13 @@ class ARSignalVideoController: ARBaseViewController {
     }
     
     private func sendMessageToPeer(message: ARtmMessage) {
-        ARCallRtmManager.rtmKit?.send(message, toPeer: infoModel.callerId!, sendMessageOptions: ARtmSendMessageOptions(), completion: { (errorCode) in
-            print("sendMessageToPeer errCode = \(errorCode)")
-        })
+        if !destroy {
+            ARCallRtmManager.rtmKit?.send(message, toPeer: infoModel.callerId!, sendMessageOptions: ARtmSendMessageOptions(), completion: { (errorCode) in
+                print("sendMessageToPeer errCode = \(errorCode.rawValue)")
+            })
+        } else {
+            NotificationCenter.default.post(name: UIResponder.callNotificationException, object: self, userInfo: ["peerId": exceptionPeerId as Any])
+        }
     }
     
     @IBAction func didClickSignalVcButton(_ sender: UIButton) {
@@ -229,7 +235,7 @@ class ARSignalVideoController: ARBaseViewController {
     }
     
     private func switchVideoSize() {
-        //  大小屏切换
+        // 大小屏切换
         if isCallSucess {
             let frame = localVideo.frame
             localVideo.frame = remoteVideo.frame
@@ -386,6 +392,7 @@ extension ARSignalVideoController: ARtcEngineDelegate {
         // 远端用户（通信场景）/主播（直播场景）离开当前频道回调
         if reason == .dropped {
             leaveReason = .drop
+            showToast(text: "当前通话对方网络环境较差", image: "icon_warning")
             dealWithException(time: 10)
         } else if reason == .quit {
             leaveReason = .normal
@@ -402,9 +409,8 @@ extension ARSignalVideoController: ARtcEngineDelegate {
         // 已显示远端视频首帧的回调
         if windowView != nil {
             windowView?.placeholderView.isHidden = true
-        } else {
-            remoteVideo.placeholderView.isHidden = true
         }
+        remoteVideo.placeholderView.isHidden = true
     }
     
     func rtcEngine(_ engine: ARtcEngineKit, firstRemoteAudioFrameDecodedOfUid uid: String, elapsed: Int) {
@@ -434,7 +440,7 @@ extension ARSignalVideoController {
             destroySignalVc()
         } else if value == "CallState" {
             var responseDic = NSDictionary()
-            isCallSucess ? (responseDic = ["Cmd": "CallStateResult", "state": 1]) : (responseDic = ["Cmd": "CallStateResult", "state": 2, "Mode": (infoModel.callMode == .video ? 0 : 1)])
+            !isCallSucess ? (responseDic = ["Cmd": "CallStateResult", "state": 1]) : (responseDic = ["Cmd": "CallStateResult", "state": 2, "Mode": (infoModel.callMode == .video ? 0 : 1)])
             let message = ARtmMessage(text: getJSONStringFromDictionary(dictionary: responseDic as NSDictionary))
             sendMessageToPeer(message: message)
 
@@ -515,7 +521,9 @@ extension ARSignalVideoController {
     
     override func rtmCallKit(_ callKit: ARtmCallKit, remoteInvitationCanceled remoteInvitation: ARtmRemoteInvitation) {
         // 主叫已取消呼叫邀请
-        leaveReason = .cancle
-        destroySignalVc()
+        if remoteInvitation.callerId == infoModel.callerId {
+            leaveReason = .cancle
+            destroySignalVc()
+        }
     }
 }
