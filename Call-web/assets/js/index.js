@@ -1326,7 +1326,6 @@ var OperationPackge = {
             ($("#loginSetting").removeClass("show"),
             $("#loginMutiSetting").hasClass("show") &&
               $("#loginMutiSetting").removeClass("show"),
-            $("#settingVideoPreview").html(""),
             await SdkPackge.RTC.LocalTracksClose());
         }
       }, 50);
