@@ -448,6 +448,11 @@ var Store = {
   // 设置
   setting: {
     // p2p设置
+    // 是否显示视频相关数据
+    videoDataShow: false,
+    // 数据显示定时器
+    videoStatsInterval: null,
+
     videoSize: [1920, 1080], //设置视频采集的分辨率大小
     audioDevice: "default", // 设置音频设备ID
     videoDevice: "default", // 设置视频设备ID
@@ -610,13 +615,15 @@ var PageShow = {
   },
   // 音频开关(p2p)
   audioSwitch: function () {
-    Store.localTracks.audioTrack.isMuted
-      ? $("#audioSwitchBtn > i")
-          .removeClass("icon-audio_open icon_color_blue")
-          .addClass("icon-audio_close")
-      : $("#audioSwitchBtn > i")
-          .removeClass("icon-audio_close")
-          .addClass("icon-audio_open icon_color_blue");
+    if (Store.localTracks.audioTrack) {
+      Store.localTracks.audioTrack.isMuted
+        ? $("#audioSwitchBtn > i")
+            .removeClass("icon-audio_open icon_color_blue")
+            .addClass("icon-audio_close")
+        : $("#audioSwitchBtn > i")
+            .removeClass("icon-audio_close")
+            .addClass("icon-audio_open icon_color_blue");
+    }
   },
 
   // 显示会议页面 (多人)
@@ -822,7 +829,7 @@ var SdkPackge = {
             {
               cameraId: Store.setting.videoDevice,
               encoderConfig: {
-                bitrateMax: 1130,
+                // bitrateMax: 1130,
                 // bitrateMin: ,
                 frameRate: 15,
                 height: Store.setting.videoSize[1],
@@ -864,10 +871,19 @@ var SdkPackge = {
         // 设置主播身份
         await Store.rtcClient.setClientRole("host");
         // 发布
-        await Store.rtcClient.publish([
-          Store.localTracks.videoTrack,
-          Store.localTracks.audioTrack,
-        ]);
+        console.log(Store.localTracks);
+        const oArray = [];
+        Store.localTracks.videoTrack &&
+          oArray.push(Store.localTracks.videoTrack);
+        Store.localTracks.audioTrack &&
+          oArray.push(Store.localTracks.audioTrack);
+        if (oArray.length == 2) {
+          await Store.rtcClient.publish(oArray);
+        } else {
+          await Store.rtcClient.publish(
+            Store.localTracks.videoTrack || Store.localTracks.audioTrack
+          );
+        }
       }
     },
     // 取消本地发布
@@ -987,10 +1003,13 @@ var SdkPackge = {
               clearInterval(oTime);
               // 语音通话
               await PageShow.showVoicePage();
+
               // 关闭视频并释放
               (await Store.localTracks.videoTrack) &&
                 (Store.localTracks.videoTrack.close(),
                 (Store.localTracks.videoTrack = null));
+              Store.setting.videoStatsInterval &&
+                clearInterval(Store.setting.videoStatsInterval);
               // console.log("关闭视频并释放", Store.localTracks.videoTrack);
               // 显示音频通话时长
               OperationPackge.public.communicationDuration("audioDuration");
@@ -1088,6 +1107,10 @@ var OperationPackge = {
       Store.callDurationClearInterval &&
         (clearInterval(Store.callDurationClearInterval),
         (Store.callDurationClearInterval = null));
+      // 清除视频数据展示
+      Store.setting.videoStatsInterval &&
+        clearInterval(Store.setting.videoStatsInterval);
+
       Store.networkSet && clearTimeout(Store.networkSet);
       Store.remodVideoEnd && clearTimeout(Store.remodVideoEnd);
       // 恢复
@@ -1190,6 +1213,8 @@ var OperationPackge = {
         // 显示呼叫邀请页面
         await PageShow.makeVideoCall();
         Store.repetitionClick = false;
+
+        OperationPackge.p2p.videoStats();
       }
     },
     // 接受呼叫
@@ -1220,6 +1245,7 @@ var OperationPackge = {
           UserData: "",
           SipData: "",
         });
+        OperationPackge.p2p.videoStats();
         // 显示视频页面
         PageShow.showVideoPage();
       }
@@ -1317,6 +1343,257 @@ var OperationPackge = {
           break;
       }
     },
+    // 视频相关数据
+    videoStats: function () {
+      Store.setting.videoStatsInterval &&
+        clearInterval(Store.setting.videoStatsInterval);
+      if (Store.setting.videoDataShow) {
+        // var oa = null;
+        Store.setting.videoStatsInterval = setInterval(async function () {
+          // 通话总数据
+          const oCallAll = await Store.rtcClient.getRTCStats();
+          // 本地音频数据
+          const oLocalAudio = await Store.rtcClient.getLocalAudioStats();
+          // console.log("本地音频数据", oLocalAudio);
+          // 本地视频数据
+          const oLocalVideo = await Store.rtcClient.getLocalVideoStats();
+          // console.log("本地视频数据", oLocalVideo);
+
+          if (oLocalVideo) {
+            $("#userLocalVideoData").removeClass("d-none");
+            const oLocalVideoList = [
+              {
+                description: "视频采集分辨率(高*宽)",
+                value:
+                  (oLocalVideo.captureResolutionHeight || 0) +
+                  " * " +
+                  (oLocalVideo.captureResolutionWidth || 0),
+                unit: "",
+              },
+              {
+                description: "实际发送分辨率(高*宽)",
+                value:
+                  (oLocalVideo.sendResolutionHeight || 0) +
+                  " * " +
+                  (oLocalVideo.sendResolutionWidth || 0),
+                unit: "",
+              },
+              {
+                description: "视频采集帧率",
+                value: oLocalVideo.captureFrameRate || 0,
+                unit: "fps",
+              },
+              {
+                description: "网络延迟RTT",
+                value: oCallAll.RTT || 0,
+                unit: "ms",
+              },
+              {
+                description: "发送带宽",
+                value: (
+                  (Number(oLocalAudio.sendBitrate || 0) +
+                    Number(oLocalVideo.sendBitrate || 0)) /
+                  1024 /
+                  8
+                ).toFixed(3),
+                unit: "kB/s",
+              },
+              {
+                description: "接收带宽",
+                value: ((Number(oCallAll.RecvBitrate) || 0) / 1024 / 8).toFixed(
+                  3
+                ),
+                unit: "kB/s",
+              },
+              {
+                description: "音频发送丢包率",
+                value: Number(oLocalAudio.packetLossRate || 0).toFixed(3),
+                unit: "%",
+              },
+              {
+                description: "视频发送丢包率",
+                value: Number(oLocalVideo.packetLossRate || 0).toFixed(3),
+                unit: "%",
+              },
+              // {
+              //   description: "视频编码格式",
+              //   value: oLocalVideo.codecType || "",
+              //   unit: "",
+              // },
+              // {
+              //   description: "视频编码延迟",
+              //   value: oLocalVideo.encodeDelay || 0,
+              //   unit: "ms",
+              // },
+              // {
+              //   description: "视频发送码率",
+              //   value: oLocalVideo.sendBitrate || 0,
+              //   unit: "bps",
+              // },
+              // {
+              //   description: "发送的视频总字节数",
+              //   value: oLocalVideo.sendBytes || 0,
+              //   unit: "bytes",
+              // },
+              // {
+              //   description: "发送的视频总包数",
+              //   value: oLocalVideo.sendPackets || 0,
+              //   unit: "",
+              // },
+              // {
+              //   description: "发送的视频总丢包数",
+              //   value: oLocalVideo.sendPacketsLost || 0,
+              //   unit: "",
+              // },
+              // {
+              //   description: "视频目标发送码率",
+              //   value: oLocalVideo.targetSendBitrate || 0,
+              //   unit: "bps",
+              // },
+              // {
+              //   description: "视频总时长",
+              //   value: oLocalVideo.totalDuration || 0,
+              //   unit: "s",
+              // },
+              // {
+              //   description: "视频总卡顿时长",
+              //   value: oLocalVideo.totalFreezeTime || 0,
+              //   unit: "s",
+              // },
+            ];
+            $("#userLocalVideoData").html(`
+            ${oLocalVideoList
+              .map(
+                (stat) =>
+                  `<p class="stats-row">${stat.description}: ${stat.value} ${stat.unit}</p>`
+              )
+              .join("")}`);
+          } else {
+            $("#userLocalVideoData").addClass("d-none");
+          }
+
+          // 远端视频数据
+          const oRemoVideoData = await Store.rtcClient.getRemoteVideoStats();
+          const oRemoVideo = oRemoVideoData[Store.peerUserId];
+          // console.log("远端视频数据", oRemoVideo);
+          // 远端音频数据
+          const oRemoAudioData = await Store.rtcClient.getRemoteAudioStats();
+          const oRemoAudio = oRemoAudioData[Store.peerUserId];
+          // console.log("远端音频数据", oRemoAudio);
+          if (oRemoVideo && oRemoAudio) {
+            $("#userRemodeVideoData").removeClass("d-none");
+            const oRemoVideoList = [
+              {
+                description: "视频接收分辨率(高*宽)",
+                value:
+                  (oRemoVideo.receiveResolutionHeight || 0) +
+                  " * " +
+                  (oRemoVideo.receiveResolutionWidth || 0),
+                unit: "",
+              },
+              {
+                description: "视频接收帧率",
+                value: oRemoVideo.receiveFrameRate || 0,
+                unit: "fps",
+              },
+              {
+                description: "接收带宽",
+                value: (
+                  ((Number(oRemoVideo.receiveBitrate) || 0) +
+                    (Number(oRemoAudio.receiveBitrate) || 0)) /
+                  1024 /
+                  8
+                ).toFixed(3),
+                unit: "kB/s",
+              },
+              {
+                description: "视频接收丢包率",
+                value: Number(oRemoVideo.packetLossRate || 0).toFixed(3),
+                unit: "%",
+              },
+              {
+                description: "音频接收丢包率",
+                value: Number(oRemoAudio.packetLossRate || 0).toFixed(3),
+                unit: "%",
+              },
+              // {
+              //   description: "视频解码帧率",
+              //   value: oRemoVideo.decodeFrameRate || 0,
+              //   unit: "fps",
+              // },
+              // {
+              //   description: "视频渲染帧率",
+              //   value: oRemoVideo.renderFrameRate || 0,
+              //   unit: "fps",
+              // },
+              // {
+              //   description: "远端视频编码格式",
+              //   value: oRemoVideo.codecType || "",
+              //   unit: "",
+              // },
+              // {
+              //   description: "传输延迟",
+              //   value: oRemoVideo.transportDelay || 0,
+              //   unit: "ms",
+              // },
+              // {
+              //   description: "视频端到端延迟",
+              //   value: oRemoVideo.end2EndDelay || 0,
+              //   unit: "ms",
+              // },
+              // {
+              //   description: "接收视频延迟",
+              //   value: oRemoVideo.receiveDelay || 0,
+              //   unit: "ms",
+              // },
+              // {
+              //   description: "接收的视频卡顿率",
+              //   value: oRemoVideo.freezeRate || 0,
+              //   unit: "",
+              // },
+
+              // {
+              //   description: "接收的视频总字节数",
+              //   value: oRemoVideo.receiveBytes || 0,
+              //   unit: "bytes",
+              // },
+              // {
+              //   description: "接收的视频总包数",
+              //   value: oRemoVideo.receivePackets || 0,
+              //   unit: "",
+              // },
+              // {
+              //   description: "接收的视频总丢包数",
+              //   value: oRemoVideo.receivePacketsLost || 0,
+              //   unit: "",
+              // },
+              // {
+              //   description: "接收的视频总时长",
+              //   value: oRemoVideo.totalDuration || 0,
+              //   unit: "s",
+              // },
+              // {
+              //   description: "接收的视频总卡顿时长",
+              //   value: oRemoVideo.totalFreezeTime || 0,
+              //   unit: "s",
+              // },
+            ];
+            $("#userRemodeVideoData").html(`
+            ${oRemoVideoList
+              .map(
+                (stat) =>
+                  `<p class="stats-row">${stat.description}: ${stat.value} ${stat.unit}</p>`
+              )
+              .join("")}`);
+          } else {
+            $("#userRemodeVideoData").addClass("d-none");
+          }
+        }, 1000);
+      } else {
+        $("#userLocalVideoData").addClass("d-none");
+        $("#userRemodeVideoData").addClass("d-none");
+      }
+    },
     // 关闭设置
     closeSeting: function () {
       var oTimeTemporary = setInterval(async function () {
@@ -1366,6 +1643,7 @@ var OperationPackge = {
         return calleeId;
       }
     },
+
     // RTM 主叫: 创建呼叫邀请并发送 (callMode: 视频通话 0 语音通话 1)
     createLocalInvitationAndSend: async function (callMode) {
       // 加入实时通讯频道
@@ -1429,7 +1707,9 @@ var OperationPackge = {
       videoBox.className = "video-preview_box";
       document.getElementById("mineVideoPreview").appendChild(videoBox);
       Store.localTracks.videoTrack &&
-        Store.localTracks.videoTrack.play(videoBox.id);
+        Store.localTracks.videoTrack.play(videoBox.id,{
+          fit: "contain",
+        });
     },
     // p2p 远端音视频渲染
     createPeerVideoAdd: function (peer) {
@@ -1783,7 +2063,8 @@ var OperationPackge = {
                 {
                   text: JSON.stringify({
                     Cmd: "CallStateResult",
-                    state: Store.network.status,
+                    state:
+                      Store.peerUserId !== peerId ? 0 : Store.network.status,
                     Mode: Store.network.Mode,
                   }),
                 },
@@ -1796,31 +2077,6 @@ var OperationPackge = {
         }
       }, 500);
     },
-    // // p2p 断网处理
-    // networkP2P: function () {
-    //   // if (Store.network.type == "rtm") {
-    //   // 在呼叫中断网
-    //   if (Store.network.calltype == 0) {
-    //     // 主叫取消
-    //     // 挂断
-    //     Store.localInvitation && Store.localInvitation.cancel();
-    //     // 隐藏呼叫邀请页面
-    //     PageShow.hiddenCallPage();
-    //     // 本地存储恢复
-    //     OperationPackge.public.restoreDefault();
-    //   } else {
-    //     // 被叫取消
-    //     Store.remoteInvitation.response = JSON.stringify({
-    //       refuseId: Store.ownUserId,
-    //     });
-    //     // 拒绝接听
-    //     Store.remoteInvitation && Store.remoteInvitation.refuse();
-    //   }
-    //   // } else {
-    //   // 在视频通话中断网
-    //   //
-    //   // }
-    // },
   },
   multi: {
     // 频道消息
@@ -2255,6 +2511,13 @@ var OperationPackge = {
   $("#closeSettingBtn").click(async function () {
     await OperationPackge.p2p.closeSeting();
   });
+
+  // 监听用户是否开启视频相关数据展示
+  $("#videoDataSwitch").change(function () {
+    var videoEnable = $(this).prop("checked");
+    Store.setting.videoDataShow = videoEnable;
+  });
+
   // 监听用户设置视频大小
   $("#settingVideoResolution").change(async function () {
     Store.setting.videoSize = await $("#settingVideoResolution")
@@ -2350,6 +2613,8 @@ var OperationPackge = {
       (await Store.localTracks.videoTrack) &&
         (Store.localTracks.videoTrack.close(),
         (Store.localTracks.videoTrack = null));
+      Store.setting.videoStatsInterval &&
+        clearInterval(Store.setting.videoStatsInterval);
       // 显示音频通话时长
       await OperationPackge.public.communicationDuration("audioDuration");
     }
