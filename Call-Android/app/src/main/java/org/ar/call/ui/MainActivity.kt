@@ -29,34 +29,36 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         ViewCompat.setTransitionName(binding.ivLogo, "logo")
-        lifecycleScope.launchWhenResumed {
-            WaitDialog.show("正在登录...")
-            delay(1000)
-            if (callViewModel.login()) {
-               showSuccess("登录成功")
-            } else {
-                showError("登录失败")
-            }
-        }
-
+        loginRtm()
         binding.run {
             tvUser.text = "您的呼叫ID:${callViewModel.userId}"
             btnP2p.setOnClickListener {
                 if (callViewModel.isLoginSuccess) {
                     go(P2PActivity::class.java)
                 } else {
-                    toast("登录失败")
+                    showReLoginDialog()
                 }
             }
             btnMultiple.setOnClickListener {
                 if (callViewModel.isLoginSuccess) {
                    go(GroupCallActivity::class.java)
                 } else {
-                    toast("登录失败")
+                    showReLoginDialog()
                 }
             }
         }
 
+    }
+
+    private fun loginRtm() {
+        lifecycleScope.launchWhenResumed {
+            WaitDialog.show("正在登录...")
+            if (callViewModel.login()) {
+                showSuccess("登录成功")
+            } else {
+                showError("登录失败，请检查网络")
+            }
+        }
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
@@ -76,6 +78,15 @@ class MainActivity : BaseActivity() {
                 true
             }.setCancelable(false)
 
+    }
+
+    private fun showReLoginDialog(){
+        MessageDialog.show("提示", "登录RTM失败，请检查网络", "重新登录","取消")
+            .setOkButtonClickListener { baseDialog, v ->
+                baseDialog.dismiss()
+                loginRtm()
+                true
+            }.setCancelable(false)
     }
 
     override fun onRemoteInvitationReceived(var1: RemoteInvitation?) {

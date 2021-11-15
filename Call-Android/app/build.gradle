@@ -10,8 +10,8 @@ android {
         applicationId "org.ar.call"
         minSdk 21
         targetSdk 30
-        versionCode 35
-        versionName "1.3.5"
+        versionCode 39
+        versionName "1.3.9"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -19,7 +19,7 @@ android {
     buildTypes {
         release {
             buildConfigField("String", "APPID", '"YOUR APPID"')
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
@@ -59,7 +59,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
-    implementation 'io.anyrtc:rtc:4.2.2.8'
+    implementation 'io.anyrtc:rtc:4.2.2.9'
     implementation 'io.anyrtc:rtm:1.0.2.5'
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.4'
     implementation 'com.google.code.gson:gson:2.6.2'

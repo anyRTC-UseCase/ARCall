@@ -58,15 +58,15 @@ class P2PActivity : BaseActivity() {
                     showError("不能呼叫自己")
                     return@setOnClickListener
                 }
-                callViewModel.queryOnline(etUser.text.toString()){
-                    if (it) {
-                        BottomMenu.show(arrayOf("视频呼叫", "语音呼叫")).setMessage("请选择呼叫类型")
-                            .setOnMenuItemClickListener(object : OnMenuItemClickListener<BottomMenu> {
-                                override fun onClick(
-                                    dialog: BottomMenu?,
-                                    text: CharSequence?,
-                                    index: Int
-                                ): Boolean {
+                BottomMenu.show(arrayOf("视频呼叫", "语音呼叫")).setMessage("请选择呼叫类型")
+                    .setOnMenuItemClickListener(object : OnMenuItemClickListener<BottomMenu> {
+                        override fun onClick(
+                            dialog: BottomMenu?,
+                            text: CharSequence?,
+                            index: Int
+                        ): Boolean {
+                            callViewModel.queryOnline(etUser.text.toString()){
+                                if (it) {
                                     callViewModel.createLocalInvitation(
                                         binding.etUser.text.toString(),
                                         index
@@ -77,14 +77,15 @@ class P2PActivity : BaseActivity() {
                                         })
                                         dialog?.dismiss()
                                     }
-                                    return true
+                                }else{
+                                    showError("对方不在线")
                                 }
+                            }
+                            return true
+                        }
 
-                            })
-                    }else{
-                        showError("对方不在线")
-                    }
-                }
+                    })
+
             }
             ivBack.setOnClickListener { finish() }
         }

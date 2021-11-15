@@ -26,28 +26,32 @@ import org.ar.call.R
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.RingtoneManager
+import android.util.Log
 import org.ar.call.ui.GroupCallActivity
 import org.ar.call.ui.P2PVideoActivity
 import androidx.core.content.FileProvider
 import io.karn.notify.Notify
 import io.karn.notify.NotifyCreator
 import io.karn.notify.entities.NotifyConfig
+import org.ar.call.utils.NetworkObserver
 import org.ar.call.utils.getAppOpenIntentByPackageName
 import org.ar.call.utils.getPackageContext
 import java.io.File
 
 
-class GlobalVM : ViewModel(), LifecycleObserver {
+class GlobalVM : ViewModel(), LifecycleObserver,NetworkObserver.Listener {
 
     private var isBackground = false //是否处于后台
     private var needReCallBack = false //从后台回到前台 期间如果有人呼叫 需要将呼叫重新回调出去
-    private var isShowNotify = false
+    private var isShowNotify = false //是否显示了通知
     var isWaiting = false //是否正处于呼叫/被叫接听等待中...
     var isCalling = false// 是否正在通话中...
     var callType = -1//呼叫类型
     var callingUid = ""//p2p正在通话中的人的UID
+    var netOnline = true //网络是否连接着
     init {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        NetworkObserver.invoke(CallApplication.callApp.applicationContext,true,this)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
@@ -126,18 +130,19 @@ class GlobalVM : ViewModel(), LifecycleObserver {
     fun sendCallStateResponseMsg(uid:String) {
         sendMessage(
            uid, JSONObject().apply {
+                put("Cmd","CallStateResult")
                 if (isWaiting){
-                    put("CallState", 1)
+                    put("state", 1)
                 }else if (isCalling){
                     //如果发消息的id和当前通话id不一致则直接发CallState =0
                         if (uid!=callingUid){
-                            put("CallState", 0)
+                            put("state", 0)
                         }else{
-                            put("CallState", 2)
+                            put("state", 2)
                             put("Mode",callType)
                         }
                 }else{
-                    put("CallState", 0)
+                    put("state", 0)
                 }
             }.toString(), {
 
@@ -153,6 +158,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
     }
 
     suspend fun login() = suspendCoroutine<Boolean> {
+        rtmClient.logout(null)
         rtmClient.login("", userId, object : ResultCallback<Void> {
             override fun onSuccess(var1: Void?) {
                 isLoginSuccess = true
@@ -245,11 +251,6 @@ class GlobalVM : ViewModel(), LifecycleObserver {
     }
 
 
-    fun subscribe(peerId: String) {
-        val list: MutableSet<String> = ArraySet()
-        list.add(peerId)
-        rtmClient.subscribePeersOnlineStatus(list, null)
-    }
 
     fun call() {
         localInvitation?.let {
@@ -261,11 +262,6 @@ class GlobalVM : ViewModel(), LifecycleObserver {
         rtmCallManager.sendLocalInvitation(localInvitation, null)
     }
 
-    fun unSubscribe(peerId: String) {
-        val list: MutableSet<String> = ArraySet()
-        list.add(peerId)
-        rtmClient.unsubscribePeersOnlineStatus(list, null)
-    }
 
     fun sendMessage(userId: String, msg: String, block: (Boolean) -> Unit) {
         rtmClient.sendMessageToPeer(
@@ -353,6 +349,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
     }
 
     private inner class CallEvent : RtmCallEventListener {
+
         //返回给主叫的回调：被叫已收到呼叫邀请。
         override fun onLocalInvitationReceivedByPeer(var1: LocalInvitation?) {
             events?.onLocalInvitationReceivedByPeer(var1)
@@ -374,7 +371,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
             events?.onLocalInvitationCanceled(var1)
         }
 
-        //返回给主叫的回调：发出的呼叫邀请过程失败。
+        //返回给主叫的回调：发出的呼叫邀请失败。可能对方一直没有接听
         override fun onLocalInvitationFailure(var1: LocalInvitation?, var2: Int) {
             events?.onLocalInvitationFailure(var1, var2)
         }
@@ -451,6 +448,7 @@ class GlobalVM : ViewModel(), LifecycleObserver {
 
         }
 
+        //返回给被叫的回调：拒绝呼叫邀请成功
         override fun onRemoteInvitationCanceled(var1: RemoteInvitation?) {
             cancleNotify()
             events?.onRemoteInvitationCanceled(var1)
@@ -507,5 +505,14 @@ class GlobalVM : ViewModel(), LifecycleObserver {
             Notify.cancelNotification(1000)
             isShowNotify = false
         }
+    }
+
+    override fun onConnectivityChange(isOnline: Boolean) {
+        netOnline = isOnline
+        Log.d("onConnectivityChange",isOnline.toString())
+    }
+
+    override fun onCleared() {
+        super.onCleared()
     }
 }

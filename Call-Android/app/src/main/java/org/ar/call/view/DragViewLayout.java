@@ -21,7 +21,7 @@ public class DragViewLayout extends RelativeLayout {
                 @Override
                 public boolean tryCaptureView(View child, int pointerId) {
                    if (null!=child.getTag()){
-                       if (child.getTag().toString().equals("local")||child.getTag().toString().equals("remote")){
+                       if (child.getTag().toString().equals("local")||child.getTag().toString().equals("remote")||child.getTag().toString().equals("local_log")||child.getTag().toString().equals("remote_log")){
                            return true;
                        }
                    }

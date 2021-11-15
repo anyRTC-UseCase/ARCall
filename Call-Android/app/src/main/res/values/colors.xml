@@ -10,4 +10,24 @@
     <color name="colorPrimary">#40A3FC</color>
     <color name="colorPrimaryDark">#40A3FC</color>
     <color name="colorAccent">#40A3FC</color>
+
+    <color name="black5unalpha">#0D000000</color>
+    <color name="black10unalpha">#1A000000</color>
+    <color name="black15unalpha">#26000000</color>
+    <color name="black20unalpha">#33000000</color>
+    <color name="black25unalpha">#40000000</color>
+    <color name="black30unalpha">#4D000000</color>
+    <color name="black35unalpha">#59000000</color>
+    <color name="black40unalpha">#66000000</color>
+    <color name="black45unalpha">#73000000</color>
+    <color name="black50unalpha">#80000000</color>
+    <color name="black55unalpha">#8C000000</color>
+    <color name="black60unalpha">#99000000</color>
+    <color name="black65unalpha">#A6000000</color>
+    <color name="black70unalpha">#B3000000</color>
+    <color name="black75unalpha">#BF000000</color>
+    <color name="black80unalpha">#CC000000</color>
+    <color name="black85unalpha">#D9000000</color>
+    <color name="black90unalpha">#E6000000</color>
+    <color name="black95unalpha">#F2000000</color>
 </resources>
