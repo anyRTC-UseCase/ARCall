@@ -27,9 +27,10 @@
 		onLoad(options) {
 			// 默认弹窗
 			this.$store.dispatch('upDataPopubId', 'poPup');
-			if (options.state === 'end') {
+			if (options.state === 'end' || options.state === 'abnormityEnd') {
 				setTimeout(() => {
-					this.$Utils.hintInfo('通话已结束', 'success');
+					this.$Utils.hintInfo(options.state === 'end' ? '通话已结束' : '通话异常', options.state === 'end' ?
+						'success' : 'warn');
 				}, 800)
 			}
 		},
@@ -49,14 +50,6 @@
 					_this.windowHeight = res.windowHeight;
 				}
 			});
-			// 获取uid
-			// console.log(this.$store.state.uid);
-			// const getUid = setInterval(() => {
-			// 	console.log("获取uid", this.$store.state.uid);
-			// 	if (this.$store.state.uid) {
-			// 		clearInterval(getUid);
-			// 	}
-			// }, 1000)
 		},
 		methods: {
 			// 跳转
@@ -80,7 +73,6 @@
 						duration: 2000
 					});
 				}
-
 			}
 		}
 	}

@@ -50,15 +50,15 @@ p {
   height: 100%;
 }
 .home-login-flex {
-	display: flex;
+  display: flex;
 }
 /* login-left */
-.login-left>.img-responsive {
+.login-left > .img-responsive {
   width: 100%;
 }
 
 /* login-right */
-.login-right>.full-wrap {
+.login-right > .full-wrap {
   padding: 15px 30px;
 }
 
@@ -123,7 +123,7 @@ p {
   margin: 60px 0 10px;
 }
 
-.login-form_us>button {
+.login-form_us > button {
   margin: 5px;
 }
 
@@ -143,7 +143,7 @@ p {
   justify-content: center;
   align-items: center;
   margin: 0 10px;
-	color: #fff !important;
+  color: #fff !important;
 }
 
 .login-form_ownid {
@@ -185,9 +185,10 @@ p {
   z-index: 1060;
 }
 
-.userid-inputs {}
+.userid-inputs {
+}
 
-.userid-inputs>input {
+.userid-inputs > input {
   width: 60px;
   height: 60px;
   text-align: center;
@@ -227,7 +228,7 @@ p {
   color: #6a6a6a;
 }
 
-.setting-bd>select {
+.setting-bd > select {
   outline: none;
   border: 0;
   border-bottom: 1px solid #ddd;
@@ -269,7 +270,6 @@ p {
     border: 1px solid #999999;
     position: absolute;
   }
-
 }
 
 @media (min-width: 576px) and (max-width: 767.98px) {
@@ -288,16 +288,14 @@ p {
     border: 1px solid #999999;
     position: absolute;
   }
-
 }
 
-
 @media (min-width: 768px) and (max-width: 991.98px) {
-	.meet-view {
-	  width: 800px;
-	  height: 600px;
-	}
-	
+  .meet-view {
+    width: 800px;
+    height: 600px;
+  }
+
   .video-preview_little {
     user-select: none;
     margin: 20px;
@@ -309,7 +307,6 @@ p {
     position: absolute;
   }
 }
-
 
 @media (min-width: 992px) and (max-width: 1199.98px) {
   .meet-view {
@@ -327,11 +324,9 @@ p {
     border: 1px solid #999999;
     position: absolute;
   }
-
 }
 
-
-@media (min-width:1200px) and (max-width:1499.98px) {
+@media (min-width: 1200px) and (max-width: 1499.98px) {
   .meet-view {
     width: 900px;
     height: 675px;
@@ -349,7 +344,7 @@ p {
   }
 }
 
-@media (min-width:1500px) {
+@media (min-width: 1500px) {
   .meet-view {
     width: 1100px;
     height: 825px;
@@ -358,11 +353,11 @@ p {
   .video-preview_little {
     user-select: none;
     margin: 20px;
-    width: 300px;
-    height: 225px;
     z-index: 8;
     background: #1c1c1c;
     border: 1px solid #999999;
+    width: 300px;
+    height: 225px;
     position: absolute;
   }
 }
@@ -380,6 +375,10 @@ p {
   height: 100%;
   background: #333;
   position: relative;
+}
+
+.video-preview_big_network {
+  background: #000;
 }
 
 .video-preview_box {
@@ -418,7 +417,7 @@ p {
 .invitation {
   padding: 40px 15px;
   width: 420px;
-  background-color: #169BD5;
+  background-color: #169bd5;
 }
 
 .head_portrait {
@@ -466,15 +465,15 @@ p {
   width: 175px;
   border-radius: 40px;
   justify-content: space-evenly;
+  z-index: 666;
 }
 
-.audio_option>button {
+.audio_option > button {
   outline: none;
   border: 0;
   background: #fff;
   color: #515151;
   font-size: 1em;
-
 }
 
 .meet-control_icon {
@@ -490,7 +489,7 @@ p {
 /*  */
 .prompt_little {
   padding: 0 10px;
-  background-color: rgba(35,35,35,1);
+  background-color: rgba(35, 35, 35, 1);
   position: absolute;
   z-index: 99;
   bottom: 0;
@@ -501,6 +500,33 @@ p {
   z-index: 99;
   bottom: 0;
   color: #fff;
+}
+#userLocalVideoData {
+  position: absolute;
+  right: -204px;
+  width: 204px;
+  /* left: 120px; */
+  top: 10px;
+  /* width: 100%; */
+  padding: 6px 10px;
+  /* width: 120px; */
+  z-index: 99;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.5);
+}
+#userRemodeVideoData {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  z-index: 99;
+  padding: 6px 10px;
+  /* width: 240px; */
+  border-radius: 4px;
+  color: #fff;
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .prompt_little > i,
@@ -518,7 +544,7 @@ p {
 }
 
 .icon_color_blue {
-  color: #40A3FC;
+  color: #40a3fc;
 }
 
 .icon_color_red {
@@ -581,7 +607,7 @@ p {
 }
 
 /* 模态框 */
-.modal-form_bd{
+.modal-form_bd {
   padding: 30px;
 }
 

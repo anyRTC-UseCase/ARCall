@@ -74,6 +74,7 @@ ARCall 示例项目支持以下平台和版本：
 - [Android 运行指南](https://github.com/anyRTC-UseCase/ARCall/tree/master/Call-Android)
 - [iOS 运行指南](https://github.com/anyRTC-UseCase/ARCall/tree/master/Call-iOS)
 - [Web 运行指南](https://github.com/anyRTC-UseCase/ARCall/tree/master/Call-web)
+- [Uniapp 运行指南](https://github.com/anyRTC-UseCase/ARCall/tree/master/Call_uniapp)
 
 ### 与SIP互通
 

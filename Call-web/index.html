@@ -237,11 +237,33 @@
                 </div>
               </div>
               <div class="setting-bd">
+                <div
+                  class="
+                    d-flex
+                    justify-content-between
+                    align-items-end
+                    seting-mutil_height
+                  "
+                >
+                  <span>点对点视频呼叫统计</span>
+                  <div class="custom-control custom-switch">
+                    <input
+                      autocomplete="off"
+                      type="checkbox"
+                      class="custom-control-input"
+                      id="videoDataSwitch"
+                    />
+                    <label class="custom-control-label" for="videoDataSwitch">
+                    </label>
+                  </div>
+                </div>
+
                 <div class="setting-option_title">分辨率</div>
                 <select name="" id="settingVideoResolution">
-                  <option value="640*360">360P</option>
-                  <option value="640*480">480P</option>
+                  <option value="1920*1080">1080P</option>
                   <option value="1280*720">720P</option>
+                  <option value="640*480">480P</option>
+                  <option value="640*360">360P</option>
                 </select>
                 <!--  -->
                 <div class="setting-option_title">音频设备</div>
@@ -705,6 +727,7 @@
 		        </div> -->
             <div id="UserIdChanel">用户</div>
           </div>
+          <div class="d-none" id="userLocalVideoData"></div>
         </div>
 
         <!-- 大屏 -->
@@ -729,6 +752,7 @@
           <div class="prompt_big meet-control_icon m-3" id="videoDuration">
             00:00
           </div>
+          <div class="d-none" id="userRemodeVideoData"></div>
         </div>
 
         <!--  -->
