@@ -56,7 +56,11 @@ class MainActivity : BaseActivity() {
             if (callViewModel.login()) {
                 showSuccess("登录成功")
             } else {
-                showError("登录失败，请检查网络")
+                if (BuildConfig.APPID.equals("YOUR APPID")){
+                    showError("登录失败，请配置APPID")
+                }else{
+                    showError("登录失败，请检查网络")
+                }
             }
         }
     }
