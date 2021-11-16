@@ -3,7 +3,7 @@
 ## 前提条件
 
 - 开发环境：
-  - Android Studio 2020.3.1 Canary 1 +(预览版)
+  - Android Studio 2020.3.1 Canary 1
 - Android 真机（不能用模拟器）
 
 ## 运行示例项目
@@ -30,51 +30,7 @@ buildConfigField("String", "APPID", '"YOUR APPID"')
 
 4.运行
 
-## 注意事项⚠️
 
-本项目基于 Android Studio 预览版开发，如果你是用的是稳定版本，你可能会遇到如下错误
-
-```
-Caused by: org.gradle.internal.metaobject.AbstractDynamicObject$CustomMessageMissingMethodException: Could not find method dependencyResolutionManagement() for arguments [settings_6qkcwtonwe1izrgnh6x456ese$_run_closure1@2899b5c4] on settings 'Call-Android' of type org.gradle.initialization.DefaultSettings.
-```
-
-请做如下修改：
-
-- 打开 settings.gradle 删除如下内容
-
-  ```
-  dependencyResolutionManagement {
-      repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-      repositories {
-          maven { url 'https://www.jitpack.io' }
-          google()
-          mavenCentral()
-  
-      }
-  }
-  ```
-  
-- 打开Call-Android/build.gradle  添加以下内容
-  
-  ```
-  allprojects {
-          repositories {
-              maven { url 'https://jitpack.io' }
-              mavenCentral()
-              google()
-              jcenter()
-          }
-      }
-  ```
-  
-- 打开 Call-Android/app/build.gradle 修改以下属性  
-  
-  ```
-  compileSdk 30 ->compileSdkVersion 30
-  minSdk 21 ->minSdkVersion 21
-  targetSdk 30 ->targetSdkVersion 30
-  
-  ```
   
   
 
