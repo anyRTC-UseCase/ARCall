@@ -132,3 +132,7 @@ fun getAppOpenIntentByPackageName(context: Context, packageName: String): Intent
     intent.component = ComponentName(packageName, mainAct!!)
     return intent
 }
+
+fun getSpValue(key:String):Int{
+    return SpUtil.get().getInt(key,2)
+}

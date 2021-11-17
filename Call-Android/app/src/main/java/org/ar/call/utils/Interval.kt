@@ -130,6 +130,12 @@ import java.util.concurrent.TimeUnit
         launch(delay)
     }
 
+    fun cancel() {
+        if (state == IntervalStatus.STATE_IDLE) return
+        state = IntervalStatus.STATE_IDLE
+        scope?.cancel()
+        count = start
+    }
     /**
      * 暂停
      */
