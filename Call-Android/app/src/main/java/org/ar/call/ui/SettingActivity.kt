@@ -11,6 +11,7 @@ import org.ar.call.utils.Constans
 import org.ar.call.R
 import org.ar.call.utils.SpUtil
 import org.ar.call.databinding.ActivitySettingBinding
+import org.ar.call.utils.getSpValue
 import org.ar.call.utils.showSuccess
 import org.ar.rtm.RemoteInvitation
 import org.json.JSONObject
@@ -40,6 +41,11 @@ class SettingActivity : BaseActivity() {
                 it.putBoolean(Constans.OPEN_DENOISE, isChecked)
             }
         }
+        binding.swAvdata.setOnCheckedChangeListener { _, isChecked ->
+            SpUtil.edit {
+                it.putBoolean(Constans.OPEN_AVDATA, isChecked)
+            }
+        }
         binding.ivBack.setOnClickListener { finish() }
     }
 
@@ -57,7 +63,7 @@ class SettingActivity : BaseActivity() {
     }
 
     private fun setConfig() {
-        when (SpUtil.get().getInt(Constans.KEY_FRAME,1)) {
+        when (getSpValue(Constans.KEY_FRAME)) {
             1 -> {
                 binding.tvFrame.text = "15"
             }
@@ -68,7 +74,7 @@ class SettingActivity : BaseActivity() {
                 binding.tvFrame.text = "30"
             }
         }
-        when (SpUtil.get().getInt(Constans.KEY_DIMENS,1)) {
+        when (getSpValue(Constans.KEY_DIMENS)) {
             1 -> {
                 binding.tvXy.text = "240 * 320"
             }
@@ -79,6 +85,7 @@ class SettingActivity : BaseActivity() {
                 binding.tvXy.text = "720 * 1280"
             }
         }
+        binding.swAvdata.isChecked = SpUtil.get().getBoolean(Constans.OPEN_AVDATA, false)
     }
 
     private fun setAVStatus(){

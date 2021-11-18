@@ -141,7 +141,18 @@
         android:paddingRight="15dp"
         android:textSize="15sp"
         android:text="AI智能降噪"/>
-
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/sw_avdata"
+        android:layout_width="match_parent"
+        android:layout_marginTop="11dp"
+        android:layout_centerVertical="true"
+        android:layout_height="47dp"
+        android:background="@color/white"
+        android:textColor="#333333"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:textSize="15sp"
+        android:text="点对点音视频数据展示"/>
 
 
 </LinearLayout>

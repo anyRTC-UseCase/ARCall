@@ -14,20 +14,15 @@ import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
-import com.drake.statusbar.darkMode
-import com.drake.statusbar.immersive
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.ar.call.*
-import org.ar.call.databinding.ActivityP2PvideoBinding
-import org.ar.call.databinding.LayoutAudioBinding
-import org.ar.call.databinding.LayoutReceivedSingleCallBinding
-import org.ar.call.databinding.LayoutVideoBinding
+import org.ar.call.bean.VideoDebugData
 import org.ar.call.utils.*
 import org.ar.call.vm.RtcVM
 import org.ar.rtc.RtcEngine
 import org.ar.rtc.VideoEncoderConfiguration
-import org.ar.rtc.video.VideoCanvas
 import org.ar.rtm.LocalInvitation
 import org.ar.rtm.RemoteInvitation
 import org.ar.rtm.RtmMessage
@@ -36,10 +31,10 @@ import org.webrtc.TextureViewRenderer
 import java.util.HashMap
 
 class P2PVideoActivity : BaseActivity() {
-    private val binding by lazy { ActivityP2PvideoBinding.inflate(layoutInflater) }
-    private val bindingReceive by lazy { LayoutReceivedSingleCallBinding.inflate(layoutInflater) }
-    private val bindingAudio by lazy { LayoutAudioBinding.inflate(layoutInflater) }
-    private val bindingVideo by lazy { LayoutVideoBinding.inflate(layoutInflater) }
+    private val binding by lazy { org.ar.call.databinding.ActivityP2PvideoBinding.inflate(layoutInflater) }
+    private val bindingReceive by lazy { org.ar.call.databinding.LayoutReceivedSingleCallBinding.inflate(layoutInflater) }
+    private val bindingAudio by lazy { org.ar.call.databinding.LayoutAudioBinding.inflate(layoutInflater) }
+    private val bindingVideo by lazy { org.ar.call.databinding.LayoutVideoBinding.inflate(layoutInflater) }
 
     private val rtcVM: RtcVM by viewModels()
 
@@ -56,13 +51,13 @@ class P2PVideoActivity : BaseActivity() {
         setContentView(binding.root)
         isCalled = intent.getBooleanExtra("isCalled",false)
         binding.root.addView(bindingReceive.root)
+        callViewModel.isWaiting = true
         if (!isCalled){//如果是主动呼叫
             callViewModel.localInvitation?.let {
                 val contentJSON = JSONObject(it.content)
                 callMode = contentJSON.getInt("Mode")
                 remoteUserId = it.calleeId
                 rtcVM.initRTC(this,callMode,contentJSON.getString("ChanId"),callViewModel.userId)
-                callViewModel.subscribe(remoteUserId)
                 showCallLayout()
                 callViewModel.call()
             }?:run {
@@ -76,7 +71,6 @@ class P2PVideoActivity : BaseActivity() {
                 remoteUserId = it.callerId
                 rtcVM.initRTC(this,callMode,contentJSON.getString("ChanId"),callViewModel.userId)
                 bindingReceive.tvState.text=(if (callMode == Constans.AUDIO_MODE) "收到语音呼叫邀请" else "收到视频呼叫邀请")
-                callViewModel.subscribe(remoteUserId)
                 showCallLayout()
             }?:run {
                 toast("error...")
@@ -86,8 +80,14 @@ class P2PVideoActivity : BaseActivity() {
         callViewModel.callingUid = remoteUserId
         initOnclick()
         initLiveData()
-
-
+        val openAVData=SpUtil.get().getBoolean(Constans.OPEN_AVDATA, false)
+        if (openAVData&&callMode==0){
+            bindingVideo.tvLoaclStatus.visibility= View.VISIBLE
+            bindingVideo.tvRemoteStatus.visibility= View.VISIBLE
+        }else{
+            bindingVideo.tvLoaclStatus.visibility= View.GONE
+            bindingVideo.tvRemoteStatus.visibility= View.GONE
+        }
     }
 
 
@@ -186,7 +186,6 @@ class P2PVideoActivity : BaseActivity() {
     override fun onLocalInvitationCanceled(var1: LocalInvitation?) {
         super.onLocalInvitationCanceled(var1)
         runOnUiThread {
-            callViewModel.unSubscribe(remoteUserId)
             finish()
         }
     }
@@ -223,9 +222,6 @@ class P2PVideoActivity : BaseActivity() {
 
             }else{
                 rtcVM.inMeeting = false
-                var1?.let {
-                    callViewModel.unSubscribe(it.callerId)
-                }
                 finish()
 
             }
@@ -237,38 +233,7 @@ class P2PVideoActivity : BaseActivity() {
         runOnUiThread {
             rtcVM.inMeeting = false
             toast("对方已取消呼叫")
-            var1?.let {
-                callViewModel.unSubscribe(it.callerId)
-            }
             finish()
-        }
-    }
-
-    override fun onPeersOnlineStatusChanged(map: MutableMap<String, Int>?) {
-        super.onPeersOnlineStatusChanged(map)
-        runOnUiThread {
-            map?.let {
-                if (map.containsKey(remoteUserId)) {
-                    if (map[remoteUserId] != 0) {//离线了
-                        //****sdk bug 会收到对方先离线再上线****
-                        //****临时解决办法 收到离线 主动查询是否真的离线****
-                        callViewModel.queryOnline(remoteUserId){
-                            if (!it){
-                                if (callViewModel.isWaiting) {
-                                    //如果正在呼叫界面
-                                    callViewModel.finishCall()
-                                }
-                                callViewModel.unSubscribe(remoteUserId)
-                                rtcVM.inMeeting = false
-                                toast("对方已离线")
-                                finish()
-                            }
-                        }
-
-                    }
-                }
-            }
-
         }
     }
 
@@ -383,7 +348,9 @@ class P2PVideoActivity : BaseActivity() {
         if (videoList.containsKey("remote")) {
             videoList.remove("remote")
         }
-        bindingVideo.rlRemoteVideo.addView(mRemoteView, 1)
+        val params = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.WRAP_CONTENT)
+        params.addRule(RelativeLayout.CENTER_IN_PARENT)
+        bindingVideo.rlRemoteVideo.addView(mRemoteView, 1,params)
         videoList["remote"] = mRemoteView
        rtcVM.setupRemoteVideo(uid,mRemoteView)
     }
@@ -407,8 +374,10 @@ class P2PVideoActivity : BaseActivity() {
             rlRemoteVideo.setOnClickListener {
                 if (rlBtnGroup.visibility == View.VISIBLE) {
                     rlBtnGroup.gone()
+                    binding.chronometer.gone()
                 } else {
                     rlBtnGroup.show()
+                    binding.chronometer.show()
                 }
             }
             rlLocalVideo.setOnClickListener {
@@ -522,6 +491,48 @@ class P2PVideoActivity : BaseActivity() {
                 }
         })
 
+        rtcVM.nobodyComeIn.observe(this,{
+            lifecycleScope.launch {
+                    toast("对方网络异常")
+                    delay(1500)
+                    leave(false)
+            }
+        })
+        rtcVM.userOffline.observe(this,{
+            if (it == 1){
+                toast("对方网络异常")
+            }else{
+                lifecycleScope.launch {
+                    toast("对方通话异常")
+                    delay(1500)
+                    leave(false)
+                }
+            }
+        })
+        rtcVM.localVideoStatusObserver.observe(this,{
+            StringBuffer().apply {
+                appendLine("本地音视频数据展示")
+                appendLine(it.dimens)
+                appendLine(it.frame)
+                appendLine(it.rtt)
+                appendLine("发送带宽：${it.sendAudioBitrate+it.sendVideoBitrate}")
+                appendLine("接收带宽：${it.recAudioBitrate+it.recVideoBitrate}")
+                appendLine(it.audioSendLoss)
+                appendLine(it.videoSendLoss)
+                bindingVideo.tvLoaclStatus.setText(this.toString())
+            }
+        })
+        rtcVM.remoteVideoStatusObserver.observe(this,{
+            StringBuffer().apply {
+                appendLine("远端音视频数据展示")
+                appendLine(it.dimens)
+                appendLine(it.frame)
+                appendLine("接收带宽：${it.recAudioBitrate+it.recVideoBitrate}")
+                appendLine(it.audioRecLoss)
+                appendLine(it.videoRecLoss)
+                bindingVideo.tvRemoteStatus.setText(this.toString())
+            }
+        })
 
 
     }
@@ -546,11 +557,15 @@ class P2PVideoActivity : BaseActivity() {
             bindingVideo.rlLocalVideo.layoutParams = marginLayoutParams
         }
         if (bindingVideo.rlLocalVideo.tag.toString() == "local") {
-            bindingVideo.rlRemoteVideo.addView(videoList["local"], 1)
+            val params = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.MATCH_PARENT)
+            params.addRule(RelativeLayout.CENTER_IN_PARENT)
+            bindingVideo.rlRemoteVideo.addView(videoList["local"], 1,params)
             bindingVideo.rlLocalVideo.addView(videoList["remote"], 1)
             bindingVideo.rlLocalVideo.tag = "remote"
         } else {
-            bindingVideo.rlRemoteVideo.addView(videoList["remote"], 1)
+            val params = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.WRAP_CONTENT)
+            params.addRule(RelativeLayout.CENTER_IN_PARENT)
+            bindingVideo.rlRemoteVideo.addView(videoList["remote"], 1,params)
             bindingVideo.rlLocalVideo.addView(videoList["local"], 1)
             bindingVideo.rlLocalVideo.tag = "local"
         }
@@ -568,14 +583,15 @@ class P2PVideoActivity : BaseActivity() {
         Toast.makeText(this@P2PVideoActivity, "声音将通过听筒播放", Toast.LENGTH_SHORT).show()
     }
     private fun leave(needSendMessage:Boolean = true){
-        rtcVM.inMeeting = false
-        if (callMode == Constans.VIDEO_MODE){
-            bindingVideo.rlVideo.removeAllViews()
-        }
         if (needSendMessage) {
             callViewModel.sendMessage(remoteUserId, JSONObject().apply {
                 put("Cmd", "EndCall")
             }.toString()) {}
+        }
+        rtcVM.inMeeting = false
+        rtcVM.leaveChannel()
+        if (callMode == Constans.VIDEO_MODE){
+            bindingVideo.rlVideo.removeAllViews()
         }
         if (!isCalled) {//这里本可以不调用 但如果是断网重连进来的就需要再取消一下 否则下次无法再呼叫
             callViewModel.cancle()
@@ -593,7 +609,7 @@ class P2PVideoActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        callViewModel.isWaiting = true
+
 
     }
 

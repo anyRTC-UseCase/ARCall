@@ -14,12 +14,13 @@
             android:id="@+id/rl_remote_video"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <ImageView
-                android:background="#2C3033"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="center"
                 android:layout_centerInParent="true"
+                android:background="#2C3033"
+                android:scaleType="center"
                 android:src="@drawable/img_logo_dark_big"></ImageView>
         </RelativeLayout>
 
@@ -38,6 +39,31 @@
 
         </RelativeLayout>
 
+        <TextView
+            android:id="@+id/tv_loacl_status"
+            android:layout_width="180dp"
+            android:layout_height="220dp"
+            android:tag="local_log"
+            android:gravity="center_vertical"
+            android:padding="4dp"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sp_14"
+            android:background="@color/black40">
+        </TextView>
+
+        <TextView
+            android:id="@+id/tv_remote_status"
+            android:layout_width="180dp"
+            android:layout_height="220dp"
+            android:tag="remote_log"
+            android:gravity="center_vertical"
+            android:padding="4dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sp_14"
+            android:background="@color/black40">
+        </TextView>
 
     </org.ar.call.view.DragViewLayout>
 
@@ -147,5 +173,9 @@
             android:src="@drawable/img_small"
             ></ImageButton>
     </RelativeLayout>
+
+
+
+
 
 </FrameLayout>
