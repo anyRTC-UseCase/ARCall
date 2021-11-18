@@ -220,36 +220,57 @@ var Utils = {
   },
   // 大小屏幕切换
   switchover: function (user) {
-    $(`#${user.uid}Window`).bind("click", function () {
+    $(`#${user.uid}Window`).bind("click", async function () {
       // 当前大屏没有用户
       if (!Store.bigMutiUser.uid) {
+        if (user.uid !== Store.ownUserId) {
+          // 设置为大流
+          await Store.rtcClient.setRemoteVideoStreamType(user.uid, 0);
+        }
         Store.bigMutiUser = user;
-        user.videoTrack.stop();
-        user.videoTrack.play("peerMutiVideoPreview", {
+        await user.videoTrack.stop();
+        await user.videoTrack.play("peerMutiVideoPreview", {
           fit: "contain",
         });
       } else {
         // 当前大屏用户与想展示用户不符
         if (Store.bigMutiUser.uid !== user.uid) {
+          if (Store.ownUserId !== Store.bigMutiUser.uid) {
+            // 设置为小流
+            await Store.rtcClient.setRemoteVideoStreamType(
+              Store.bigMutiUser.uid,
+              1
+            );
+          }
           // 大屏用户切回去原来的小视图
-          Store.bigMutiUser.videoTrack.stop();
-          Store.bigMutiUser.videoTrack.play(
+          await Store.bigMutiUser.videoTrack.stop();
+          await Store.bigMutiUser.videoTrack.play(
             Store.bigMutiUser.uid + "VideoView",
             {
               fit: "contain",
             }
           );
+          if (user.uid !== Store.ownUserId) {
+            // 设置为大流
+            await Store.rtcClient.setRemoteVideoStreamType(user.uid, 0);
+          }
           //当前点击的小窗口切换到大屏
           Store.bigMutiUser = user;
-          user.videoTrack.stop();
-          user.videoTrack.play("peerMutiVideoPreview", {
+          await user.videoTrack.stop();
+          await user.videoTrack.play("peerMutiVideoPreview", {
             fit: "contain",
           });
         } else {
-          user.videoTrack.stop();
-          user.videoTrack.play(user.uid + "VideoView", {
+          if (user.uid !== Store.ownUserId) {
+            // 设置为小流
+            await Store.rtcClient.setRemoteVideoStreamType(user.uid, 1);
+          }
+          console.log("切换至小品");
+          await user.videoTrack.stop();
+          await user.videoTrack.play(user.uid + "VideoView", {
             fit: "contain",
           });
+
           Store.bigMutiUser = {};
         }
       }
@@ -1707,7 +1728,7 @@ var OperationPackge = {
       videoBox.className = "video-preview_box";
       document.getElementById("mineVideoPreview").appendChild(videoBox);
       Store.localTracks.videoTrack &&
-        Store.localTracks.videoTrack.play(videoBox.id,{
+        Store.localTracks.videoTrack.play(videoBox.id, {
           fit: "contain",
         });
     },
@@ -2200,8 +2221,19 @@ var OperationPackge = {
       await SdkPackge.RTC.getUserMedia();
       // 发布音视频
       await SdkPackge.RTC.publishLocalTracks();
+      // 开启双流
+      await Store.rtcClient
+        .enableDualStream()
+        .then(() => {
+          console.log("Enable Dual stream success!");
+        })
+        .catch((err) => {
+          console.log("开启双流失败", err);
+        });
+
       // 设置音视频
       await OperationPackge.multi.setVideoOrAudio();
+
       // 本地预览
       Store.localTracks.videoTrack &&
         (await Store.localTracks.videoTrack.play(
@@ -2426,6 +2458,13 @@ var OperationPackge = {
       Store.invitationUserIds = Array.from(await new Set(oArray));
       // 创建视图
       await Utils.createUserView(user.uid);
+      // 默认接收小流
+      await Store.rtcClient
+        .setRemoteVideoStreamType(user.uid, 1)
+        .then(() => {})
+        .catch((err) => {
+          console.log("默认接收小流失败", err);
+        });
       if (mediaType === "video") {
         // 绑定大小屏切换
         await Utils.switchover(user);
