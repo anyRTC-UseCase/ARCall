@@ -2502,7 +2502,8 @@ var OperationPackge = {
 // SDK 自检
 (async function () {
   //查看sdk版本
-  console.log(ArRTC.VERSION);
+  console.log("RTC SDK 版本",ArRTC.VERSION);
+  console.log("RTM SDK 版本",ArRTM.VERSION);
   // 视频设备状态变化
   ArRTC.onCameraChanged = function (info) {
     SdkPackge.Support.cameraChanged(info);
