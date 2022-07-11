@@ -1,0 +1,57 @@
+<!--pages/p2ppage/p2ppage.wxml-->
+<view class="container">
+    <image class="icon_back" mode="scaleToFill" src="../img/icon_back.png" />
+    <view class="details">
+        <!-- 用户 -->
+        <view style="padding: 80px 0 0;display: flex;flex-direction: column;align-items: center;">
+            <image class="head_portrait" src="../img/icon_head.png"></image>
+            <text class="text_color">{{uid}}</text>
+        </view>
+        <!-- 加载中 -->
+        <view class="loading">
+            <image class="img_size" src="../img/animation.png"></image>
+            <text class="text_color m">{{CallFlse ? '收到邀请' : '呼叫中'}} </text>
+        </view>
+        <!-- 操作 -->
+        <view style="width: 100%;">
+            <!-- 视频操作 -->
+            <view class="operate" wx:if="{{mode == 0 && CallFlse}}">
+                <view style="visibility: hidden;">
+                    <image class="img_size" src="../img/icon_switch_voice.png"></image>
+                </view>
+                <!-- 视频转语音 -->
+                <view class="loading" bindtap="voiceCall">
+                    <image class="img_size" src="../img/icon_switch_voice.png"></image>
+                    <text class="text_color m">转语音</text>
+                </view>
+
+            </view>
+            <!-- 公共操作 -->
+            <view class="operate m">
+                <!-- 挂断 -->
+                <view class="loading" bindtap="cancelCall">
+                    <image class="img_size" src="../img/icon_hangup.png"></image>
+                    <text class="text_color m">{{CallFlse ?'挂断':'取消'}}</text>
+                </view>
+
+                <!-- 接听 -->
+                <view class="loading" wx:if="{{CallFlse}}" bindtap="acceptCall">
+                    <image class="img_size" src="../img/icon_accept.png"></image>
+                    <text class="text_color m">接听</text>
+                </view>
+            </view>
+        </view>
+    </view>
+</view>
+
+
+<!--<text>呼叫页面</text>
+ <view>
+    <text>{{uid}}</text>
+   
+</view>
+<button bindtap="voiceCall" wx:if="{{mode == 0 && CallFlse}}" class="m" type="primary">转语音</button>
+<view>
+    <button bindtap="cancelCall" class="m" type="primary">{{CallFlse ?'挂断':'取消'}}</button>
+    <button bindtap="acceptCall" wx:if="{{CallFlse}}" class="m" type="primary">接听</button>
+</view> -->

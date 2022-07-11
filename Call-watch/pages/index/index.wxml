@@ -1,0 +1,24 @@
+<!--index.wxml-->
+<view class="container">
+  <image class="icon_back" mode="scaleToFill" src="../img/icon_back.png" />
+  <view class="details">
+    <!-- logo -->
+    <view class="logo">
+      <image class="icon_logo" src="../img/icon_logo.png" />
+      <text class="text_color">AR呼叫邀请场景展示</text>
+    </view>
+    <!-- 按钮选项 -->
+    <view class="">
+      <view class="select_button" bindtap="bindViewTapP2p">
+        <image class="select_button_icon" src="../img/icon_single.png"></image>
+        <text>点对点呼叫</text>
+      </view>
+
+    </view>
+    <!-- 本地用户提示 -->
+    <view class="hint text_color">
+      <text class="user-motto">您的呼叫ID:</text>
+      <text>{{motto ? motto : '未登录'}}</text>
+    </view>
+  </view>
+</view>

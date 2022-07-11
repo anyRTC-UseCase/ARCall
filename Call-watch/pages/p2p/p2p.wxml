@@ -1,0 +1,37 @@
+<!--pages/p2p/p2p.wxml-->
+<view class="container">
+    <image class="icon_back" src="../img/icon_back.png"></image>
+    <view class="details">
+        <!-- 导航 -->
+        <view class="nav">
+            <image class="nav_icon" src="../img/icon_return_w.png"></image>
+            <text class="text_color">点对点呼叫邀请</text>
+            <view></view>
+        </view>
+        <view class="p2p">
+            <!-- 输入 -->
+            <view>
+                <text class="text_color">请输入对方的ID:</text>
+                <validCode valueData="{{peeruid}}" bindchange="validCodeChange"></validCode>
+            </view>
+            <!-- 发送 -->
+            <button class="m_2" bindtap="sendCall" type="primary" disabled="{{peeruid.length>0?false:true}}">
+                开始呼叫
+            </button>
+            <!-- 提示 -->
+            <view class="hint text_color">
+                <text class="user-motto">您的呼叫ID:</text>
+                <text>{{motto ? motto : '未登录'}}</text>
+            </view>
+
+        </view>
+        <button class="mini-btn" type="primary" size="mini">
+            <view style="display: flex;align-items: center;">
+                <image class="nav_icon" style="margin-right: 6px;" src="../img/icon_set.png"></image>
+                <text class="text_color">通话相关设置</text>
+            </view>
+
+        </button>
+
+    </view>
+</view>
