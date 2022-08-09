@@ -52,10 +52,15 @@ class RtcVM :ViewModel(){
 
     fun initRTC(context: Context,callType:Int,chanID:String,uid:String){
         rtcEngine = RtcEngine.create(context, BuildConfig.APPID,RtcEvent())
-//        rtcEngine?.let {
-//            it.setParameters("{\"Cmd\":\"ConfPriCloudAddr\", \"ServerAdd\":\"xxx\", \"Port\": 6080}")
-//        }
         rtcEngine?.let {
+            if (!BuildConfig.ADDRESS.equals("0.0.0.0")){
+                it.setParameters(JSONObject().apply {
+                    put("Cmd", "ConfPriCloudAddr")
+                    put("ServerAdd", BuildConfig.ADDRESS)
+                    put("Port",6080)
+                }.toString())
+            }
+
             var isOpen = SpUtil.get().getBoolean(Constans.OPEN_DENOISE,true)
             if (isOpen){
                 it.setParameters(JSONObject().apply {
@@ -88,6 +93,7 @@ class RtcVM :ViewModel(){
                         videoEncoderConfiguration.dimensions = VideoEncoderConfiguration.VD_1280x720
                     }
                 }
+                it.enableDualStreamMode(true)
                 videoEncoderConfiguration.bitrate = 2000
                 it.setVideoEncoderConfiguration(videoEncoderConfiguration)
                 it.enableVideo()
@@ -174,6 +180,10 @@ class RtcVM :ViewModel(){
             }
         }
 
+        override fun onFirstLocalVideoFramePublished(elapsed: Int) {
+            super.onFirstLocalVideoFramePublished(elapsed)
+        }
+
         override fun onFirstRemoteVideoDecoded(
             uid: String?,
             width: Int,
@@ -229,6 +239,12 @@ class RtcVM :ViewModel(){
             }
 
         }
+
+
+
+        override fun onFirstLocalVideoFrame(width: Int, height: Int, elapsed: Int) {
+            super.onFirstLocalVideoFrame(width, height, elapsed)
+        }
         override fun onRemoteVideoStateChanged(
             uid: String?,
             state: Int,
@@ -242,6 +258,7 @@ class RtcVM :ViewModel(){
                 }
             }
         }
+
 
         override fun onRemoteAudioStats(stats: RemoteAudioStats?) {
             super.onRemoteAudioStats(stats)
