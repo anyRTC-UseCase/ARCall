@@ -1,0 +1,9 @@
+<!--components/validCode/validCode.wxml-->
+<view class='content'>
+    <block wx:for="{{Length}}" wx:key="item">
+        <!--  -->
+        <!-- value="{{value.length>=index+1?value[index]:''}}" password='{{ispassword}}' -->
+        <view class="iptbox {{(value && value.length == index) || indexFocus == index ? 'show' : ''}}" catchtap='Tap'>{{value.length>=index+1?value[index]:''}}</view>
+    </block>
+</view>
+<input name="password" type="number" value="{{value}}" password="{{true}}" class='ipt' maxlength="{{Length}}" focus="{{isFocus}}" bindinput="Focus" bindblur="Change" bindconfirm="Change"></input>

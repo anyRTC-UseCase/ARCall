@@ -1,0 +1,46 @@
+/**index.wxss**/
+.details {
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.logo {
+  padding: 60px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.icon_logo {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+}
+
+.select_button {
+  padding: 20px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff;
+}
+
+.select_button_icon {
+  width: 60px;
+  height: 60px;
+}
+
+.hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 60px;
+}

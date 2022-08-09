@@ -1,0 +1,55 @@
+/* components/validCode/validCode.wxss */
+.content {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-left: 80rpx;
+  margin-right: 80rpx;
+  margin-top: 40rpx;
+  margin-bottom: 40rpx;
+}
+
+.iptbox {
+  width: 90rpx;
+  height: 90rpx;
+  border: 1rpx solid #ddd;
+  border-radius: 20rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.ipt {
+  width: 0;
+  height: 0;
+}
+
+.show::after {
+  content: '';
+  width: 2rpx;
+  height: 50rpx;
+  background-color: #333;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  animation: blink 1s linear infinite;
+}
+
+.hide {
+  display: none;
+}
+
+@keyframes blink {
+
+  0%,
+  50% {
+    opacity: 1;
+  }
+
+  50.01%,
+  to {
+    opacity: 0;
+  }
+}

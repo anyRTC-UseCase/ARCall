@@ -1,0 +1,76 @@
+/* pages/pagecall/pagecall.wxss */
+.m {
+    margin: 10px;
+}
+.live {
+    position: relative;
+    height: 100vh;
+}
+
+.movable-area {
+    pointer-events: none;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 999;
+}
+
+/* 本地 */
+.live-pusher {
+    pointer-events: auto;
+    position: absolute;
+    width: 280rpx;
+    height: 320rpx;
+    z-index: 999;
+    border-radius: 6px;
+}
+
+/* 远端 */
+.live-player {
+    position: absolute;
+    height: 100vh;
+    width: 100%;
+    z-index: 99;
+}
+
+/* 操作 */
+.operate {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 240rpx;
+    display: flex;
+    justify-content: space-around;
+    z-index: 9999;
+}
+
+.operate-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.operate_img {
+    width: 60px;
+    height: 60px;
+}
+
+.peerinfo {
+display: flex;
+flex-direction: column;
+align-items: center;
+margin-top: 90px;
+}
+.icon_head {
+    width: 120px;
+    height: 120px;
+}
+
+.calltime {
+    position: absolute;
+    bottom: 280rpx;
+    width: 100%;
+    text-align: center;
+}

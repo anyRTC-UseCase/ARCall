@@ -1,0 +1,21 @@
+/**app.wxss**/
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 200rpx 0;
+  box-sizing: border-box;
+  position: relative;
+  height: 100vh;
+}
+.icon_back {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  height: 100%;
+  width: 100%;
+}
+.text_color {
+  color: #fff;
+}

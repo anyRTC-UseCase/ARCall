@@ -1,0 +1,72 @@
+<!--pages/pagecall/pagecall.wxml-->
+<!-- 视频通话 -->
+<view class="live" wx:if="{{mode === 0}}">
+    <!-- 可移动 -->
+    <movable-area class="movable-area">
+        <movable-view direction="all" x="{{windowWidth-140}}" y="20" class="live-pusher">
+            <!-- 本地录制 -->
+            <live-pusher v-if="{{livePusherUrl}}" url="{{livePusherUrl}}" mode="RTC" autopush bindstatechange="statechange" binderror="error" style="height: 100%;width: 100%;" />
+        </movable-view>
+    </movable-area>
+
+    <!-- 远端播放 -->
+    <view class="live-player">
+        <live-player src="{{livePlayerUrl}}" mode="RTC" autoplay bindstatechange="statechange" binderror="error" style="height: 100%;width: 100%;position: absolute;z-index: -100;">
+            <!-- 通话计时 -->
+            <cover-view class="calltime text_color">{{calltime}}</cover-view>
+            <!-- 操作 -->
+            <cover-view class="operate">
+                <cover-view class="operate-item" bindtap="switchAudio">
+                    <cover-image class="operate_img" src="../img/icon_switch_voice.png"></cover-image>
+                    <cover-view class="text_color m">切换至语音</cover-view>
+                </cover-view>
+                <cover-view class="operate-item" bindtap="endCall">
+                    <cover-image class="operate_img" src="../img/icon_hangup.png"></cover-image>
+                    <cover-view class="text_color m">挂断</cover-view>
+                </cover-view>
+                <cover-view class="operate-item" bindtap="switchCamera">
+                    <cover-image class="operate_img" src="{{devicePosition == 'front' ? '../img/icon_switch.png':'../img/icon_switchs.png'}}"></cover-image>
+                    <cover-view class="text_color m">
+                        {{devicePosition == 'front' ? '前' : '后'}}摄像头
+                    </cover-view>
+                </cover-view>
+            </cover-view>
+        </live-player>
+        <!-- style="height: 100%;width: 100%;position: absolute;z-index: -100;"  -->
+    </view>
+
+
+
+</view>
+<!-- 语音通话 -->
+<view class="live" style="background-color: rgba(0, 0, 0, 0.5);" wx:else>
+    <!-- 本地推流 关闭摄像头-->
+    <live-pusher style="width: 0px;height: 0px;" mode='RTC' enable-camera='{{false}}' url='{{ livePusherUrl }}' autopush></live-pusher>
+    <!-- 远端拉流 -->
+    <live-player v-if="{{livePlayerUrl}}" style="width: 0px;height: 0px;" autoplay mode='RTC' src='{{ livePlayerUrl }}' binderror="error" bindstatechange="statechange" sound-mode='{{soundMode}}'></live-player>
+
+    <!-- 远端用户信息 -->
+    <view class="peerinfo">
+        <image class="icon_head" src="../img/icon_head.png"></image>
+        <text class="text_color m">{{peerid}}</text>
+    </view>
+    <!-- 通话计时 -->
+    <view class="calltime">
+        <text class="text_color">{{calltime}}</text>
+    </view>
+    <!-- 操作 -->
+    <view class="operate">
+        <view class="operate-item" bindtap="muteAudio">
+            <image class="operate_img" src="{{enableMic ? '../img/icon_closeaudio.png' : '../img/icon_openaudio.png' }}"></image>
+            <text class="text_color m">静音</text>
+        </view>
+        <view class="operate-item" bindtap="endCall">
+            <image class="operate_img" src="../img/icon_hangup.png"></image>
+            <text class="text_color m">挂断</text>
+        </view>
+        <view class="operate-item" bindtap="handsFree">
+            <image class="operate_img" src="{{soundMode == 'speaker' ? '../img/icon_speakers.png':'../img/icon_speaker.png'}}"></image>
+            <text class="text_color m">免提</text>
+        </view>
+    </view>
+</view>
