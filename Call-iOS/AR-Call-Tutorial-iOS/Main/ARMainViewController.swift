@@ -110,19 +110,23 @@ class ARMainViewController: ARBaseViewController {
             if calleeIdArr.count < 6 {
                 if calleeId?.count == 4 {
                     if calleeIdArr.contains(calleeId!) == false {
-                        calleeIdArr.append(calleeId!)
-                        calleeIdTextField.text = ""
-                        if mainCollectionView.isHidden {
-                            mainCollectionView.isHidden = false
-                            changeConstraint(exist: true)
-                        }
-                        mainCollectionView.reloadData()
-                        callButton.isEnabled = true
-                        callButton.setTitleColor(UIColor(hexString: "#40A3FB"), for: .normal)
-                        
-                        for index in 0...3 {
-                            let button: UIButton = stackView.subviews[index] as! UIButton
-                            button.setTitle("", for: .normal)
+                        if calleeId != UserDefaults.string(forKey: .uid) {
+                            calleeIdArr.append(calleeId!)
+                            calleeIdTextField.text = ""
+                            if mainCollectionView.isHidden {
+                                mainCollectionView.isHidden = false
+                                changeConstraint(exist: true)
+                            }
+                            mainCollectionView.reloadData()
+                            callButton.isEnabled = true
+                            callButton.setTitleColor(UIColor(hexString: "#40A3FB"), for: .normal)
+                            
+                            for index in 0...3 {
+                                let button: UIButton = stackView.subviews[index] as! UIButton
+                                button.setTitle("", for: .normal)
+                            }
+                        } else {
+                            showToast(text: "不能呼叫自己，请重新输入！", image: "icon_warning")
                         }
                     } else {
                         showToast(text: "当前ID已存在，请重新输入", image: "icon_warning")

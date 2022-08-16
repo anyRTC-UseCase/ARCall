@@ -19,6 +19,7 @@
 		63AABAAA269EBEDD00128FDB /* ARCallRtmManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63AABAA9269EBEDD00128FDB /* ARCallRtmManager.swift */; };
 		63AABAB4269EBF4200128FDB /* AppID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63AABAB3269EBF4200128FDB /* AppID.swift */; };
 		63AABABB269ECEF800128FDB /* ARMainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63AABABA269ECEF800128FDB /* ARMainViewController.swift */; };
+		63AB463D27698124005BEF89 /* ARBaseNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63AB463C27698124005BEF89 /* ARBaseNavigationController.swift */; };
 		63AF5351269EDF8500D1D316 /* ARExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63AF5350269EDF8500D1D316 /* ARExtension.swift */; };
 		63AF537726A02D0800D1D316 /* ARSignalVideoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63AF537626A02D0800D1D316 /* ARSignalVideoController.swift */; };
 		63AF537A26A02D2200D1D316 /* ARGroupVideoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63AF537926A02D2200D1D316 /* ARGroupVideoController.swift */; };
@@ -30,6 +31,19 @@
 		63AF53DE26A6C6D700D1D316 /* ARVideoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 63AF53DD26A6C6D700D1D316 /* ARVideoView.xib */; };
 		D0988BFEF7D52CF2D6291997 /* Pods_AR_Call_Tutorial_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D836C2A0BFBE74B86A84B02D /* Pods_AR_Call_Tutorial_iOS.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		6321679A271FCA8E009A8D0A /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		4E8A35195B26C99D83ED32B8 /* Pods-AR-Call-Tutorial-iOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AR-Call-Tutorial-iOS.release.xcconfig"; path = "Target Support Files/Pods-AR-Call-Tutorial-iOS/Pods-AR-Call-Tutorial-iOS.release.xcconfig"; sourceTree = "<group>"; };
@@ -47,6 +61,7 @@
 		63AABAA9269EBEDD00128FDB /* ARCallRtmManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARCallRtmManager.swift; sourceTree = "<group>"; };
 		63AABAB3269EBF4200128FDB /* AppID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppID.swift; sourceTree = "<group>"; };
 		63AABABA269ECEF800128FDB /* ARMainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARMainViewController.swift; sourceTree = "<group>"; };
+		63AB463C27698124005BEF89 /* ARBaseNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARBaseNavigationController.swift; sourceTree = "<group>"; };
 		63AF5350269EDF8500D1D316 /* ARExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARExtension.swift; sourceTree = "<group>"; };
 		63AF537626A02D0800D1D316 /* ARSignalVideoController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARSignalVideoController.swift; sourceTree = "<group>"; };
 		63AF537926A02D2200D1D316 /* ARGroupVideoController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARGroupVideoController.swift; sourceTree = "<group>"; };
@@ -132,6 +147,7 @@
 				63AF53A826A56CF400D1D316 /* VideoView */,
 				63AF5350269EDF8500D1D316 /* ARExtension.swift */,
 				63AABAA5269EB7E800128FDB /* ARBaseViewController.swift */,
+				63AB463C27698124005BEF89 /* ARBaseNavigationController.swift */,
 				63AABAA9269EBEDD00128FDB /* ARCallRtmManager.swift */,
 				633F400626AAFB30004DCB6C /* ARAlertTextFieldController.swift */,
 			);
@@ -187,6 +203,7 @@
 				6391BA3D269D87DB005124B5 /* Sources */,
 				6391BA3E269D87DB005124B5 /* Frameworks */,
 				6391BA3F269D87DB005124B5 /* Resources */,
+				6321679A271FCA8E009A8D0A /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -285,6 +302,7 @@
 				633F3FD926AAAAC5004DCB6C /* ARTouchView.swift in Sources */,
 				63AF537726A02D0800D1D316 /* ARSignalVideoController.swift in Sources */,
 				63AF5351269EDF8500D1D316 /* ARExtension.swift in Sources */,
+				63AB463D27698124005BEF89 /* ARBaseNavigationController.swift in Sources */,
 				63AABAAA269EBEDD00128FDB /* ARCallRtmManager.swift in Sources */,
 				63AABAA6269EB7E800128FDB /* ARBaseViewController.swift in Sources */,
 				633F400726AAFB30004DCB6C /* ARAlertTextFieldController.swift in Sources */,
@@ -441,13 +459,18 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5543CP4MRT;
+				ENABLE_BITCODE = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/AR-Call-Tutorial-iOS",
+				);
 				INFOPLIST_FILE = "AR-Call-Tutorial-iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "AR.AR-Call-Tutorial-iOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -466,13 +489,18 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5543CP4MRT;
+				ENABLE_BITCODE = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/AR-Call-Tutorial-iOS",
+				);
 				INFOPLIST_FILE = "AR-Call-Tutorial-iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "AR.AR-Call-Tutorial-iOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

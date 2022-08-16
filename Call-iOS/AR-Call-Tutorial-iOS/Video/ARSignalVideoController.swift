@@ -111,6 +111,7 @@ class ARSignalVideoController: ARBaseViewController {
         // init ARtcEngineKit
         rtcKit = ARtcEngineKit.sharedEngine(withAppId: AppID, delegate: self)
         rtcKit.setChannelProfile(.liveBroadcasting)
+        rtcKit.enableDualStreamMode(true)
         
         switchAINoise()
     }
