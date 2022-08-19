@@ -168,8 +168,8 @@ const RTM = {
 		return Store.logining;
 	},
 	// 查询所有用户是否在线
-	queryPeersOnlineStatus: async function(peerIdLits) {
-		return await new Promise((resolve, reject) => {
+	queryPeersOnlineStatus: function(peerIdLits) {
+		return new Promise((resolve, reject) => {
 			rtmModule.queryPeersOnlineStatus({
 					peerIds: peerIdLits,
 				},
@@ -200,10 +200,10 @@ const RTM = {
 		);
 	},
 	// 发送呼叫邀请给对方
-	sendLocalInvitation: async function(calleeId, info) {
+	sendLocalInvitation: function(calleeId, info) {
 		// 记录为主叫
 		Store.type = true;
-		return await new Promise((resolve, reject) => {
+		return new Promise((resolve, reject) => {
 			rtmModule.sendLocalInvitation({
 					calleeId: calleeId, // 被呼叫者的 user ID
 					content: JSON.stringify(info), // 邀请内容

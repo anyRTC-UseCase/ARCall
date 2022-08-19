@@ -376,7 +376,14 @@ p {
   background: #333;
   position: relative;
 }
-
+.video-preview_big_left_bottom {
+  padding: 0 10px;
+  background-color: rgba(35, 35, 35, 1);
+  position: absolute;
+  z-index: 99;
+  bottom: 0;
+  left: 0;
+}
 .video-preview_big_network {
   background: #000;
 }
@@ -569,7 +576,7 @@ p {
   width: 100%;
   overflow-y: hidden;
   overflow-x: auto;
-  z-index: 1;
+  z-index: 2;
 }
 
 .video-preview_small_box {
@@ -606,6 +613,20 @@ p {
   font-size: 2.5em;
 }
 
+.basicView_img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  background: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.basicView_img_index {
+  z-index: 1;
+}
 /* 模态框 */
 .modal-form_bd {
   padding: 30px;

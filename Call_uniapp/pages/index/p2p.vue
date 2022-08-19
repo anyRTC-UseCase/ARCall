@@ -135,7 +135,7 @@
 			// 判断呼叫对象人员在线
 			async PeersOnlineStatusFn() {
 				// 查看呼叫用户是否存在
-				const queryPeersOnline = await this.$RTM.queryPeersOnlineStatus([this.peeerUid]);
+				const queryPeersOnline = await this.$RTM.queryPeersOnlineStatus([this.peeerUid + '']);
 				console.log("查看呼叫用户是否存在",queryPeersOnline);
 				if (queryPeersOnline.code === 0 && queryPeersOnline.peerOnlineStatus[0].state != 2) {
 					return true

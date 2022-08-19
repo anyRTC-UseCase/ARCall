@@ -194,16 +194,16 @@ const RTC = {
 		rtcModule.setEnableSpeakerphone({
 			"enabled": fase
 		}, (res) => {
-			console.log('RTC 远端加入房间后设置' + fase ? '开启' : '关闭' + '扬声器播放', res.code === 0 ? '成功' : '失败：' +
+			console.log('RTC 远端加入房间后设置' + (fase ? '开启' : '关闭' + '扬声器播放'), res.code === 0 ? '成功' : '失败：' +
 				res);
 		});
 	},
 	// 音频是否关闭
-	enableLocalAudio: function(checked) {
-		rtcModule.enableLocalAudio({
-			"enabled": checked
+	muteLocalAudioStream: function(checked) {
+		rtcModule.muteLocalAudioStream({
+			"muted": !checked
 		}, (res) => {
-			console.log('RTC 音频' + checked ? '开启' : '关闭', res.code === 0 ? '成功' : '失败：' + res);
+			console.log('RTC 音频' + (!checked ? '开启' : '关闭'), res.code === 0 ? '成功' : '失败：' + res);
 		})
 	},
 	// 摄像头（前后）
