@@ -197,7 +197,7 @@ class GroupVideoActivity : BaseActivity() {
             binding.chronometer.start()
             memberAdapter.data.forEachIndexed { index, rtcMember ->
                 if (rtcMember.userId == it) {
-                    rtcVM.setupRemoteVideo(rtcMember.getVideoCanvas(this)!!)
+                    rtcVM.setupRemoteVideo(rtcMember.getVideoCanvas(this,Constants.RENDER_MODE_HIDDEN)!!)
                     rtcMember.isWaiting = false
                     memberAdapter.notifyItemChanged(index, org.ar.call.bean.MemberAVStatus.WAITING(false))
                     return@forEachIndexed

@@ -19,6 +19,15 @@ let PingFangBold = "PingFangSC-Semibold"
 
 extension NSObject {
     
+    func toJSONString(dict:NSDictionary?)->String {
+
+        let data = try? JSONSerialization.data(withJSONObject: dict!, options: JSONSerialization.WritingOptions.prettyPrinted)
+
+        let strJson = NSString(data: data!, encoding: String.Encoding.utf8.rawValue)
+
+        return strJson! as String
+    }
+    
     //RGBA转换
     func RGBA(r:CGFloat,g:CGFloat,b:CGFloat,a: CGFloat) ->UIColor{
         //
@@ -35,13 +44,19 @@ extension NSObject {
         return randomStr
     }
     
-    func generateRandomNumber(num: Int) -> Int{
+    
+    /// 随机 num 位数
+    /// - Parameter num: 位数
+    func generateRandomNumber(num: Int) -> Int {
        var place = 1
        var finalNumber = 0
         
-        for _ in 0..<num {
+        for index in 0..<num-1 {
             place *= 10
-            let randomNumber = arc4random_uniform(10)
+            var randomNumber = arc4random_uniform(10)
+            if index == num - 2 {
+                randomNumber = arc4random_uniform(9) + 1
+            }
             finalNumber += Int(randomNumber) * place
         }
         return finalNumber

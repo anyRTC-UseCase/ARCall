@@ -86,6 +86,7 @@ class ARGroupVideoController: ARBaseViewController {
         rtcKit = ARtcEngineKit.sharedEngine(withAppId: AppID, delegate: self)
         rtcKit.setChannelProfile(.liveBroadcasting)
         rtcKit.setClientRole(.broadcaster)
+        rtcKit.enableDualStreamMode(true)
         
         rtcKit.enableVideo()
         let videoCanvas = ARtcVideoCanvas()
@@ -285,6 +286,7 @@ class ARGroupVideoController: ARBaseViewController {
                 }
             }
             
+            rtmChannel?.leave()
             rtmChannel?.channelDelegate = nil
             ARCallRtmManager.rtmKit?.destroyChannel(withId: infoModel.channelId)
             
@@ -334,11 +336,6 @@ extension ARGroupVideoController: ARtcEngineDelegate {
     
     func rtcEngine(_ engine: ARtcEngineKit, didOfflineOfUid uid: String, reason: ARUserOfflineReason) {
         // 远端用户（通信场景）/主播（直播场景）离开当前频道回调
-        let video = getVideoWithUid(uid: uid)
-        if video != nil {
-            videoArr.remove(video!)
-            videoLayout()
-        }
     }
     
     func rtcEngine(_ engine: ARtcEngineKit, firstLocalVideoFrameWith size: CGSize, elapsed: Int) {
@@ -414,6 +411,7 @@ extension ARGroupVideoController: ARtmChannelDelegate {
         
         if video == nil {
             video = createVideoWithUid(uid: member.uid)
+            videoLayout()
         }
         video?.loadingButton.isHidden = true
     }
@@ -422,6 +420,10 @@ extension ARGroupVideoController: ARtmChannelDelegate {
         // 频道成员离开频道回调
         let video = getVideoWithUid(uid: member.uid)
         video?.removeVideo()
+        if video != nil {
+            videoArr.remove(video!)
+            videoLayout()
+        }
         
         callerIdArr.remove(member.uid)
         cancleArr.remove(member.uid)

@@ -26,6 +26,7 @@ import org.ar.call.R
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.RingtoneManager
+import android.service.carrier.CarrierMessagingService
 import android.util.Log
 import org.ar.call.ui.GroupCallActivity
 import org.ar.call.ui.P2PVideoActivity
@@ -159,6 +160,13 @@ class GlobalVM : ViewModel(), LifecycleObserver,NetworkObserver.Listener {
 
     suspend fun login() = suspendCoroutine<Boolean> {
         rtmClient.logout(null)
+        if (!BuildConfig.ADDRESS.equals("0.0.0.0")){
+            rtmClient.setParameters(JSONObject().apply {
+                put("Cmd", "ConfPriCloudAddr")
+                put("ServerAdd", BuildConfig.ADDRESS)
+                put("Port",7080)
+            }.toString())
+        }
         rtmClient.login("", userId, object : ResultCallback<Void> {
             override fun onSuccess(var1: Void?) {
                 isLoginSuccess = true

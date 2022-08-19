@@ -10,20 +10,22 @@ android {
         applicationId "org.ar.call"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 39
-        versionName "1.3.9"
+        versionCode 40
+        versionName "1.4.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            buildConfigField("String", "APPID", '"YOUR APPID"')
+            buildConfigField("String", "APPID", '"APPID"')//请在这配置APPID 替换APPID
+            buildConfigField("String", "ADDRESS", '"0.0.0.0"')//如果你有私有云 请在这配置私有云地址 替换0.0.0.0 没有勿改
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
-            buildConfigField("String", "APPID", '"YOUR APPID"')
+            buildConfigField("String", "APPID", '"APPID"')//请在这配置APPID 替换APPID
+            buildConfigField("String", "ADDRESS", '"0.0.0.0"')//如果你有私有云 请在这配置私有云地址 替换0.0.0.0 没有勿改
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -60,7 +62,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     implementation 'io.anyrtc:rtc:4.2.2.9'
-    implementation 'io.anyrtc:rtm:1.0.2.5'
+    implementation 'io.anyrtc:rtm:1.0.2.9'
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.4'
     implementation 'com.google.code.gson:gson:2.6.2'
     implementation 'com.github.Karn:notify:1.4.0'

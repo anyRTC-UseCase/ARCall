@@ -3,14 +3,15 @@ target 'AR-Call-Tutorial-iOS' do
     
 use_frameworks!
 
-  #anyRTC 音视频库
-  pod 'ARtcKit_iOS', '~> 4.2.2.6'
-  #anyRTC 实时消息库
-  pod 'ARtmKit_iOS', '~> 1.0.1.7'
+#anyRTC 音视频库
+pod 'ARtcKit_iOS', '~> 4.2.2.7'
+#anyRTC 实时消息库
+pod 'ARtmKit_iOS', '~> 1.0.1.7'
 
-  pod 'SVProgressHUD', '~> 2.2.5'
-  pod 'SnapKit'
-  pod 'AttributedString'
-  pod 'Alamofire'
+pod 'SVProgressHUD', '~> 2.2.5'
+pod 'SnapKit'
+pod 'AttributedString'
+pod 'Alamofire'
+
 end
 

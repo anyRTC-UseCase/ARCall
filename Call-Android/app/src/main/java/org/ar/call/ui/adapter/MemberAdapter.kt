@@ -6,6 +6,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import org.ar.call.R
 import org.ar.call.bean.MemberAVStatus
 import org.ar.call.bean.RtcMember
+import org.ar.rtc.Constants
 
 class MemberAdapter :BaseQuickAdapter<RtcMember, BaseViewHolder>(R.layout.item_member) {
 
@@ -14,7 +15,7 @@ class MemberAdapter :BaseQuickAdapter<RtcMember, BaseViewHolder>(R.layout.item_m
     override fun convert(holder: BaseViewHolder, item: RtcMember) {
         val videoGroup = holder.getView<RelativeLayout>(R.id.rl_video)
         videoGroup.removeAllViews()
-        val canvans = holder.itemView.context.let { item.getVideoCanvas(it) }
+        val canvans = holder.itemView.context.let { item.getVideoCanvas(it,Constants.RENDER_MODE_HIDDEN) }
         if (canvans.view.parent!=null){
             val parent= canvans.view.parent as RelativeLayout
             parent.removeView(canvans.view)

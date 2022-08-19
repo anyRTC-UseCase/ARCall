@@ -13,10 +13,10 @@ class RtcMember private constructor(val userId:String){
     var canvas:VideoCanvas? = null
 
 
-    fun getVideoCanvas(context: Context): VideoCanvas {
+    fun getVideoCanvas(context: Context,mode:Int): VideoCanvas {
         if (canvas ==null) {
             val surface = RtcEngine.CreateRendererView(context)
-            canvas = VideoCanvas(surface, Constants.RENDER_MODE_FIT, userId)
+            canvas = VideoCanvas(surface, mode, userId)
         }
         return canvas!!
     }
