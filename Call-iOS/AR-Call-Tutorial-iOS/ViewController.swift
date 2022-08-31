@@ -11,8 +11,7 @@ var localUid: String = ""
 let Default = UserDefaults.standard
 
 class ViewController: ARBaseViewController {
-    
-    @IBOutlet weak var calleeIdLabel: UILabel!
+    @IBOutlet var calleeIdLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,7 +19,7 @@ class ViewController: ARBaseViewController {
         
         var uid = UserDefaults.string(forKey: .uid)
         if uid == nil {
-            uid = "\(generateRandomNumber(num: 3))"
+            uid = "\(generateRandomNumber(num: 4))"
             UserDefaults.set(value: uid!, forKey: .uid)
             Default.setValue(true, forKey: "video")
             Default.setValue(true, forKey: "audio")
@@ -29,9 +28,9 @@ class ViewController: ARBaseViewController {
             Default.setValue(15, forKey: "frameRate")
         }
         localUid = uid!
-        calleeIdLabel.text = "您的呼叫ID：\(localUid)"
+        self.calleeIdLabel.text = "您的呼叫ID：\(localUid)"
         
-        ARCallRtmManager.rtmKit?.login(byToken: nil, user: localUid, completion: { (errorCode) in
+        ARCallRtmManager.rtmKit?.login(byToken: nil, user: localUid, completion: { errorCode in
             print("login == \(errorCode.rawValue)")
         })
     }
@@ -50,4 +49,3 @@ class ViewController: ARBaseViewController {
         super.viewWillDisappear(animated)
     }
 }
-

@@ -1,4 +1,5 @@
 <script>
+	const hgService = uni.requireNativePlugin("HG-Background");
 	export default {
 		onLaunch: function() {
 			// 锁定横屏  
@@ -27,7 +28,7 @@
 					if (oa) {
 						this.$RTM.init();
 						oa = false;
-					} 
+					}
 				} else {
 					uni.showLoading({
 						title: '联网中',
@@ -39,9 +40,16 @@
 		},
 		onShow: function() {
 			console.log('App Show')
+			hgService.closeService();
 		},
 		onHide: function() {
 			console.log('App Hide')
+			hgService.config({
+				title: "ArCall",
+				content: "服务运行中",
+				mode: 0, //0省电模式 1流氓模式
+			});
+			hgService.startService();
 		}
 	}
 </script>

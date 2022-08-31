@@ -208,7 +208,7 @@
 			// 音频开关
 			enableLocalAudioFn() {
 				this.audio = !this.audio;
-				RTC.enableLocalAudio(this.audio);
+				RTC.muteLocalAudioStream(this.audio);
 			},
 			// 转到语音通话
 			toSpeechFn() {

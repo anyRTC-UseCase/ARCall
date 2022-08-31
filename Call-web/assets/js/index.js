@@ -1,7 +1,6 @@
 // SDK 配置
 var Config = {
-  RTC_APPID: "", //RTC 应用ID
-  RTM_APPID: "", //RTM 应用ID
+  APPID: "", // 应用ID
   RTC_MODE: "live", //RTC 通信模式
   RTC_CODEC: "h264", //RTC 视频编码格式
   SELECT_CAMERA_DEVICE:
@@ -174,10 +173,15 @@ var Utils = {
         '<div class="d-flex video-preview justify-content-center align-items-center" id="' +
           userid +
           'VideoView">' +
-          '<img draggable="false" style="position: absolute;" class="d-flex img-responsive" src="assets/images/logo_title.png" />' +
+          '<div class="basicView_img" id="' +
+          userid +
+          'basicView_img"><img draggable="false" class="d-flex img-responsive" src="assets/images/logo_title.png" /></div>' +
           "</div>" +
           "<!-- 左下角小方格 -->" +
-          '<div class="prompt_little d-flex">' +
+          '<div class="prompt_little d-flex" id="' +
+          userid +
+          "PromptLittle" +
+          '">' +
           '<i class="iconfont icon-audio_close_slant icon_color_red" id="' +
           userid +
           'AudioState"></i>' +
@@ -221,60 +225,115 @@ var Utils = {
   // 大小屏幕切换
   switchover: function (user) {
     $(`#${user.uid}Window`).bind("click", async function () {
-      // 当前大屏没有用户
-      if (!Store.bigMutiUser.uid) {
-        if (user.uid !== Store.ownUserId) {
-          // 设置为大流
-          await Store.rtcClient.setRemoteVideoStreamType(user.uid, 0);
+      if (user.uid != Store.bigMutiUser.uid) {
+        // 切换对应左下角
+        Utils.switchoverLeftBottom(user.uid);
+        // 切换后大屏对应的小屏隐藏
+        Utils.switchoverHidden(user.uid, false);
+        // 原大屏对应的小屏展示
+        Utils.switchoverHidden(Store.bigMutiUser.uid, true);
+
+        // 设置为大流
+        if (user.videoTrack) {
+          user.videoTrack.stop();
+          Store.rtcClient
+            .setRemoteVideoStreamType(user.uid, 0)
+            .then(() => {
+              console.log("切换大流成功", user.uid);
+            })
+            .catch((err) => {
+              console.log("切换大流失败", user.uid, err);
+            });
+
+          await user.videoTrack.play("peerMutiVideoPreview", {
+            fit: "contain",
+          });
         }
-        Store.bigMutiUser = user;
-        await user.videoTrack.stop();
-        await user.videoTrack.play("peerMutiVideoPreview", {
-          fit: "contain",
-        });
-      } else {
-        // 当前大屏用户与想展示用户不符
-        if (Store.bigMutiUser.uid !== user.uid) {
-          if (Store.ownUserId !== Store.bigMutiUser.uid) {
-            // 设置为小流
-            await Store.rtcClient.setRemoteVideoStreamType(
-              Store.bigMutiUser.uid,
-              1
-            );
-          }
-          // 大屏用户切回去原来的小视图
-          await Store.bigMutiUser.videoTrack.stop();
+
+        // 设置为小流
+        if (Store.bigMutiUser.videoTrack) {
+          Store.bigMutiUser.videoTrack.stop();
+          Store.rtcClient
+            .setRemoteVideoStreamType(Store.bigMutiUser.uid, 1)
+            .then(() => {
+              console.log("切换小流成功", Store.bigMutiUser.uid);
+            })
+            .catch((err) => {
+              console.log("切换小流失败", Store.bigMutiUser.uid, err);
+            });
+
           await Store.bigMutiUser.videoTrack.play(
             Store.bigMutiUser.uid + "VideoView",
             {
               fit: "contain",
             }
           );
-          if (user.uid !== Store.ownUserId) {
-            // 设置为大流
-            await Store.rtcClient.setRemoteVideoStreamType(user.uid, 0);
-          }
-          //当前点击的小窗口切换到大屏
-          Store.bigMutiUser = user;
-          await user.videoTrack.stop();
-          await user.videoTrack.play("peerMutiVideoPreview", {
-            fit: "contain",
-          });
-        } else {
-          if (user.uid !== Store.ownUserId) {
-            // 设置为小流
-            await Store.rtcClient.setRemoteVideoStreamType(user.uid, 1);
-          }
-          console.log("切换至小品");
-          await user.videoTrack.stop();
-          await user.videoTrack.play(user.uid + "VideoView", {
-            fit: "contain",
-          });
-
-          Store.bigMutiUser = {};
         }
+
+        // 本地视频窗口(大屏)
+        if (user.uid == Store.ownUserId) {
+          Utils.localVideoSwitch(user.uid, Store.setting.enableVideo);
+        } else {
+          $("#peerMutiVideoPreviewbasicView_img").hasClass(
+            "basicView_img_index"
+          ) &&
+            $("#peerMutiVideoPreviewbasicView_img").removeClass(
+              "basicView_img_index"
+            );
+          //   console.log("远端视频为大屏");
+          //   Utils.localVideoSwitch(user.uid,true);
+        }
+
+        Store.bigMutiUser = user;
       }
     });
+  },
+  // 大小屏幕切换后,大小对应左下角切换
+  switchoverLeftBottom: function (bigUid) {
+    // 获取对应的音频类别
+    var oldbigUid = $("#" + bigUid + "AudioState")?.attr("class");
+    // 大屏对应左下角展示
+    var boxBig = $(
+      `
+        <i class="${oldbigUid}" id="${bigUid + "BigAudioState"}"></i>
+        <div>${bigUid}</div>
+      `
+    );
+    $("#peerMutiVideoPreviewLeftBottom").html("");
+    $("#peerMutiVideoPreviewLeftBottom").append(boxBig);
+  },
+  // 大屏对应的小屏展示隐藏
+  switchoverHidden: function (bigUid, state) {
+    if (state) {
+      // 对应小屏展示
+      $("#" + bigUid + "Window").removeClass("d-none");
+    } else {
+      // 对应小屏隐藏
+      $("#" + bigUid + "Window").addClass("d-none");
+    }
+  },
+  // 本地视频开关触发样式
+  localVideoSwitch: function (uid, state) {
+    if (state) {
+      $("#peerMutiVideoPreviewbasicView_img").hasClass("basicView_img_index") &&
+        $("#peerMutiVideoPreviewbasicView_img").removeClass(
+          "basicView_img_index"
+        );
+      // 小屏
+      $("#" + uid + "basicView_img").hasClass("basicView_img_index") &&
+        $("#" + uid + "basicView_img").removeClass("basicView_img_index");
+    } else {
+      if (Store.bigMutiUser.uid == uid) {
+        !$("#peerMutiVideoPreviewbasicView_img").hasClass(
+          "basicView_img_index"
+        ) &&
+          $("#peerMutiVideoPreviewbasicView_img").addClass(
+            "basicView_img_index"
+          );
+      }
+      !$("#" + uid + "basicView_img").hasClass("basicView_img_index") &&
+        $("#" + uid + "basicView_img").addClass("basicView_img_index");
+    }
   },
   // 更新用户在线状态
   updateUserViewStatus: function (userid, status) {
@@ -316,9 +375,10 @@ var Utils = {
     if (oUserData.length < 2) {
       // 释放资源
       await SdkPackge.RTC.LocalTracksClose();
-      await PageShow.initSetingMulti(); // 恢复初始
       // 恢复默认
       await OperationPackge.public.restoreDefault();
+      await PageShow.initSetingMulti(); // 恢复初始
+
       // 显示首页
       await PageShow.showIndex();
     }
@@ -328,9 +388,18 @@ var Utils = {
     if (haveAudio) {
       $("#" + userid + "AudioState").hasClass("icon-audio_close_slant") &&
         $("#" + userid + "AudioState").removeClass("icon-audio_close_slant");
+      // 对应大屏
+      $("#" + userid + "BigAudioState")?.hasClass("icon-audio_close_slant") &&
+        $("#" + userid + "BigAudioState")?.removeClass(
+          "icon-audio_close_slant"
+        );
     } else {
       !$("#" + userid + "AudioState").hasClass("icon-audio_close_slant") &&
         $("#" + userid + "AudioState").addClass("icon-audio_close_slant");
+
+      // 对应大屏
+      !$("#" + userid + "BigAudioState")?.hasClass("icon-audio_close_slant") &&
+        $("#" + userid + "BigAudioState")?.addClass("icon-audio_close_slant");
     }
   },
   // 用户ID输入  用户删除id (仅能输入一位用户)
@@ -561,7 +630,9 @@ var PageShow = {
   // 初始设置 (多人)
   initSetingMulti: function () {
     $("#mineMutiTitleVideoPreview").html(""); // 清空小窗口
-    $("#peerMutiVideoPreview").html($("#peerMutiVideoPreview img")); // 清空大窗口
+    $("#peerMutiVideoPreview").html(
+      $("#peerMutiVideoPreview #peerMutiVideoPreviewbasicView_img")
+    ); // 清空大窗口
     $("#callerIdView").html("");
     $("#multiUserBtn").html(""); // 清空生成的标签
     $("#loginMutiSetting").hasClass("show") &&
@@ -684,6 +755,7 @@ var PageShow = {
       !$("#localVideoEnableIcon").hasClass("icon-video_close") &&
         $("#localVideoEnableIcon").addClass("icon-video_close");
     }
+    Utils.localVideoSwitch(Store.ownUserId, enable);
   },
 };
 
@@ -841,24 +913,42 @@ var SdkPackge = {
         ArRTC.getCameras(),
         ArRTC.getMicrophones(),
       ]);
-      if (cameras.length > 0 && microhones.length > 0) {
-        [Store.localTracks.audioTrack, Store.localTracks.videoTrack] =
-          await ArRTC.createMicrophoneAndCameraTracks(
+      if (Store.Conference) {
+        // 多人模式
+        if (cameras.length > 0 && Store.setting.enableVideo) {
+          // 开启双流
+          Store.rtcClient
+            .enableDualStream()
+            .then(() => {
+              console.log("开启双流 Enable Dual stream success!");
+            })
+            .catch((err) => {
+              console.log("开启双流失败", err);
+            });
+          Store.localTracks.videoTrack = await ArRTC.createCameraVideoTrack({
+            cameraId: Store.setting.videoDevice,
+            encoderConfig: {
+              bitrateMax: 1130,
+              // bitrateMin: ,
+              frameRate: 15,
+              height: Store.setting.videoSize[1],
+              width: Store.setting.videoSize[0],
+            },
+          }).catch(function (err) {
+            console.log("err => ", err);
+          });
+        }
+        if (microhones.length > 0 && Store.setting.enableAudio) {
+          Store.localTracks.audioTrack = await ArRTC.createMicrophoneAudioTrack(
             {
               microphoneId: Store.setting.audioDevice,
-            },
-            {
-              cameraId: Store.setting.videoDevice,
-              encoderConfig: {
-                // bitrateMax: 1130,
-                // bitrateMin: ,
-                frameRate: 15,
-                height: Store.setting.videoSize[1],
-                width: Store.setting.videoSize[0],
-              },
             }
-          );
+          ).catch(function (err) {
+            console.log("err => ", err);
+          });
+        }
       } else {
+        // p2p 模式
         if (cameras.length > 0) {
           Store.localTracks.videoTrack = await ArRTC.createCameraVideoTrack({
             cameraId: Store.setting.videoDevice,
@@ -883,28 +973,34 @@ var SdkPackge = {
           });
         }
       }
+
+      // }
       // 音频展示(p2p)
       PageShow.audioSwitch();
     },
+    // 本地采集用户音频并发布(多人默认关闭音频再打开音频时调用)
+    getUserMicrophonesPublish: async function () {
+      var microhones = await ArRTC.getMicrophones();
+      if (microhones.length > 0) {
+        Store.localTracks.audioTrack = await ArRTC.createMicrophoneAudioTrack({
+          microphoneId: Store.setting.audioDevice,
+        }).catch(function (err) {
+          console.log("err => ", err);
+        });
+        // 发布音频
+        Store.rtcClient.publish(Store.localTracks.audioTrack);
+      }
+    },
     // 发布本地采集的音视频track
     publishLocalTracks: async function () {
+      // console.log("发布本地采集的音视频track");
       if (Store.localTracks.videoTrack || Store.localTracks.audioTrack) {
         // 设置主播身份
         await Store.rtcClient.setClientRole("host");
-        // 发布
-        console.log(Store.localTracks);
-        const oArray = [];
         Store.localTracks.videoTrack &&
-          oArray.push(Store.localTracks.videoTrack);
+          Store.rtcClient.publish(Store.localTracks.videoTrack);
         Store.localTracks.audioTrack &&
-          oArray.push(Store.localTracks.audioTrack);
-        if (oArray.length == 2) {
-          await Store.rtcClient.publish(oArray);
-        } else {
-          await Store.rtcClient.publish(
-            Store.localTracks.videoTrack || Store.localTracks.audioTrack
-          );
-        }
+          Store.rtcClient.publish(Store.localTracks.audioTrack);
       }
     },
     // 取消本地发布
@@ -939,7 +1035,7 @@ var SdkPackge = {
     init: function () {
       // 创建 RTM 客户端
       // console.log("初始化RTM")
-      Store.rtmClient = ArRTM.createInstance(Config.RTM_APPID);
+      Store.rtmClient = ArRTM.createInstance(Config.APPID);
       // 配置私有云
       Config.RTM_setParameters.switch
         ? Store.rtmClient.setParameters(Config.RTM_setParameters.setParameters)
@@ -1669,7 +1765,7 @@ var OperationPackge = {
     createLocalInvitationAndSend: async function (callMode) {
       // 加入实时通讯频道
       Store.ownUserId = await Store.rtcClient.join(
-        Config.RTC_APPID,
+        Config.APPID,
         Store.channelId,
         null,
         Store.ownUserId
@@ -1898,7 +1994,7 @@ var OperationPackge = {
       }, Store.callChannelProTime);
       // RTC 加入房间
       Store.ownUserId = await Store.rtcClient.join(
-        Config.RTC_APPID,
+        Config.APPID,
         Store.channelId + "",
         null,
         Store.ownUserId
@@ -2005,7 +2101,7 @@ var OperationPackge = {
     },
     // RTC 用户加入频道
     userJoined: function (user) {
-      console.log("RTC 用户加入频道", user, Store.peerUserId);
+      // console.log("RTC 用户加入频道", user, Store.peerUserId);
       if (user.uid == Store.peerUserId) {
         Store.callChannelPro && clearTimeout(Store.callChannelPro);
         Store.remodVideoEnd && clearTimeout(Store.remodVideoEnd);
@@ -2013,7 +2109,7 @@ var OperationPackge = {
     },
     // RTC 用户离开频道
     userLeft: async function (user, reason) {
-      console.log("RTC 用户离开频道", user, reason);
+      // console.log("RTC 用户离开频道", user, reason);
       //因网络断线离开
       if (reason == "ServerTimeOut") {
         Utils.alertWhole("对方网络异常", "alert-warning");
@@ -2116,8 +2212,6 @@ var OperationPackge = {
 
     // 音视频设置
     setVideoOrAudio: async function () {
-      await Store.localTracks.audioTrack.setEnabled(Store.setting.enableAudio);
-      await Store.localTracks.videoTrack.setEnabled(Store.setting.enableVideo);
       await PageShow.setEnableAudio(Store.setting.enableAudio);
       await PageShow.setEnableVideo(Store.setting.enableVideo);
     },
@@ -2132,7 +2226,7 @@ var OperationPackge = {
       await OperationPackge.multi.JoinRTMChannel();
       // 本地用户加入 RTC 实时通讯频道
       Store.ownUserId = await Store.rtcClient.join(
-        Config.RTC_APPID,
+        Config.APPID,
         Store.channelId,
         null,
         Store.ownUserId
@@ -2142,14 +2236,17 @@ var OperationPackge = {
       // 提示用户不在线
       userOnlineStatus.oNotOline.length > 0 &&
         Utils.alertWhole("用户" + userOnlineStatus.oNotOline + "不在线");
-      // 显示会议页面
-      await PageShow.showMeetPage();
-      // 创建窗口
-      await Utils.createUserView(Store.ownUserId);
+
       // 发送呼叫邀请 并创建用户视图
       await OperationPackge.multi.SendLocalInvitation(userOnlineStatus.oOline);
       // 本地音视频渲染
       await OperationPackge.multi.LocalAudioVideoRender();
+      // 显示会议页面
+      await PageShow.showMeetPage();
+      // 创建窗口
+      await Utils.createUserView(Store.ownUserId);
+      // 隐藏本地窗口
+      await Utils.switchoverHidden(Store.ownUserId, false);
     },
     // 查询呼叫的用户是否在线
     QueryPeersOnlineStatus: async function () {
@@ -2183,7 +2280,7 @@ var OperationPackge = {
     },
     // 发送呼叫邀请
     SendLocalInvitation: function (Online) {
-      Online.map(function (userid) {
+      Online.forEach(function (userid) {
         // 创建呼叫用户视图
         Utils.createUserView(userid, 0);
         // 创建呼叫邀请并发送
@@ -2203,13 +2300,17 @@ var OperationPackge = {
         SipData: "",
       });
       await Store.remoteInvitation.accept();
+
+      // 在线的用户创建视图窗口
+      await Store.invitationUserIds.forEach(async function (userid) {
+        // 创建用户视图窗口
+        await Utils.createUserView(userid, 0);
+        if (userid == Store.ownUserId) {
+          Utils.switchoverHidden(userid, false);
+        }
+      });
       // 隐藏被呼叫页面
       await PageShow.hiddenCalledPage();
-      // 在线的用户创建视图窗口
-      await Store.invitationUserIds.map(function (userid) {
-        // 创建用户视图窗口
-        Utils.createUserView(userid, 0);
-      });
       // 显示会议页面
       await PageShow.showMeetPage();
     },
@@ -2217,31 +2318,39 @@ var OperationPackge = {
     LocalAudioVideoRender: async function () {
       // 释放采集设备
       await SdkPackge.RTC.LocalTracksClose();
+
       // 采集本地图像
       await SdkPackge.RTC.getUserMedia();
       // 发布音视频
       await SdkPackge.RTC.publishLocalTracks();
-      // 开启双流
-      await Store.rtcClient
-        .enableDualStream()
-        .then(() => {
-          console.log("Enable Dual stream success!");
-        })
-        .catch((err) => {
-          console.log("开启双流失败", err);
-        });
 
       // 设置音视频
       await OperationPackge.multi.setVideoOrAudio();
 
-      // 本地预览
-      Store.localTracks.videoTrack &&
-        (await Store.localTracks.videoTrack.play(
-          Store.ownUserId + "VideoView",
-          {
+      if (!Store.bigMutiUser.uid || Store.bigMutiUser.uid == Store.ownUserId) {
+        // 本地预览(默认渲染大屏)
+        Utils.switchoverLeftBottom(Store.ownUserId);
+
+        Store.localTracks.videoTrack &&
+          (await Store.localTracks.videoTrack.play("peerMutiVideoPreview", {
             fit: "contain",
-          }
-        ));
+          }));
+        // 记录大屏数据
+        Store.bigMutiUser = {
+          uid: Store.ownUserId,
+          videoTrack: Store.localTracks.videoTrack,
+        };
+      } else {
+        // 本地预览(渲染小屏)
+        Store.localTracks.videoTrack &&
+          (await Store.localTracks.videoTrack.play(
+            Store.ownUserId + "VideoView",
+            {
+              fit: "contain",
+            }
+          ));
+      }
+
       await Utils.updateUserViewStatus(Store.ownUserId, 1);
       // 更新音频状态
       await Utils.updateUserAudioState(
@@ -2249,11 +2358,11 @@ var OperationPackge = {
         Store.setting.enableAudio
       );
       // 绑定大小屏切换
-      Store.localTracks.videoTrack &&
-        (await Utils.switchover({
-          uid: Store.ownUserId,
-          videoTrack: Store.localTracks.videoTrack,
-        }));
+
+      await Utils.switchover({
+        uid: Store.ownUserId,
+        videoTrack: Store.localTracks.videoTrack,
+      });
     },
     // 会议邀请 邀请用户
     MeetingUser: async function () {
@@ -2354,20 +2463,22 @@ var OperationPackge = {
     },
     // RTM 主叫: 被叫拒绝呼叫邀请
     LocalInvitationRefused: async function (response) {
-      // console.log("被叫拒绝呼叫邀请",response);
-      response = response ? JSON.parse(response) : "";
-      // 更新用户状态及窗口显示 - 对方已拒绝
-      await Utils.updateUserViewStatus(response.refuseId, 2);
-      if (response.Cmd == "Calling") {
-        await Utils.alertWhole("呼叫的用户正在通话中", "alert-info");
-      } else {
-        await Utils.alertWhole(
-          "用户" + response.refuseId + "拒绝呼叫邀请",
-          "alert-info"
-        );
+      // console.log("被叫拒绝呼叫邀请", response);
+      const responseInfo = response ? JSON.parse(response) : "";
+      if (responseInfo) {
+        // 更新用户状态及窗口显示 - 对方已拒绝
+        await Utils.updateUserViewStatus(responseInfo.refuseId, 2);
+        if (responseInfo.Cmd == "Calling") {
+          await Utils.alertWhole("呼叫的用户正在通话中", "alert-info");
+        } else {
+          await Utils.alertWhole(
+            "用户" + (responseInfo.refuseId || "") + "拒绝呼叫邀请",
+            "alert-info"
+          );
+        }
+        // 移除用户窗口
+        await Utils.deleteUserView(responseInfo.refuseId);
       }
-      // 移除用户窗口
-      await Utils.deleteUserView(response.refuseId);
     },
     // RTM 主叫: 呼叫邀请进程失败
     LocalInvitationFailure: function (reason) {
@@ -2416,7 +2527,7 @@ var OperationPackge = {
       // console.log("被叫: 接受呼叫邀请");
       // 加入 RTC 实时通讯频道
       Store.ownUserId = await Store.rtcClient.join(
-        Config.RTC_APPID,
+        Config.APPID,
         Store.channelId,
         null,
         Store.ownUserId
@@ -2453,26 +2564,45 @@ var OperationPackge = {
     },
     // RTC 用户发布
     userPublished: async function (user, mediaType) {
-      // console.log("用户" + user.uid + "发布" + mediaType);
+      console.log("用户" + user.uid + "发布" + mediaType);
       var oArray = await Store.invitationUserIds.concat([user.uid]);
       Store.invitationUserIds = Array.from(await new Set(oArray));
-      // 创建视图
-      await Utils.createUserView(user.uid);
-      // 默认接收小流
-      await Store.rtcClient
-        .setRemoteVideoStreamType(user.uid, 1)
-        .then(() => {})
-        .catch((err) => {
-          console.log("默认接收小流失败", err);
-        });
+      if ($("#" + user.uid + "Window").length > 0) {
+        // 更新视图
+        Utils.updateUserViewStatus(user.uid, 1);
+      } else {
+        // 创建视图
+        await Utils.createUserView(user.uid);
+      }
+
       if (mediaType === "video") {
+        // 默认接收小流
+        await Store.rtcClient
+          .setRemoteVideoStreamType(
+            user.uid,
+            Store.bigMutiUser.uid == user.uid ? 0 : 1
+          )
+          .then(() => {})
+          .catch((err) => {
+            console.log(
+              Store.bigMutiUser.uid == user.uid
+                ? "默认接收大流失败"
+                : "默认接收小流失败",
+              err
+            );
+          });
         // 绑定大小屏切换
         await Utils.switchover(user);
         // 存放用户发布的视频
         user.videoTrack &&
-          (await user.videoTrack.play(user.uid + "VideoView", {
-            fit: "contain",
-          }));
+          (await user.videoTrack.play(
+            Store.bigMutiUser.uid == user.uid
+              ? "peerMutiVideoPreview"
+              : user.uid + "VideoView",
+            {
+              fit: "contain",
+            }
+          ));
       } else {
         user.audioTrack && (await user.audioTrack.play());
         // 更改用户的音频状态
@@ -2502,8 +2632,8 @@ var OperationPackge = {
 // SDK 自检
 (async function () {
   //查看sdk版本
-  console.log("RTC SDK 版本",ArRTC.VERSION);
-  console.log("RTM SDK 版本",ArRTM.VERSION);
+  console.log("RTC SDK 版本", ArRTC.VERSION);
+  console.log("RTM SDK 版本", ArRTM.VERSION);
   // 视频设备状态变化
   ArRTC.onCameraChanged = function (info) {
     SdkPackge.Support.cameraChanged(info);
@@ -2718,10 +2848,17 @@ var OperationPackge = {
   // 音频开关
   $("#setAudioEnableBtn").click(async function () {
     Store.setting.enableAudio = !Store.setting.enableAudio;
-    Store.localTracks.audioTrack &&
-      (await Store.localTracks.audioTrack.setEnabled(
-        Store.setting.enableAudio
-      ));
+
+    if (Store.setting.enableAudio && !Store.localTracks.audioTrack) {
+      // 默认关闭音频时打开音频
+      await SdkPackge.RTC.getUserMicrophonesPublish();
+    } else {
+      Store.localTracks.audioTrack &&
+        (await Store.localTracks.audioTrack.setMuted(
+          !Store.setting.enableAudio
+        ));
+    }
+
     // 更改用户的音频状态
     Utils.updateUserAudioState(Store.ownUserId, Store.setting.enableAudio);
     PageShow.setEnableAudio(Store.setting.enableAudio);
@@ -2729,17 +2866,15 @@ var OperationPackge = {
   // 视频开关
   $("#setVideoEnableBtn").click(async function () {
     Store.setting.enableVideo = !Store.setting.enableVideo;
-    if (!Store.setting.enableAudio) {
-      Store.localTracks.audioTrack.setEnabled(!Store.setting.enableAudio);
-      setTimeout(function () {
-        Store.localTracks.audioTrack.setEnabled(Store.setting.enableAudio);
-      }, 200);
+    if (!Store.localTracks.videoTrack && Store.setting.enableVideo) {
+      // 默认关闭视频时打开视频
+      await OperationPackge.multi.LocalAudioVideoRender();
+    } else {
+      Store.localTracks.videoTrack &&
+        (await Store.localTracks.videoTrack.setMuted(
+          !Store.setting.enableVideo
+        ));
     }
-    Store.localTracks.videoTrack &&
-      (await Store.localTracks.videoTrack.setEnabled(
-        Store.setting.enableVideo
-      ));
-    // console.log("视频开关", Store.setting.enableVideo);
     await PageShow.setEnableVideo(Store.setting.enableVideo);
   });
   // 挂断
@@ -2751,11 +2886,11 @@ var OperationPackge = {
     // 释放采集设备
     await SdkPackge.RTC.LocalTracksClose();
 
-    // 通话页面恢复初始
+    // // 通话页面恢复初始
     await PageShow.initSetingMulti();
-    // 回到首页
+    // // 回到首页
     await PageShow.showIndex();
-    // 本地存储恢复
+    // // 本地存储恢复
     await OperationPackge.public.restoreDefault();
   });
   // 输入框 (会议中邀请)

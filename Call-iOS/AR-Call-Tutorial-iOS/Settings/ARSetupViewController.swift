@@ -28,7 +28,7 @@ class ARSetupViewController: ARBaseViewController {
     let identifier = "Call_SetUp"
     
     lazy var dimensionsArr = {
-        return ["240*320","480*640","720*1280"]
+        ["240*320", "480*640", "720*1280"]
     }()
 
     override func viewDidLoad() {
@@ -36,7 +36,7 @@ class ARSetupViewController: ARBaseViewController {
 
         // Do any additional setup after loading the view.
         view.backgroundColor = UIColor(hexString: "#F5F5F5")
-        self.title = "设置"
+        title = "设置"
         navigationItem.leftBarButtonItem = createBarButtonItem(title: "", image: "icon_return")
         
         if callWay == .single {
@@ -52,7 +52,7 @@ class ARSetupViewController: ARBaseViewController {
         }
         menus.append(MenuItem.getMenu(dic: ["title": "AI降噪", "state": Default.bool(forKey: "noise")]))
         
-        tableView = UITableView.init(frame: view.bounds, style: .grouped)
+        tableView = UITableView(frame: view.bounds, style: .grouped)
         tableView?.delegate = self
         tableView?.dataSource = self
         tableView?.rowHeight = 50
@@ -65,19 +65,22 @@ class ARSetupViewController: ARBaseViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.navigationBar.setBackgroundImage(createImage(UIColor.white), for: .any, barMetrics: .default)
-        navigationController?.navigationBar.barStyle = .default
+        navigationController?.navgationBarColor = UIColor.white
+        navigationController?.titleColor = UIColor.black
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        navigationController?.navigationBar.barStyle = .black
-        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.white]
+        navigationController?.navgationBarColor = UIColor(hexString: "#0F9DFD")
+        navigationController?.titleColor = UIColor.white
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .default
     }
 }
 
 extension ARSetupViewController: UITableViewDelegate, UITableViewDataSource {
-    
     func numberOfSections(in tableView: UITableView) -> Int {
         return menus.count
     }
@@ -89,7 +92,7 @@ extension ARSetupViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell = tableView.dequeueReusableCell(withIdentifier: identifier)
         if cell == nil {
-            cell = UITableViewCell.init(style: .value1, reuseIdentifier: identifier)
+            cell = UITableViewCell(style: .value1, reuseIdentifier: identifier)
         }
         cell?.selectionStyle = .none
         cell?.textLabel?.font = UIFont(name: PingFang, size: 15)
@@ -97,7 +100,7 @@ extension ARSetupViewController: UITableViewDelegate, UITableViewDataSource {
         
         let model = menus[indexPath.section]
         cell?.textLabel?.text = model.title
-        if callWay == .single && indexPath.section < 2 {
+        if callWay == .single, indexPath.section < 2 {
             cell?.accessoryType = .disclosureIndicator
             cell?.detailTextLabel?.text = model.subtitle
         } else {
@@ -111,7 +114,7 @@ extension ARSetupViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if callWay == .single && indexPath.section < 2 {
+        if callWay == .single, indexPath.section < 2 {
             let title: String?
             var arr = [String]()
             if indexPath.section == 0 {
@@ -122,7 +125,7 @@ extension ARSetupViewController: UITableViewDelegate, UITableViewDataSource {
                 arr = ["7", "15", "24"]
             }
             
-            ARAlertActionSheet.showAlert(titleStr: title , msgStr: nil, style: .actionSheet, currentVC: self, cancelHandler: nil, otherBtns: arr) { (index) in
+            ARAlertActionSheet.showAlert(titleStr: title, msgStr: nil, style: .actionSheet, currentVC: self, cancelHandler: nil, otherBtns: arr) { index in
                 if indexPath.section == 0 {
                     Default.setValue(index, forKey: "dimensions")
                     self.menus[0].subtitle = arr[index]
@@ -131,7 +134,7 @@ extension ARSetupViewController: UITableViewDelegate, UITableViewDataSource {
                     self.menus[1].subtitle = arr[index]
                 }
                 
-                let indexSet = NSIndexSet.init(index: indexPath.section)
+                let indexSet = NSIndexSet(index: indexPath.section)
                 tableView.reloadSections(indexSet as IndexSet, with: .none)
             }
         }
