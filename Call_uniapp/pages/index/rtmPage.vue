@@ -106,11 +106,11 @@
 					console.log("被叫挂断(拒绝对方的呼叫邀请)", this.uid);
 					await this.$RTM.refuseRemoteInvitation(this.uid);
 				}
-				// 发送挂断信息
-				uni.$emit("sendMessageToPeer", {
-					Cmd: 'EndCall',
-					peerid: this.uid
-				});
+				// // 发送挂断信息
+				// uni.$emit("sendMessageToPeer", {
+				// 	Cmd: 'EndCall',
+				// 	peerid: this.uid
+				// });
 			},
 			// 接听
 			acceptFn() {
