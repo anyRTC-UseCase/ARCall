@@ -7,9 +7,6 @@ import {
 const rtcModule = uni.requireNativePlugin('AR-RtcModule');
 // uniapp 监测
 let Store = {
-	// 检测 Store 存在的定时器
-	existTimer: null,
-	destroyRtcTimer: null,
 	channel: "", // 频道
 	// 对方网络异常定时器（10s后关闭通话）
 	networkAnomaly: null,
@@ -61,11 +58,7 @@ const RTC = {
 				break;
 				// 加入频道成功回调
 			case "onJoinChannelSuccess":
-				// 本地渲染
-				RTC.localVideo({
-					"channel": Store.channelId + '',
-					"uid": Store.uid + '',
-				});
+				console.log("加入频道成功回调", res);
 				// 10s内无用户加入频道
 				Store.joinChannelUser = setTimeout(() => {
 					Utils.hintRTCInfo('对方网络异常', 'warn');
@@ -104,8 +97,10 @@ const RTC = {
 				break;
 				// 已显示远端视频首帧回调
 			case "onFirstRemoteVideoFrame":
+				console.log("已显示远端视频首帧回调 onFirstRemoteVideoFrame")
 				break;
 			case "onFirstRemoteVideoDecoded":
+				console.log("已显示远端视频首帧回调 onFirstRemoteVideoDecoded")
 				RTC.remotenableVideo({
 					channel: Store.channel,
 					uid: res.uid
@@ -194,7 +189,8 @@ const RTC = {
 		rtcModule.setEnableSpeakerphone({
 			"enabled": fase
 		}, (res) => {
-			console.log('RTC 远端加入房间后设置' + (fase ? '开启' : '关闭' + '扬声器播放'), res.code === 0 ? '成功' : '失败：' +
+			console.log('RTC 远端加入房间后设置' + (fase ? '开启' : '关闭' + '扬声器播放'), res.code === 0 ? '成功' :
+				'失败：' +
 				res);
 		});
 	},
@@ -224,53 +220,64 @@ const RTC = {
 		}
 	},
 	// 启用视频（加入房间后自动发布）
-	enableVideo: function() {
-		Store.existTimer && clearInterval(Store.existTimer)
-		Store.existTimer = setInterval(async () => {
-			if (Store.VideoConfig) {
-				clearInterval(Store.existTimer)
-				if (!Store.VideoConfig.width) {
-					Store.VideoConfig = {
-						"width": 720,
-						"height": 1280,
-						"frameRate": 15,
-						"bitrate": 2000,
-						"orientationMode": 2
-					}
+	enableVideo: async function() {
+		// 视频编码属性
+		let VideoConfig = {}
+		try {
+			const value = uni.getStorageSync('DataVideoConfig');
+			if (value) {
+				VideoConfig = value
+			} else {
+				VideoConfig = {
+					"width": 720,
+					"height": 1280,
+					"frameRate": 15,
+					"bitrate": 2000,
+					"orientationMode": 2
 				}
-				// 设置视频编码属性
-				await rtcModule.setVideoEncoderConfiguration(Store.VideoConfig, (res) => {
-					console.log('RTC 设置视频编码属性 setVideoEncoderConfiguration 方法调用', res
-						.code ===
-						0 ? '成功' :
-						'失败：' + res);
-				});
-				// 启用视频
-				await rtcModule.enableVideo((res) => {
-					console.log('RTC 启用视频 enableVideo 方法调用', res.code === 0 ? '成功' : '失败：' +
-						res);
-				});
 			}
-		}, 50)
+
+			console.log("视频编码属性 VideoConfig", JSON.stringify(VideoConfig));
+			// 设置视频编码属性
+			await rtcModule.setVideoEncoderConfiguration(VideoConfig, (res) => {
+				console.log('RTC 设置视频编码属性 setVideoEncoderConfiguration 方法调用', res
+					.code ===
+					0 ? '成功' :
+					'失败：' + res);
+			});
+			// 启用视频
+			await rtcModule.enableVideo((res) => {
+				console.log('RTC 启用视频 enableVideo 方法调用', res.code === 0 ? '成功' : '失败：' +
+					res);
+				if (res.code === 0) {
+					RTC.localVideo({
+						"channel": Store.channelId + '',
+						"uid": Store.uid + '',
+					});
+				}
+			});
+
+		} catch (e) {
+			// error
+		}
 	},
 	// 本地启用视频后
 	localVideo: function(data) {
-		setTimeout(async () => {
-			// console.log("本地启用视频后",data);
-			// // 渲染视频
-			await Store.location.setupLocalVideo({
-				"renderMode": 1,
-				"channelId": data.channel,
-				"uid": data.uid,
-				"mirrorMode": 0
-			}, (res) => {
-				console.log('渲染视频', res);
-			});
-			// 本地预览
-			await Store.location.startPreview((res) => {
-				console.log('本地预览', res);
-			})
-		}, 200)
+
+		console.log("本地启用视频后", Store.location, data);
+		// // 渲染视频
+		Store.location.setupLocalVideo({
+			"renderMode": 1,
+			"channelId": data.channel,
+			"uid": data.uid,
+			"mirrorMode": 0
+		}, (res) => {
+			console.log('渲染视频', res);
+		});
+		// 本地预览
+		Store.location.startPreview((res) => {
+			console.log('本地预览', res);
+		})
 	},
 	// 远端加入房间后进行
 	remotenableVideo: async function(data) {
@@ -282,10 +289,10 @@ const RTC = {
 		}, (res) => {
 			console.log('渲染远端视频', res);
 		})
-		// 本地预览
-		await Store.remote.startPreview((res) => {
-			console.log('远端本地预览', res);
-		})
+		// // 本地预览
+		// await Store.remote.startPreview((res) => {
+		// 	console.log('远端本地预览', res);
+		// })
 	},
 	/**
 	 * 如果你只在一个页面写 可以直接调 destory 
@@ -326,7 +333,7 @@ uni.$on("location-cavasview", data => {
 uni.$on("rtc-endcall", data => {
 	// 挂断
 	if (data.message === "EndCall") {
-		console.log("监测 rtc 收到的挂断信息", data,Store);
+		console.log("监测 rtc 收到的挂断信息", data, Store);
 		Utils.restoreAll();
 		if (!Store.channel && !Store.uid) {
 			// // 清除(呼叫时取消呼叫)
