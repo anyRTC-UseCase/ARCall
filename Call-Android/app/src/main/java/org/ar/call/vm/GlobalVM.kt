@@ -347,6 +347,10 @@ class GlobalVM : ViewModel(), LifecycleObserver,NetworkObserver.Listener {
             events?.onMessageReceived(var1,var2)
         }
 
+        override fun onTokenWillExpire() {
+
+        }
+
         override fun onTokenExpired() {
         }
 
@@ -466,7 +470,6 @@ class GlobalVM : ViewModel(), LifecycleObserver,NetworkObserver.Listener {
             remoteInvitationArray.find { it.callerId == var1?.callerId }?.let {
                 remoteInvitationArray.remove(it)
             }
-
         }
 
         override fun onRemoteInvitationFailure(var1: RemoteInvitation?, var2: Int) {
