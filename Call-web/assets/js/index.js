@@ -997,10 +997,13 @@ var SdkPackge = {
       if (Store.localTracks.videoTrack || Store.localTracks.audioTrack) {
         // 设置主播身份
         await Store.rtcClient.setClientRole("host");
-        Store.localTracks.videoTrack &&
-          Store.rtcClient.publish(Store.localTracks.videoTrack);
-        Store.localTracks.audioTrack &&
-          Store.rtcClient.publish(Store.localTracks.audioTrack);
+        if(Store.localTracks.videoTrack || Store.localTracks.audioTrack) {
+          Store.rtcClient.publish(Object.values(Store.localTracks));
+        }
+        // Store.localTracks.videoTrack &&
+        //   Store.rtcClient.publish(Store.localTracks.videoTrack);
+        // Store.localTracks.audioTrack &&
+        //   Store.rtcClient.publish(Store.localTracks.audioTrack);
       }
     },
     // 取消本地发布
