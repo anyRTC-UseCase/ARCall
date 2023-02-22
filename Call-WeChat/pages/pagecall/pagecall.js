@@ -85,6 +85,12 @@ Page({
                 mode: data.mode,
             });
             Store.Mode = data.mode;
+            if (data.mode === 1) {
+                // 被动变更
+                Store.rtcClient.muteLocal('video');
+            }
+
+
         })
         // 可用宽度
         try {
@@ -112,7 +118,7 @@ Page({
      */
     onUnload: function () {
         Until.remove("livePusherUrlEvent", this);
-        Until.remove("callModeChange",this);
+        Until.remove("callModeChange", this);
     },
     // 切换至语音
     switchAudio() {
@@ -121,6 +127,8 @@ Page({
             mode: 1,
         });
         Store.Mode = 1;
+        // 被动变更
+        Store.rtcClient.muteLocal('video');
         // 发送切换语音消息
         RTM.rtmInternal.sendMessage(Store.peerUserId, {
             Cmd: "SwitchAudio",

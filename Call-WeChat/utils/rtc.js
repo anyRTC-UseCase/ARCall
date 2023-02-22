@@ -194,6 +194,12 @@ const rtcInternal = {
     // 发布本地音视频
     publishTrack: () => {
         Store.rtcClient.publish((url) => {
+            // 因微信更新，纯语音通话需要调用该方法
+            if(Store.Mode == 1) {
+                console.log("因微信更新，纯语音通话需要调用该方法");
+                Store.rtcClient.muteLocal('video');
+            }
+
             console.log("发布本地音视频", url);
             // 本地录制地址(小程序特有推流)
             Store.livePusherUrl = url;

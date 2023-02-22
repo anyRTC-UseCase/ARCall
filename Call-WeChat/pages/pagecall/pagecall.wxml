@@ -41,7 +41,7 @@
 <!-- 语音通话 -->
 <view class="live" style="background-color: rgba(0, 0, 0, 0.5);" wx:else>
     <!-- 本地推流 关闭摄像头-->
-    <live-pusher style="width: 0px;height: 0px;" mode='RTC' enable-camera='{{false}}' url='{{ livePusherUrl }}' autopush></live-pusher>
+    <live-pusher style="width: 0px;height: 0px;" mode='RTC' enable-camera='{{false}}' enable-mic='{{!enableMic}}' url='{{ livePusherUrl }}' autopush></live-pusher>
     <!-- 远端拉流 -->
     <live-player v-if="{{livePlayerUrl}}" style="width: 0px;height: 0px;" autoplay mode='RTC' src='{{ livePlayerUrl }}' binderror="error" bindstatechange="statechange" sound-mode='{{soundMode}}'></live-player>
 
