@@ -16,6 +16,7 @@ import org.ar.call.utils.showError
 import org.ar.call.utils.showSuccess
 import org.ar.call.utils.toast
 import kotlinx.coroutines.delay
+import org.ar.call.utils.FileUtils
 import org.ar.rtm.RemoteInvitation
 import org.json.JSONObject
 import kotlin.system.exitProcess
@@ -29,6 +30,7 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         ViewCompat.setTransitionName(binding.ivLogo, "logo")
+        FileUtils.setLogFilePath(this,callViewModel.rtmClient,"qqq")
         loginRtm()
         binding.run {
             tvUser.text = "您的呼叫ID:${callViewModel.userId}"

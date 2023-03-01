@@ -15,7 +15,7 @@ class MemberAdapter :BaseQuickAdapter<RtcMember, BaseViewHolder>(R.layout.item_m
     override fun convert(holder: BaseViewHolder, item: RtcMember) {
         val videoGroup = holder.getView<RelativeLayout>(R.id.rl_video)
         videoGroup.removeAllViews()
-        val canvans = holder.itemView.context.let { item.getVideoCanvas(it,Constants.RENDER_MODE_HIDDEN) }
+        val canvans = holder.itemView.context.let { item.getVideoCanvas(it,Constants.RENDER_MODE_FIT) }
         if (canvans.view.parent!=null){
             val parent= canvans.view.parent as RelativeLayout
             parent.removeView(canvans.view)

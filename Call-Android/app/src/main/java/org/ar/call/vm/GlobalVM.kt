@@ -34,6 +34,7 @@ import androidx.core.content.FileProvider
 import io.karn.notify.Notify
 import io.karn.notify.NotifyCreator
 import io.karn.notify.entities.NotifyConfig
+import org.ar.call.utils.FileUtils
 import org.ar.call.utils.NetworkObserver
 import org.ar.call.utils.getAppOpenIntentByPackageName
 import org.ar.call.utils.getPackageContext
@@ -79,7 +80,7 @@ class GlobalVM : ViewModel(), LifecycleObserver,NetworkObserver.Listener {
     private var events: RtmEvents? = null
 
 
-    private val rtmClient by lazy {
+     val rtmClient by lazy {
         RtmClient.createInstance(
             CallApplication.callApp.applicationContext,
             BuildConfig.APPID,
@@ -158,7 +159,9 @@ class GlobalVM : ViewModel(), LifecycleObserver,NetworkObserver.Listener {
         }.toString())
     }
 
+
     suspend fun login() = suspendCoroutine<Boolean> {
+
         rtmClient.logout(null)
         if (!BuildConfig.ADDRESS.equals("0.0.0.0")){
             rtmClient.setParameters(JSONObject().apply {
@@ -348,8 +351,11 @@ class GlobalVM : ViewModel(), LifecycleObserver,NetworkObserver.Listener {
         }
 
         override fun onTokenWillExpire() {
-
         }
+//
+//        override fun onTokenWillExpire() {
+//
+//        }
 
         override fun onTokenExpired() {
         }
