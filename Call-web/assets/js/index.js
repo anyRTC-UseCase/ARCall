@@ -224,69 +224,72 @@ var Utils = {
   },
   // 大小屏幕切换
   switchover: function (user) {
-    $(`#${user.uid}Window`).bind("click", async function () {
-      if (user.uid != Store.bigMutiUser.uid) {
-        // 切换对应左下角
-        Utils.switchoverLeftBottom(user.uid);
-        // 切换后大屏对应的小屏隐藏
-        Utils.switchoverHidden(user.uid, false);
-        // 原大屏对应的小屏展示
-        Utils.switchoverHidden(Store.bigMutiUser.uid, true);
-
-        // 设置为大流
-        if (user.videoTrack) {
-          user.videoTrack.stop();
-          Store.rtcClient
-            .setRemoteVideoStreamType(user.uid, 0)
-            .then(() => {
-              console.log("切换大流成功", user.uid);
-            })
-            .catch((err) => {
-              console.log("切换大流失败", user.uid, err);
-            });
-
-          await user.videoTrack.play("peerMutiVideoPreview", {
-            fit: "contain",
-          });
-        }
-
-        // 设置为小流
-        if (Store.bigMutiUser.videoTrack) {
-          Store.bigMutiUser.videoTrack.stop();
-          Store.rtcClient
-            .setRemoteVideoStreamType(Store.bigMutiUser.uid, 1)
-            .then(() => {
-              console.log("切换小流成功", Store.bigMutiUser.uid);
-            })
-            .catch((err) => {
-              console.log("切换小流失败", Store.bigMutiUser.uid, err);
-            });
-
-          await Store.bigMutiUser.videoTrack.play(
-            Store.bigMutiUser.uid + "VideoView",
-            {
-              fit: "contain",
-            }
-          );
-        }
-
-        // 本地视频窗口(大屏)
-        if (user.uid == Store.ownUserId) {
-          Utils.localVideoSwitch(user.uid, Store.setting.enableVideo);
-        } else {
-          $("#peerMutiVideoPreviewbasicView_img").hasClass(
-            "basicView_img_index"
-          ) &&
-            $("#peerMutiVideoPreviewbasicView_img").removeClass(
-              "basicView_img_index"
-            );
-          //   console.log("远端视频为大屏");
-          //   Utils.localVideoSwitch(user.uid,true);
-        }
-
-        Store.bigMutiUser = user;
-      }
+    $(`#${user.uid}Window`).bind("click", function () {
+      Utils.switchoverFnBind(user);
     });
+  },
+  // 大小屏幕切换方法绑定
+  switchoverFnBind: async function (user) {
+    if (user.uid != Store.bigMutiUser.uid) {
+      // 切换对应左下角
+      Utils.switchoverLeftBottom(user.uid);
+      // 切换后大屏对应的小屏隐藏
+      Utils.switchoverHidden(user.uid, false);
+      // 原大屏对应的小屏展示
+      Utils.switchoverHidden(Store.bigMutiUser.uid, true);
+      // 设置为大流
+      if (user.videoTrack) {
+        user.videoTrack.stop();
+        Store.rtcClient
+          .setRemoteVideoStreamType(user.uid, 0)
+          .then(() => {
+            console.log("切换大流成功", user.uid);
+          })
+          .catch((err) => {
+            console.log("切换大流失败", user.uid, err);
+          });
+
+        await user.videoTrack.play("peerMutiVideoPreview", {
+          fit: "contain",
+        });
+      }
+
+      // 设置为小流
+      if (Store.bigMutiUser.videoTrack) {
+        Store.bigMutiUser.videoTrack.stop();
+        Store.rtcClient
+          .setRemoteVideoStreamType(Store.bigMutiUser.uid, 1)
+          .then(() => {
+            console.log("切换小流成功", Store.bigMutiUser.uid);
+          })
+          .catch((err) => {
+            console.log("切换小流失败", Store.bigMutiUser.uid, err);
+          });
+
+        await Store.bigMutiUser.videoTrack.play(
+          Store.bigMutiUser.uid + "VideoView",
+          {
+            fit: "contain",
+          }
+        );
+      }
+
+      // 本地视频窗口(大屏)
+      if (user.uid == Store.ownUserId) {
+        Utils.localVideoSwitch(user.uid, Store.setting.enableVideo);
+      } else {
+        $("#peerMutiVideoPreviewbasicView_img").hasClass(
+          "basicView_img_index"
+        ) &&
+          $("#peerMutiVideoPreviewbasicView_img").removeClass(
+            "basicView_img_index"
+          );
+        //   console.log("远端视频为大屏");
+        //   Utils.localVideoSwitch(user.uid,true);
+      }
+
+      Store.bigMutiUser = user;
+    }
   },
   // 大小屏幕切换后,大小对应左下角切换
   switchoverLeftBottom: function (bigUid) {
@@ -997,10 +1000,13 @@ var SdkPackge = {
       if (Store.localTracks.videoTrack || Store.localTracks.audioTrack) {
         // 设置主播身份
         await Store.rtcClient.setClientRole("host");
-        Store.localTracks.videoTrack &&
-          Store.rtcClient.publish(Store.localTracks.videoTrack);
-        Store.localTracks.audioTrack &&
-          Store.rtcClient.publish(Store.localTracks.audioTrack);
+        if (Store.localTracks.videoTrack || Store.localTracks.audioTrack) {
+          Store.rtcClient.publish(Object.values(Store.localTracks));
+        }
+        // Store.localTracks.videoTrack &&
+        //   Store.rtcClient.publish(Store.localTracks.videoTrack);
+        // Store.localTracks.audioTrack &&
+        //   Store.rtcClient.publish(Store.localTracks.audioTrack);
       }
     },
     // 取消本地发布
@@ -2236,17 +2242,16 @@ var OperationPackge = {
       // 提示用户不在线
       userOnlineStatus.oNotOline.length > 0 &&
         Utils.alertWhole("用户" + userOnlineStatus.oNotOline + "不在线");
-
+      // 创建窗口
+      await Utils.createUserView(Store.ownUserId);
+      // 隐藏本地窗口
+      await Utils.switchoverHidden(Store.ownUserId, false);
       // 发送呼叫邀请 并创建用户视图
       await OperationPackge.multi.SendLocalInvitation(userOnlineStatus.oOline);
       // 本地音视频渲染
       await OperationPackge.multi.LocalAudioVideoRender();
       // 显示会议页面
       await PageShow.showMeetPage();
-      // 创建窗口
-      await Utils.createUserView(Store.ownUserId);
-      // 隐藏本地窗口
-      await Utils.switchoverHidden(Store.ownUserId, false);
     },
     // 查询呼叫的用户是否在线
     QueryPeersOnlineStatus: async function () {
@@ -2357,8 +2362,7 @@ var OperationPackge = {
         Store.ownUserId,
         Store.setting.enableAudio
       );
-      // 绑定大小屏切换
-
+       // 绑定大小屏切换
       await Utils.switchover({
         uid: Store.ownUserId,
         videoTrack: Store.localTracks.videoTrack,
