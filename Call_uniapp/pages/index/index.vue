@@ -1,5 +1,9 @@
 <template>
-	<view class="content_bg" :style="{width: windowWidth + 'px',height: windowHeight + 'px'}">
+	<view class="content_bg"
+		:style="{width: windowWidth + 'px',height: windowHeight + 'px'}">
+		<view class="content_bg_img">
+			<image class="content_bg_img_" src="../../static/icon_back.png" mode=""></image>
+		</view>
 		<view class="content colum_flex" style="">
 			<!-- icon -->
 			<view class="colum_flex">
@@ -15,17 +19,26 @@
 						<text style="margin-top: 10px;">点对点呼叫邀请</text>
 					</view>
 				</view>
+
 				<text style="color: #FFFFFF;margin-top: 40px;text-align: center;">您的呼叫ID:
-					{{$store.state.uid ? $store.state.uid : '未登录'}}</text>
+					{{uid ? uid : '未登录'}}</text>
 			</view>
 		</view>
 
 	</view>
 </template>
 <script>
+	import {
+		mapState
+	} from "vuex"
+	
 	export default {
+		computed: {
+			...mapState(['uid'])
+		},
 		onLoad(options) {
 			// 默认弹窗
+			// #ifdef APP-PLUS
 			this.$store.dispatch('upDataPopubId', 'poPup');
 			if (options.state === 'end' || options.state === 'abnormityEnd') {
 				setTimeout(() => {
@@ -33,6 +46,17 @@
 						'success' : 'warn');
 				}, 800)
 			}
+			// #endif
+
+			// #ifdef MP-WEIXIN
+			// if (options.state === 'end' || options.state === 'abnormityEnd') {
+			// 	uni.showToast({
+			// 		title: options.state === 'end' ? '通话已结束' : '通话异常',
+			// 		icon: "none",
+			// 		duration: 2000
+			// 	});
+			// }
+			// #endif
 		},
 		data() {
 			return {
@@ -42,7 +66,9 @@
 		},
 		created() {
 			// 默认弹窗
+			// #ifdef APP-PLUS
 			this.$store.dispatch('upDataPopubId', 'poPup');
+			// #endif
 			let _this = this;
 			uni.getSystemInfo({
 				success: function(res) {
@@ -54,7 +80,7 @@
 		methods: {
 			// 跳转
 			goBack(url) {
-				if (this.$store.state.uid) {
+				if (this.uid) {
 					uni.navigateTo({
 						url,
 						animationType: "slide-in-bottom",
@@ -87,10 +113,23 @@
 	}
 
 	.content_bg {
-		background: url(../../static/icon_back.png) no-repeat;
-		background-size: cover;
-		background-position: center;
 		position: relative;
+	}
+	
+	.content_bg_img {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		display: flex;
+		z-index: -1;
+	}
+		
+	.content_bg_img_ {
+		flex: 1;
+		width: 100%;
+		height: 100%;
 	}
 
 	.content {

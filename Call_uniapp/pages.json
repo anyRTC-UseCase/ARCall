@@ -96,6 +96,17 @@
 					"bounce": "none"
 				}
 			}
+			
+		},{
+			"path": "pages/index/weixinCall",
+			"style": {
+				"navigationBarTitleText": "音视频通话",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": false,
+				"app-plus": {
+					"bounce": "none"
+				}
+			}
 		}
 	],
 	"globalStyle": {
