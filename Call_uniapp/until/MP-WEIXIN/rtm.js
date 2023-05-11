@@ -285,7 +285,7 @@ const rtmEvent = {
 		switch (message.text.Cmd) {
 			case "SwitchAudio":
 				// 视频通话页面转语音
-				Until.emit("callModeChange", {
+				uni.$emit("callModeChange", {
 					mode: 1
 				});
 				break;
@@ -479,12 +479,14 @@ const rtmInternal = {
 		// 返回首页
 		uni.reLaunch({
 			url: 'index',
-		});
-		uni.showToast({
-			title: message,
-			icon: 'none',
-			duration: 2000,
-			mask: true,
+			success() {
+				uni.showToast({
+					title: message,
+					icon: 'none',
+					duration: 2000,
+					mask: true,
+				});
+			}
 		});
 	},
 
