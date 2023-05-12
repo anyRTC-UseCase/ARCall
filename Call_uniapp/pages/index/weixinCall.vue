@@ -47,7 +47,7 @@
 		<view v-else class="live" style="background-color: rgba(0, 0, 0, 0.5);" >
 			<!-- 本地推流 关闭摄像头-->
 			<live-pusher v-if="livePusherUrl.length > 0" style="width: 0px;height: 0px;" mode='RTC'
-				:enable-camera='false' :url='livePusherUrl' autopush></live-pusher>
+				:enable-camera='false' :muted="enableMic" :url='livePusherUrl' autopush></live-pusher>
 			<!-- 远端拉流 -->
 			<live-player v-if="livePlayerUrl.length > 0" style="width: 0px;height: 0px;" autoplay mode='RTC'
 				:src='livePlayerUrl' @error="error" @statechange="statechange" :sound-mode='soundMode'></live-player>
