@@ -1,0 +1,15 @@
+{
+  "name": "call_uniapp",
+  "version": "1.0.0",
+  "description": "本文指导你运行 uniapp_ARCall 示例项目。",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ar-rtc-miniapp": "^4.0.5",
+    "ar-rtm-sdk": "^1.0.10"
+  }
+}

@@ -1,6 +1,6 @@
 {
     "name" : "ArCall_uniapp",
-    "appid" : "",
+    "appid" : "__UNI__90C1353",
     "description" : "",
     "versionName" : "1.1.1",
     "versionCode" : "100",
@@ -91,7 +91,7 @@
                     "description" : "anyRTC音视频SDK插件提供音视频功能，支持Android、iOS。",
                     "platforms" : "Android,iOS",
                     "url" : "https://ext.dcloud.net.cn/plugin?id=3661",
-                    "android_package_name" : "anyrtc.io",
+                    "android_package_name" : "arcall.io_a",
                     "ios_bundle_id" : "",
                     "isCloud" : true,
                     "bought" : 1,
@@ -106,7 +106,7 @@
                     "description" : "anyRTC实时消息插件提供实时消息功能，支持Android、iOS。",
                     "platforms" : "Android,iOS",
                     "url" : "https://ext.dcloud.net.cn/plugin?id=3777",
-                    "android_package_name" : "anyrtc.io",
+                    "android_package_name" : "arcall.io_a",
                     "ios_bundle_id" : "",
                     "isCloud" : true,
                     "bought" : 1,
@@ -119,34 +119,6 @@
                         }
                     }
                 }
-            },
-            "HG-Background" : {
-                "__plugin_info__" : {
-                    "name" : "保活 前台运行",
-                    "description" : "用于提高app存活概率或添加前台显示 q群：219508489",
-                    "platforms" : "Android",
-                    "url" : "https://ext.dcloud.net.cn/plugin?id=2203",
-                    "android_package_name" : "anyrtc.io",
-                    "ios_bundle_id" : "",
-                    "isCloud" : true,
-                    "bought" : 1,
-                    "pid" : "2203",
-                    "parameters" : {}
-                }
-            },
-            "yh-notify" : {
-                "__plugin_info__" : {
-                    "name" : "通知栏监听，应用保活，后台持续运行，获取通知栏消息可传后台可配声音可前端展示！ - [试用版，仅用于自定义调试基座]",
-                    "description" : "插件主要用于需要持续监听应用通知，保活，支付宝、微信个人收款监听，商家应用后台声音提醒，关闭应用也能提醒！",
-                    "platforms" : "Android",
-                    "url" : "https://ext.dcloud.net.cn/plugin?id=6910",
-                    "android_package_name" : "",
-                    "ios_bundle_id" : "",
-                    "isCloud" : true,
-                    "bought" : 0,
-                    "pid" : "6910",
-                    "parameters" : {}
-                }
             }
         }
     },
@@ -154,9 +126,10 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "",
+        "appid" : "wxf32f0025615e24e6",
         "setting" : {
-            "urlCheck" : false
+            "urlCheck" : false,
+            "es6" : true
         },
         "usingComponents" : true
     },

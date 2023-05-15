@@ -90,11 +90,11 @@
 </template>
 
 <script>
-	import RTC from "../../../until/rtc.js";
+	import RTC from "../../../until/APP-PLUS/rtc.js";
 	import {
 		RTCUtils,
 		Utils
-	} from "../../../until/until.js";
+	} from "../../../until/APP-PLUS/until.js";
 	const BindingX = uni.requireNativePlugin('bindingx');
 	export default {
 		data() {

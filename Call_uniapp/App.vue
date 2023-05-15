@@ -1,19 +1,31 @@
 <script>
-	const hgService = uni.requireNativePlugin("HG-Background");
+	// #ifdef MP-WEIXIN
+	import {RTM} from './until/MP-WEIXIN/index.js'
+	// #endif
 	export default {
 		onLaunch: function() {
+			
+			// #ifdef APP-PLUS
 			// 锁定横屏  
 			// plus.screen.lockOrientation("landscape-primary");  
 			// 锁定竖屏  
 			plus.screen.lockOrientation("portrait-primary");
-			// 相机、麦克风权限
+			// 相机、麦克风权限 app
 			this.$Utils.equipment();
+			// #endif
+			
 			let oa = true;
 			// 确保联网
 			uni.getNetworkType({
 				success: (res) => {
 					if (res.networkType !== "none") {
+						// #ifdef APP-PLUS
 						this.$RTM.init();
+						// #endif
+
+						// #ifdef MP-WEIXIN
+						RTM.InItRtm();
+						// #endif
 						oa = false;
 					} else {
 						uni.showLoading({
@@ -26,7 +38,13 @@
 				if (res.isConnected) {
 					uni.hideLoading();
 					if (oa) {
+						// #ifdef APP-PLUS
 						this.$RTM.init();
+						// #endif
+
+						// #ifdef MP-WEIXIN
+						RTM.InItRtm();
+						// #endif
 						oa = false;
 					}
 				} else {
@@ -40,16 +58,10 @@
 		},
 		onShow: function() {
 			console.log('App Show')
-			hgService.closeService();
+
 		},
 		onHide: function() {
 			console.log('App Hide')
-			hgService.config({
-				title: "ArCall",
-				content: "服务运行中",
-				mode: 0, //0省电模式 1流氓模式
-			});
-			hgService.startService();
 		}
 	}
 </script>

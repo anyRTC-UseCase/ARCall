@@ -1,6 +1,11 @@
 <!-- rtm 呼叫邀请页面 -->
 <template>
-	<view class="conent content_bg" :style="{width: windowWidth + 'px',height: windowHeight + 'px'}">
+	<view class="conent content_bg"
+		:style="{width: windowWidth + 'px',height: windowHeight + 'px'}">
+		<view class="content_bg_img">
+			<image class="content_bg_img_" src="../../static/icon_back.png" mode=""></image>
+		</view>
+		
 		<!-- 头像 -->
 		<view class="">
 			<image style="width: 120px;height: 120px;" src="../../static/icon_head.png" mode=""></image>
@@ -38,6 +43,12 @@
 </template>
 
 <script>
+	// #ifdef MP-WEIXIN
+	import {
+		Store
+	} from '../../until/MP-WEIXIN/index.js'
+	// #endif
+
 	export default {
 		onLoad(option) {
 			if (option.info) {
@@ -67,10 +78,11 @@
 				current: 'rtm',
 				network: false,
 
-				networkEnd: null
+				networkEnd: null,
 			}
 		},
 		created() {
+			// #ifdef APP-PLUS
 			// 断网后处理
 			uni.onNetworkStatusChange((res) => {
 				if (res.isConnected) {
@@ -92,10 +104,12 @@
 					}, 30000);
 				}
 			});
+			// #endif
 		},
 		methods: {
 			// 挂断
 			async cancelFn() {
+				// #ifdef APP-PLUS
 				// 结束正在通话
 				this.$Utils.restoreAll();
 				if (this.type === "主叫") {
@@ -106,14 +120,22 @@
 					console.log("被叫挂断(拒绝对方的呼叫邀请)", this.uid);
 					await this.$RTM.refuseRemoteInvitation(this.uid);
 				}
-				// // 发送挂断信息
-				// uni.$emit("sendMessageToPeer", {
-				// 	Cmd: 'EndCall',
-				// 	peerid: this.uid
-				// });
+				// #endif
+
+
+				// #ifdef MP-WEIXIN
+				if (this.type === "主叫") {
+					// 主叫取消
+					Store.localInvitation && await Store.localInvitation.cancel();
+				} else {
+					// 被叫拒绝
+					Store.remoteInvitation && await Store.remoteInvitation.refuse();
+				}
+				// #endif
 			},
 			// 接听
 			acceptFn() {
+				// #ifdef APP-PLUS
 				this.current = 'rtc'
 				this.$RTM.acceptRemoteInvitation(this.uid, {
 					Mode: this.mode === '视频' ? 0 : 1, // 
@@ -121,9 +143,28 @@
 					UserData: "",
 					SipData: "",
 				});
+				// #endif
+
+				// #ifdef MP-WEIXIN
+				if (Store.remoteInvitation) {
+					console.log("接受邀请", Store.remoteInvitation);
+					// 设置响应模式
+					Store.remoteInvitation.response = JSON.stringify({
+						Mode: this.mode === '视频' ? 0 : 1,
+						Conference: false,
+						UserData: "",
+						SipData: "",
+					});
+					// 本地模式
+					Store.Mode = this.mode === '视频' ? 0 : 1;
+					// 接受邀请
+					Store.remoteInvitation.accept();
+				}
+				// #endif
 			},
 			// 转语音
 			switchFn() {
+				// #ifdef APP-PLUS
 				this.current = 'rtc'
 				// 转语音并接受呼叫
 				this.$RTM.acceptRemoteInvitation(this.uid, {
@@ -132,6 +173,23 @@
 					UserData: "",
 					SipData: "",
 				});
+				// #endif
+
+				// #ifdef MP-WEIXIN
+				if (Store.remoteInvitation) {
+					// 设置响应模式
+					Store.remoteInvitation.response = JSON.stringify({
+						Mode: 1,
+						Conference: false,
+						UserData: "",
+						SipData: "",
+					});
+					// 本地模式
+					Store.Mode = 1;
+					// 接受邀请
+					Store.remoteInvitation.accept();
+				}
+				// #endif
 			},
 		}
 	}
@@ -139,10 +197,23 @@
 
 <style scoped>
 	.content_bg {
-		background: url(../../static/icon_back.png) no-repeat;
-		background-size: cover;
-		background-position: center;
 		position: relative;
+	}
+
+	.content_bg_img {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		display: flex;
+		z-index: -1;
+	}
+
+	.content_bg_img_ {
+		flex: 1;
+		width: 100%;
+		height: 100%;
 	}
 
 	.conent {
