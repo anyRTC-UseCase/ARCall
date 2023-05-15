@@ -73,7 +73,6 @@ class GroupCallActivity : BaseActivity() {
                         val params = JSONObject()
                         val callArray = JSONArray()
                         val channelId = ((Math.random()*9+1)* 100000000L).toLong().toString()
-                        callArray.put(callViewModel.userId)
                         params.put("Mode", 0)
                         params.put("Conference", true)
                         params.put("ChanId", channelId)
