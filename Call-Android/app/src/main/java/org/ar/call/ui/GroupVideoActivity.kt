@@ -61,7 +61,7 @@ class GroupVideoActivity : BaseActivity() {
             if (!isCalled){
                 startRing()
             }
-            callArray?.forEach {
+            callArray?.filter { !it.equals(callViewModel.userId) }?.forEach {
                 memberAdapter.addData(org.ar.call.bean.RtcMember.Factory.create(it))
                 if (!isCalled){
                     val response = intent.getStringExtra("content")
@@ -136,7 +136,6 @@ class GroupVideoActivity : BaseActivity() {
                             callArray?.add(inviteBinding.etUser.text.toString())
                             val params = JSONObject()
                             val arr = JSONArray()
-                            arr.put(callViewModel.userId)
                             params.put("Mode", 0)
                             params.put("Conference", true)
                             params.put("ChanId", channelId)
@@ -241,7 +240,7 @@ class GroupVideoActivity : BaseActivity() {
     override fun onMemberJoined(member: RtmChannelMember?) {
         super.onMemberJoined(member)
        member?.let {
-           if (!it.userId.equals(callViewModel.userId)&&it.userId !in callArray!!){
+           if (it.userId !in callArray!!){
                memberAdapter.addData(org.ar.call.bean.RtcMember.Factory.create(member?.userId.toString()))
                callArray?.add(member?.userId.toString())//邀请的人可能是
            }
