@@ -80,6 +80,7 @@ class GroupCallActivity : BaseActivity() {
                         it.forEach{
                             callArray.put(it)
                         }
+                        it.add(callViewModel.userId)
                         params.put("UserData", callArray)
                         startActivity(Intent(this@GroupCallActivity, GroupVideoActivity::class.java).apply {
                             putExtra("callArray", it)

@@ -58,10 +58,12 @@ class GroupVideoActivity : BaseActivity() {
                 isOpenAudio = true
                 isOpenVideo = true
             })
-            callArray?.forEach {
+            if (!isCalled){
+                startRing()
+            }
+            callArray?.filter { !it.equals(callViewModel.userId) }?.forEach {
                 memberAdapter.addData(org.ar.call.bean.RtcMember.Factory.create(it))
                 if (!isCalled){
-                    startRing()
                     val response = intent.getStringExtra("content")
                     val localInvitation = callViewModel.rtmCallManager.createLocalInvitation(it)?.apply {
                         content=response
@@ -134,7 +136,6 @@ class GroupVideoActivity : BaseActivity() {
                             callArray?.add(inviteBinding.etUser.text.toString())
                             val params = JSONObject()
                             val arr = JSONArray()
-                            arr.put(callViewModel.userId)
                             params.put("Mode", 0)
                             params.put("Conference", true)
                             params.put("ChanId", channelId)
@@ -197,7 +198,7 @@ class GroupVideoActivity : BaseActivity() {
             binding.chronometer.start()
             memberAdapter.data.forEachIndexed { index, rtcMember ->
                 if (rtcMember.userId == it) {
-                    rtcVM.setupRemoteVideo(rtcMember.getVideoCanvas(this,Constants.RENDER_MODE_FIT)!!)
+                    rtcVM.setupRemoteVideo(rtcMember.getVideoCanvas(this,Constants.RENDER_MODE_HIDDEN)!!)
                     rtcMember.isWaiting = false
                     memberAdapter.notifyItemChanged(index, org.ar.call.bean.MemberAVStatus.WAITING(false))
                     return@forEachIndexed
@@ -238,10 +239,12 @@ class GroupVideoActivity : BaseActivity() {
 
     override fun onMemberJoined(member: RtmChannelMember?) {
         super.onMemberJoined(member)
-        if (member?.userId.toString() !in callArray!!){
-            memberAdapter.addData(org.ar.call.bean.RtcMember.Factory.create(member?.userId.toString()))
-            callArray?.add(member?.userId.toString())//邀请的人可能是
-        }
+       member?.let {
+           if (it.userId !in callArray!!){
+               memberAdapter.addData(org.ar.call.bean.RtcMember.Factory.create(member?.userId.toString()))
+               callArray?.add(member?.userId.toString())//邀请的人可能是
+           }
+       }
     }
 
     override fun onMemberLeft(member: RtmChannelMember?) {
