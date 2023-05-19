@@ -2362,7 +2362,7 @@ var OperationPackge = {
         Store.ownUserId,
         Store.setting.enableAudio
       );
-       // 绑定大小屏切换
+      // 绑定大小屏切换
       await Utils.switchover({
         uid: Store.ownUserId,
         videoTrack: Store.localTracks.videoTrack,
@@ -2751,12 +2751,16 @@ var OperationPackge = {
   });
 
   // 音视频展示-语音通话页面 音频开关
-  $("#audioSwitchBtn").click(function () {
+  $("#audioSwitchBtn").click(async function () {
     Store.localTracks.audioTrack.isMuted =
       !Store.localTracks.audioTrack.isMuted;
-    Store.localTracks.audioTrack.setEnabled(
-      !Store.localTracks.audioTrack.isMuted
-    );
+    // Store.localTracks.audioTrack.setEnabled(
+    //   !Store.localTracks.audioTrack.isMuted
+    // );
+    Store.localTracks.audioTrack &&
+      (await Store.localTracks.audioTrack.setMuted(
+        Store.localTracks.audioTrack.isMuted
+      ));
     PageShow.audioSwitch();
   });
   // 音视频展示-语音通话页面 音频挂断
