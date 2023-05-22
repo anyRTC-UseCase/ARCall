@@ -24,26 +24,26 @@ ArCall点对点呼叫Demo可普遍使用于在线医疗、在线教育、企业�
 
 #### RTM-SDK功能
 
-- 创建RTM实时消息引擎：[initWithAppId](https://docs.anyrtc.io/rtm-ios/docs/ios_rtm/ios_rtm_kit#initwithappid)
-- 登录：[loginByToken](https://docs.anyrtc.io/rtm-ios/docs/ios_rtm/ios_rtm_kit#loginbytoken)
-- 获取呼叫对象：[getRtmCallKit](https://docs.anyrtc.io/rtm-ios/docs/ios_rtm/ios_rtm_kit#getrtmcallkit)
-- 呼叫邀请：[sendLocalInvitation](https://docs.anyrtc.io/rtm-ios/docs/ios_rtm/ios_rtm_callkit#sendlocalinvitation)
-- 取消呼叫邀请：[cancelLocalInvitation](https://docs.anyrtc.io/rtm-ios/docs/ios_rtm/ios_rtm_callkit#cancellocalinvitation)
-- 接受呼叫邀请：[acceptRemoteInvitation](https://docs.anyrtc.io/rtm-ios/docs/ios_rtm/ios_rtm_callkit#acceptremoteinvitation)
-- 拒绝呼叫邀请：[refuseRemoteInvitation](https://docs.anyrtc.io/rtm-ios/docs/ios_rtm/ios_rtm_callkit#refuseremoteinvitation)
+- 创建RTM实时消息引擎：[initWithAppId](https://docs.anyrtc.io/cn/RealTimeMessage/api-ref/rtm_ios/rtmkit#initwithappid)
+- 登录：[loginByToken](https://docs.anyrtc.io/cn/RealTimeMessage/api-ref/rtm_ios/rtmkit#loginbytoken)
+- 获取呼叫对象：[getRtmCallKit](https://docs.anyrtc.io/cn/RealTimeMessage/api-ref/rtm_ios/rtmkit#getrtmcallkit)
+- 呼叫邀请：[sendLocalInvitation](https://docs.anyrtc.io/cn/RealTimeMessage/api-ref/rtm_ios/rtmcallkit#sendlocalinvitation)
+- 取消呼叫邀请：[cancelLocalInvitation](https://docs.anyrtc.io/cn/RealTimeMessage/api-ref/rtm_ios/rtmcallkit#cancellocalinvitation)
+- 接受呼叫邀请：[acceptRemoteInvitation](https://docs.anyrtc.io/cn/RealTimeMessage/api-ref/rtm_ios/rtmcallkit#acceptremoteinvitation)
+- 拒绝呼叫邀请：[refuseRemoteInvitation](https://docs.anyrtc.io/cn/RealTimeMessage/api-ref/rtm_ios/rtmcallkit#refuseremoteinvitation)
 
 #### RTC-SDK功能
 
-- 创建RTC音视频引擎：[sharedEngineWithAppId](https://docs.anyrtc.io/rtc-ios/docs/ios/ios_rtc_kit#sharedengineWithappId)
-- 启用视频模块：[enableVideo](https://docs.anyrtc.io/rtc-ios/docs/ios/ios_rtc_kit#enablevideo)
-- 设置视频编码属性：[setVideoEncoderConfiguration](https://docs.anyrtc.io/rtc-ios/docs/ios/ios_rtc_kit#setvideoencoderconfiguration)
-- 初始化本地视图：[setupLocalVideo](https://docs.anyrtc.io/rtc-ios/docs/ios/ios_rtc_kit#setuplocalvideo)
-- 加入频道：[joinChannelByToken](https://docs.anyrtc.io/rtc-ios/docs/ios/ios_rtc_kit#joinchannelbytoken)
-- 离开频道：[leaveChannel](https://docs.anyrtc.io/rtc-ios/docs/ios/ios_rtc_kit#leavechannel)
-- 静音/取消静音：[muteLocalAudioStream](https://docs.anyrtc.io/rtc-ios/docs/ios/ios_rtc_kit#mutelocalaudiostream)
-- 打开/关闭扬声器：[setEnableSpeakerphone](https://docs.anyrtc.io/rtc-ios/docs/ios/ios_rtc_kit#setenablespeakerphone)
-- 开关本地视频发送：[muteLocalVideoStream](https://docs.anyrtc.io/rtc-ios/docs/ios/ios_rtc_kit#mutelocalvideostream)
-- 切换前后摄像头：[switchCamera](https://docs.anyrtc.io/rtc-ios/docs/ios/ios_rtc_kit#switchcamera)
+- 创建RTC音视频引擎：[sharedEngineWithAppId](https://docs.anyrtc.io/cn/Video/api-ref/rtc_ios/rtc_engine#sharedengineWithappId)
+- 启用视频模块：[enableVideo](https://docs.anyrtc.io/cn/Video/api-ref/rtc_ios/rtc_engine#enablevideo)
+- 设置视频编码属性：[setVideoEncoderConfiguration](https://docs.anyrtc.io/cn/Video/api-ref/rtc_ios/rtc_engine#setvideoencoderconfiguration)
+- 初始化本地视图：[setupLocalVideo](https://docs.anyrtc.io/cn/Video/api-ref/rtc_ios/rtc_engine#setuplocalvideo)
+- 加入频道：[joinChannelByToken](https://docs.anyrtc.io/cn/Video/api-ref/rtc_ios/rtc_engine#joinchannelbytoken)
+- 离开频道：[leaveChannel](https://docs.anyrtc.io/cn/Video/api-ref/rtc_ios/rtc_engine#leavechannel)
+- 静音/取消静音：[muteLocalAudioStream](https://docs.anyrtc.io/cn/Video/api-ref/rtc_ios/rtc_engine#mutelocalaudiostream)
+- 打开/关闭扬声器：[setEnableSpeakerphone](https://docs.anyrtc.io/cn/Video/api-ref/rtc_ios/rtc_engine#setenablespeakerphone)
+- 开关本地视频发送：[muteLocalVideoStream](https://docs.anyrtc.io/cn/Video/api-ref/rtc_ios/rtc_engine#mutelocalvideostream)
+- 切换前后摄像头：[switchCamera](https://docs.anyrtc.io/cn/Video/api-ref/rtc_ios/rtc_engine#switchcamera)
 
 功能展示为iOS接口，其他平台接口请前往[文档中心](https://docs.anyrtc.io/)。
 
@@ -83,7 +83,7 @@ ARCall 示例项目支持以下平台和版本：
 
 ## 常见问题
 
-详见[常见问题](https://docs.anyrtc.io/platforms/docs/platforms/FAQ/faq)。
+详见[常见问题](https://docs.anyrtc.io/cn/Video/faq/faq)。
 
 ## **anyRTC创业扶持计划**
 
