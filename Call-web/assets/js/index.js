@@ -511,6 +511,11 @@ var Utils = {
 
 // 本地数据存储
 var Store = {
+  // 麦克风设备记录
+  microhonesList: [],
+  // 摄像头设备记录
+  camerasList: [],
+
   repetitionClick: false, // 按钮重复点击标记
   Conference: false, // 选择的呼叫模式  false: p2p呼叫  true: 多人呼叫
   Calling: false, // 正在通话中(标识)
@@ -768,10 +773,16 @@ var SdkPackge = {
   Support: {
     // 硬件设备支持
     hardwareSupport: async function () {
-      var [cameras, microhones] = await Promise.all([
-        ArRTC.getCameras(),
-        ArRTC.getMicrophones(),
-      ]);
+      const mediaDevices = await ArRTC.getDevices();
+      const cameras = [];
+      const microhones = [];
+      mediaDevices.forEach((deviceInfo) => {
+        if (deviceInfo.kind === "audioinput") {
+          microhones.push(deviceInfo);
+        } else if (deviceInfo.kind === "videoinput") {
+          cameras.push(deviceInfo);
+        }
+      });
       if (cameras.length === 0 && microhones.length === 0) {
         Utils.alertWhole("缺少麦克风和摄像头设备", "alert-danger");
         $("#MultipleCalls").prop("disabled", true);
@@ -786,6 +797,11 @@ var SdkPackge = {
           $("#userMicrophoneSetting").prop("disabled", true);
         }
       }
+      // 记录麦克风设备
+      Store.microhonesList = microhones;
+      // 记录摄像头设备
+      Store.camerasList = cameras;
+
       // 视频设备列表
       SdkPackge.Support.camerasList(cameras);
       // 音频设备列表
@@ -912,13 +928,12 @@ var SdkPackge = {
 
     // 本地采集用户音视频
     getUserMedia: async function () {
-      var [cameras, microhones] = await Promise.all([
-        ArRTC.getCameras(),
-        ArRTC.getMicrophones(),
-      ]);
+      if (Store.camerasList.length === 0 && Store.microhonesList.length === 0) {
+        await SdkPackge.Support.hardwareSupport();
+      }
       if (Store.Conference) {
         // 多人模式
-        if (cameras.length > 0 && Store.setting.enableVideo) {
+        if (Store.camerasList.length > 0 && Store.setting.enableVideo) {
           // 开启双流
           Store.rtcClient
             .enableDualStream()
@@ -941,7 +956,7 @@ var SdkPackge = {
             console.log("err => ", err);
           });
         }
-        if (microhones.length > 0 && Store.setting.enableAudio) {
+        if (Store.microhonesList.length > 0 && Store.setting.enableAudio) {
           Store.localTracks.audioTrack = await ArRTC.createMicrophoneAudioTrack(
             {
               microphoneId: Store.setting.audioDevice,
@@ -952,7 +967,7 @@ var SdkPackge = {
         }
       } else {
         // p2p 模式
-        if (cameras.length > 0) {
+        if (Store.camerasList.length > 0) {
           Store.localTracks.videoTrack = await ArRTC.createCameraVideoTrack({
             cameraId: Store.setting.videoDevice,
             encoderConfig: {
@@ -966,7 +981,7 @@ var SdkPackge = {
             console.log("err => ", err);
           });
         }
-        if (microhones.length > 0) {
+        if (Store.microhonesList.length > 0) {
           Store.localTracks.audioTrack = await ArRTC.createMicrophoneAudioTrack(
             {
               microphoneId: Store.setting.audioDevice,
@@ -977,7 +992,6 @@ var SdkPackge = {
         }
       }
 
-      // }
       // 音频展示(p2p)
       PageShow.audioSwitch();
     },
