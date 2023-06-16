@@ -203,9 +203,11 @@ p {
   margin: 34px auto 0;
   display: block;
   box-sizing: border-box;
-  height: 210px;
   background: #f7f7f7;
   position: relative;
+  align-items: center;
+  width: 100%;
+  flex: 1;
 }
 
 .setting-video_preview_bg {
@@ -227,7 +229,12 @@ p {
   font-size: 0.8em;
   color: #6a6a6a;
 }
-
+.setting-bd {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1;
+}
 .setting-bd > select {
   outline: none;
   border: 0;

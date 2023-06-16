@@ -527,6 +527,11 @@ var Store = {
   invitationClearTimeouts: {}, // 存放多个有效期计时(定时器仅多人呼叫使用)
   bigMutiUser: {}, // 大屏展示(仅多人呼叫使用)
   recordUser: [], // 记录页面展示的音视频轨道(仅多人呼叫使用)
+  // 大屏展示(仅多人呼叫使用)
+  bigMutiUser: {
+    uid: "",
+    videoTrack: null,
+  },
   remoteInvitation: null, // 存放被叫邀请实例
   invitationTimeout: 58 * 1000, // 邀请有效期限
   invitationClearTimeout: null, // 邀请有效期计时(定时器)
@@ -1280,6 +1285,14 @@ var OperationPackge = {
         },
         networkSet: null,
         remodVideoEnd: null,
+
+        recordUser: [], // 记录页面展示的音视频轨道(仅多人呼叫使用)
+        // 大屏展示(仅多人呼叫使用)
+        bigMutiUser: {
+          uid: "",
+          videoTrack: null,
+        },
+        invitationClearTimeouts: {}, // 存放多个有效期计时(定时器仅多人呼叫使用)
       });
     },
     // 正在通话中
@@ -1735,12 +1748,18 @@ var OperationPackge = {
     closeSeting: function () {
       var oTimeTemporary = setInterval(async function () {
         if (Store.localTracks.videoTrack || Store.localTracks.audioTrack) {
-          await clearInterval(oTimeTemporary);
+          clearInterval(oTimeTemporary);
           $("#loginSetting").hasClass("show") &&
             ($("#loginSetting").removeClass("show"),
             $("#loginMutiSetting").hasClass("show") &&
               $("#loginMutiSetting").removeClass("show"),
-            await SdkPackge.RTC.LocalTracksClose());
+            SdkPackge.RTC.LocalTracksClose());
+        } else {
+          clearInterval(oTimeTemporary);
+          $("#loginSetting").hasClass("show") &&
+            ($("#loginSetting").removeClass("show"),
+            $("#loginMutiSetting").hasClass("show") &&
+              $("#loginMutiSetting").removeClass("show"));
         }
       }, 50);
     },
@@ -2232,8 +2251,8 @@ var OperationPackge = {
 
     // 音视频设置
     setVideoOrAudio: async function () {
-      await PageShow.setEnableAudio(Store.setting.enableAudio);
-      await PageShow.setEnableVideo(Store.setting.enableVideo);
+      PageShow.setEnableAudio(Store.setting.enableAudio);
+      PageShow.setEnableVideo(Store.setting.enableVideo);
     },
 
     // 发起呼叫
@@ -2660,13 +2679,17 @@ var OperationPackge = {
   ArRTC.onMicrophoneChanged = function (info) {
     SdkPackge.Support.microphoneChanged(info);
   };
-  // SDK 设备支持检测
-  var fase = await SdkPackge.Support.hardwareSupport();
-  fase &&
-    // 初始化RTC
-    (SdkPackge.RTC.init(),
-    // 初始化RTM
-    SdkPackge.RTM.init());
+  // // SDK 设备支持检测
+  // var fase = await SdkPackge.Support.hardwareSupport();
+  // fase &&
+  //   // 初始化RTC
+  //   (SdkPackge.RTC.init(),
+  //   // 初始化RTM
+  //   SdkPackge.RTM.init());
+  // 初始化RTC
+  SdkPackge.RTC.init();
+  // 初始化RTM
+  SdkPackge.RTM.init();
 })();
 
 // p2p点击相关操作4
@@ -2682,17 +2705,24 @@ var OperationPackge = {
   // 打开设置
   $("#openSettingBtn").click(async function () {
     if (!$("#loginSetting").hasClass("show")) {
-      $("#loginSetting").addClass("show");
-      // 清空容器
-      await $("#settingVideoPreview").html("");
-      // 释放采集设备
-      await SdkPackge.RTC.LocalTracksClose();
-      // 重新采集视频
-      await SdkPackge.RTC.getUserMedia();
-      // 本地预览
-      Store.localTracks.videoTrack &&
-        Store.localTracks.videoTrack.play("settingVideoPreview");
-      Store.localTracks.audioTrack && Store.localTracks.audioTrack.play();
+      try {
+        $("#loginSetting").addClass("show");
+        // 清空容器
+        await $("#settingVideoPreview").html("");
+        // 释放采集设备
+        await SdkPackge.RTC.LocalTracksClose();
+        // 重新采集视频
+        await SdkPackge.RTC.getUserMedia();
+        // 本地预览
+        Store.localTracks.videoTrack &&
+          Store.localTracks.videoTrack.play("settingVideoPreview");
+        Store.localTracks.audioTrack && Store.localTracks.audioTrack.play();
+      } catch (error) {
+        console.log("==> 设置相关错误", error);
+        if (error.code === "PERMISSION_DENIED") {
+          Utils.alertWhole("设备被禁用");
+        }
+      }
     }
   });
   // 关闭设置
@@ -2897,7 +2927,7 @@ var OperationPackge = {
           !Store.setting.enableVideo
         ));
     }
-    await PageShow.setEnableVideo(Store.setting.enableVideo);
+    PageShow.setEnableVideo(Store.setting.enableVideo);
   });
   // 挂断
   $("#hangupMutiBtn").click(async function () {
@@ -2906,14 +2936,14 @@ var OperationPackge = {
         clearTimeout(Store.invitationClearTimeouts[key]);
     });
     // 释放采集设备
-    await SdkPackge.RTC.LocalTracksClose();
+    SdkPackge.RTC.LocalTracksClose();
 
     // // 通话页面恢复初始
-    await PageShow.initSetingMulti();
+    PageShow.initSetingMulti();
     // // 回到首页
-    await PageShow.showIndex();
+    PageShow.showIndex();
     // // 本地存储恢复
-    await OperationPackge.public.restoreDefault();
+    OperationPackge.public.restoreDefault();
   });
   // 输入框 (会议中邀请)
   Utils.inputChangId("#userMutiModalInputs > input");
