@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ar-rtc-miniapp": "^4.0.4",
-    "ar-rtm-sdk": "^1.0.5"
+    "ar-rtc-miniapp": "^4.0.6",
+    "ar-rtm-sdk": "^1.0.11"
   }
 }

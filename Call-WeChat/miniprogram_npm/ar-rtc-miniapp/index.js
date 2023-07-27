@@ -4,10 +4,10 @@ var __DEFINE__ = function(modId, func, req) { var m = { exports: {}, _tempexport
 var __REQUIRE__ = function(modId, source) { if(!__MODS__[modId]) return require(source); if(!__MODS__[modId].status) { var m = __MODS__[modId].m; m._exports = m._tempexports; var desp = Object.getOwnPropertyDescriptor(m, "exports"); if (desp && desp.configurable) Object.defineProperty(m, "exports", { set: function (val) { if(typeof val === "object" && val !== m._exports) { m._exports.__proto__ = val.__proto__; Object.keys(val).forEach(function (k) { m._exports[k] = val[k]; }); } m._tempexports = val }, get: function () { return m._tempexports; } }); __MODS__[modId].status = 1; __MODS__[modId].func(__MODS__[modId].req, m, m.exports); } return __MODS__[modId].m.exports; };
 var __REQUIRE_WILDCARD__ = function(obj) { if(obj && obj.__esModule) { return obj; } else { var newObj = {}; if(obj != null) { for(var k in obj) { if (Object.prototype.hasOwnProperty.call(obj, k)) newObj[k] = obj[k]; } } newObj.default = obj; return newObj; } };
 var __REQUIRE_DEFAULT__ = function(obj) { return obj && obj.__esModule ? obj.default : obj; };
-__DEFINE__(1677036453123, function(require, module, exports) {
+__DEFINE__(1690447249537, function(require, module, exports) {
 /*!
-  * ar-rtc-miniapp v4.0.4
-  * (c) 2022 anyRTM SDK
+  * ar-rtc-miniapp v4.0.6
+  * (c) 2023 anyRTM SDK
   * @license MIT
   */
 
@@ -106,7 +106,7 @@ function __values(o) {
 
 var packageJson = {
 	name: "ar-rtc-miniapp",
-	version: "4.0.4",
+	version: "4.0.6",
 	description: "For publishing npm package anyrtc SDK (WeChat). Get more information from https://www.anyrtc.io.",
 	scripts: {
 		build: "node scripts/build.js --mode=production",
@@ -123,7 +123,7 @@ var packageJson = {
 	typings: "./dist/ar-rtc-miniapp-public.d.ts",
 	files: [
 		"dist/*.js",
-		"dist/ar-rtc-miniapp-sdk-public.d.ts",
+		"dist/ar-rtc-miniapp-public.d.ts",
 		"README.md"
 	],
 	author: "https://www.anyrtc.io",
@@ -1613,7 +1613,8 @@ var Client = /** @class */ (function (_super) {
         }
         _this.channelName = channel;
         // 校验 uid
-        var uidRegexp = /^[a-zA-Z0-9]{1,48}$/;
+        // const uidRegexp = /^[a-zA-Z0-9]{1,48}$/;
+        var uidRegexp = /^[a-zA-Z0-9 \!\#\$\%\&\(\)\+\-\:\;\<\=\.\>\?\@\[\]\^\_\{\}\|\~\,]{1,48}$/;
         if ("" !== uid && void 0 !== uid && null !== uid) {
             if (!uidRegexp.test(uid)) {
                 Logger.error("[join] Invalid uid");
@@ -2333,8 +2334,10 @@ var Client = /** @class */ (function (_super) {
                 msgContent.Code;
                 switch (Cmd) {
                     case "ConnectionStateChange":
-                        var curState = msgContent.curState; msgContent.revState; msgContent.reason;
+                        var curState = msgContent.curState, revState = msgContent.revState, reason = msgContent.reason;
                         _this._state = curState;
+                        // TODO 需要添加「重连逻辑」，但是重连逻辑需要配合 live-pusher / live-player
+                        _this.emit("connection-state-change", curState, revState, reason);
                         break;
                     case "StreamAdded": // 远端用户发布媒体流
                         msgContent.ChanId; var UserId = msgContent.UserId;
@@ -2555,7 +2558,7 @@ var main = {
 module.exports = main;
 
 }, function(modId) {var map = {}; return __REQUIRE__(map[modId], modId); })
-return __REQUIRE__(1677036453123);
+return __REQUIRE__(1690447249537);
 })()
 //miniprogram-npm-outsideDeps=[]
 //# sourceMappingURL=index.js.map

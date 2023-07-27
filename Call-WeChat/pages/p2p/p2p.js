@@ -1,5 +1,5 @@
-const RTM = require("../../utils/rtm")
-const Store = require("../../utils/store");
+import RTMCustom from "../../utils/rtm";
+import Store from "../../utils/store";
 // pages/p2p/p2p.js
 Page({
 
@@ -34,13 +34,13 @@ Page({
             return false;
         }
         // 查询远端用户是否在线
-        const oLine = await RTM.rtmInternal.peerUserQuery(Store.peerUserId);
+        const oLine = await RTMCustom.rtmInternal.peerUserQuery(Store.peerUserId);
         if (oLine) {
             wx.showActionSheet({
                 itemList: ['视频通话', '语音通话'],
                 success(res) {
                     // 发送呼叫邀请
-                    RTM.rtmInternal.inviteSend(res.tapIndex);
+                    RTMCustom.rtmInternal.inviteSend(res.tapIndex);
                 },
                 fail(res) {
                     console.log(res.errMsg)

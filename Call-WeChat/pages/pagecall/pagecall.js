@@ -1,8 +1,8 @@
-const Until = require("../../utils/util");
-const Store = require("../../utils/store");
-const RTC = require("../../utils/rtc");
-const RTM = require("../../utils/rtm");
-const liveCode = require("../../utils/live-code");
+import Until from "../../utils/util";
+import LiveCode from "../../utils/live-code";
+import RTCCustom from "../../utils/rtc";
+import RTMCustom from "../../utils/rtm";
+import Store from "../../utils/store";
 Page({
 
     /**
@@ -37,7 +37,7 @@ Page({
         }
         if (e.detail.code != 1006 && e.detail.message) {
             wx.showToast({
-                title: liveCode[e.detail.code] || e.detail.message,
+                title: LiveCode[e.detail.code] || e.detail.message,
                 icon: 'none',
             })
         }
@@ -130,13 +130,13 @@ Page({
         // 被动变更
         Store.rtcClient.muteLocal('video');
         // 发送切换语音消息
-        RTM.rtmInternal.sendMessage(Store.peerUserId, {
+        RTMCustom.rtmInternal.sendMessage(Store.peerUserId, {
             Cmd: "SwitchAudio",
         })
     },
     // 挂断
     endCall() {
-        RTC.rtcInternal.leaveChannel(true);
+        RTCCustom.rtcInternal.leaveChannel(true);
     },
     // 翻转摄像头
     switchCamera() {
@@ -150,7 +150,7 @@ Page({
         this.setData({
             enableMic: this.data.enableMic ? false : true,
         });
-        RTC.rtcInternal.switchAudio(this.data.enableMic);
+        RTCCustom.rtcInternal.switchAudio(this.data.enableMic);
     },
     // 免提
     handsFree() {

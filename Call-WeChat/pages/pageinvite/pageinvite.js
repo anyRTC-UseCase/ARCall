@@ -1,8 +1,5 @@
-// const RTM = require("../../utils/rtm")
-const Store = require("../../utils/store");
-const Until = require("../../utils/util");
 // pages/p2ppage/p2ppage.js
-
+import Store from "../../utils/store";
 // 响铃
 // const innerAudioContext = wx.createInnerAudioContext();
 // let innerAudioContext = null;

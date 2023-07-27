@@ -1,7 +1,6 @@
 // index.js
 // 获取应用实例
-
-const Store = require("../../utils/store");
+import Store from "../../utils/store";
 Page({
   data: {
     motto: '',

@@ -1,11 +1,11 @@
 // 引入 RTC
-const ArRTC = require("ar-rtc-miniapp");
+import ArRTC from "ar-rtc-miniapp";
 // 引入 until
-const Until = require("./util");
+import Until from "./util";
 // 引入 store
-let Store = require("./store");
+import Store from "./store";
 // 引入 SDK 配置
-const Config = require("./config");
+import Config from "./config";
 
 // 初始化 RTC
 const InItRTC = async () => {
@@ -163,13 +163,13 @@ const rtcInternal = {
         console.log("RTC 离开频道", Store);
         Store.networkSendInfoDetection && clearTimeout(Store.networkSendInfoDetection);
         if (Store.rtcClient) {
-            // 引入 RTM
-            const RTM = require("./rtm");
             Store.rtcClient.destroy(() => {
-                console.log("离开频道", RTM);
+                // 引入 RTM 封装逻辑(离开后发送挂断信令)
+                const RTMCustom = require("./rtm");
+                console.log("离开频道", RTMCustom);
                 if (sendfase) {
                     // 发送离开信息
-                    RTM.rtmInternal.sendMessage(Store.peerUserId, {
+                    RTMCustom.rtmInternal.sendMessage(Store.peerUserId, {
                         Cmd: "EndCall",
                     })
                 }

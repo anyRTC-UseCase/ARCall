@@ -1,5 +1,4 @@
-const RTM = require("./utils/rtm");
-// const Store = require("./utils/store");
+import RTMCustom from "./utils/rtm";
 // app.js
 App({
   onLaunch() {
@@ -14,7 +13,7 @@ App({
           })
         } else {
           // anyRTM 初始化
-          RTM.InItRtm();
+          RTMCustom.InItRtm();
         }
       }
     });

@@ -1,13 +1,13 @@
 // 引入 anyRTM 
-const ArRTM = require("ar-rtm-sdk");
+import ArRTM from "ar-rtm-sdk";
 // 引入 until
-const Until = require("./util");
+import Until from "./util";
 // 引入 store
-let Store = require("./store");
+import Store from "./store";
 // 引入 SDK 配置
-const Config = require("../utils/config");
-// 引入 RTC
-const RTC = require("./rtc");
+import Config from "./config";
+// 引入 RTC 封装逻辑
+import RTCCustom from "./rtc";
 
 // 本地 uid 随机生成
 Store.userId = Until.generateNumber(4) + '';
@@ -141,9 +141,9 @@ const rtmEvent = {
                 duration: 2000
             });
             // anyRTC 初始化
-            await RTC.InItRTC();
+            await RTCCustom.InItRTC();
             // 加入 RTC 频道
-            await RTC.rtcInternal.joinChannel();
+            await RTCCustom.rtcInternal.joinChannel();
 
             // 进入通话页面
             wx.reLaunch({
@@ -203,21 +203,18 @@ const rtmEvent = {
                 }, 1500);
             } else {
                 wx.hideLoading();
-                Store = await Object.assign(Store, {
-                    // 通话方式
-                    Mode: invitationContent.Mode,
-                    // 频道房间
-                    channelId: invitationContent.ChanId,
-                    // 存放被叫实例
-                    remoteInvitation,
-                    // 远端用户
-                    peerUserId: remoteInvitation.callerId,
-                    // 标识为正在通话中
-                    Calling: true,
-                    // 是否是单人通话
-                    Conference: invitationContent.Conference,
-                })
-
+                // 通话方式
+                Store.Mode = invitationContent.Mode;
+                // 频道房间
+                Store.channelId = invitationContent.ChanId;
+                // 存放被叫实例
+                Store.remoteInvitation = remoteInvitation;
+                // 远端用户
+                Store.peerUserId = remoteInvitation.callerId;
+                // 标识为正在通话中
+                Store.Calling = true;
+                // 是否是单人通话
+                Store.Conference = invitationContent.Conference;
                 // 跳转至呼叫页面
                 wx.reLaunch({
                     url: '../pageinvite/pageinvite?call=1'
@@ -236,9 +233,9 @@ const rtmEvent = {
             mask: true,
         })
         // anyRTC 初始化
-        await RTC.InItRTC();
+        await RTCCustom.InItRTC();
         // 加入 RTC 频道
-        await RTC.rtcInternal.joinChannel();
+        await RTCCustom.rtcInternal.joinChannel();
         wx.hideLoading()
         // 进入通话页面
         wx.reLaunch({
@@ -278,7 +275,7 @@ const rtmEvent = {
                 break;
             case "EndCall":
                 // 挂断
-                RTC.rtcInternal.leaveChannel(false);
+                RTCCustom.rtcInternal.leaveChannel(false);
                 break;
             case "CallState":
                 // 对方查询本地状态,返回给对方信息
@@ -300,7 +297,7 @@ const rtmEvent = {
                     // 远端 rtc 通话
                     if (Store.State == 1) {
                         // 本地 rtm 呼叫中进入RTC
-                        console.log("本地 rtm 呼叫中进入RTC",Store);
+                        console.log("本地 rtm 呼叫中进入RTC", Store);
                     } else if (Store.State == 2) {
                         // 本地 rtc 通话
                         if (message.text.Mode == 1) {
@@ -369,19 +366,16 @@ const rtmInternal = {
 
     // 主叫发起呼叫
     inviteSend: async (callMode) => {
-        Store = await Object.assign(Store, {
-            // 随机生成频道
-            channelId: '' + Until.generateNumber(9),
-            // 正在通话中
-            Calling: true,
-            // 通话方式
-            Mode: callMode,
-            // 创建呼叫邀请
-            localInvitation: Store.rtmClient.createLocalInvitation(
-                Store.peerUserId
-            )
-        })
-
+        // 随机生成频道
+        Store.channelId = '' + Until.generateNumber(9);
+        // 正在通话中
+        Store.Calling = true;
+        // 通话方式
+        Store.Mode = callMode;
+        // 创建呼叫邀请
+        Store.localInvitation = Store.rtmClient.createLocalInvitation(
+            Store.peerUserId
+        );
         // 设置邀请内容
         Store.localInvitation.content = JSON.stringify({
             Mode: callMode, // 呼叫类型 视频通话 0 语音通话 1
