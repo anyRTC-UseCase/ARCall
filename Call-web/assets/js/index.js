@@ -1438,9 +1438,8 @@ var OperationPackge = {
         if (navigator.onLine) {
           if (Store.lineworkRTC && Store.lineworkRTM) {
             clearInterval(oNormal);
-            if (Store.localTracks.audioTrack || Store.localTracks.videoTrack) {
-              // Store.peerUserIdRTM ? Store.peerUserIdRTM :
-              // 发送挂断信息
+            if (Store.JoinRTCChannel) {
+              // 加入 RTC 频道后挂断 发送挂断信息
               Store.rtmClient &&
                 Store.rtmClient
                   .sendMessageToPeer(
@@ -1455,9 +1454,28 @@ var OperationPackge = {
                     // 你的代码：点对点消息发送失败。
                     // console.log(err);
                   });
-              //  释放采集设备
-              SdkPackge.RTC.LocalTracksClose();
-              OperationPackge.public.restoreDefault();
+              /** 设备采集后释放/无设备后4s后自动释放 */
+              let time = 0;
+              const timer = setInterval(async () => {
+                time++;
+                if (
+                  time >= 20 ||
+                  Store.localTracks.audioTrack ||
+                  Store.localTracks.videoTrack
+                ) {
+                  clearInterval(timer);
+
+                  //  释放采集设备
+                  await SdkPackge.RTC.LocalTracksClose();
+                  await OperationPackge.public.restoreDefault();
+                  // 隐藏被呼叫页面
+                  await PageShow.hiddenCallPage();
+                  // 页面恢复初始
+                  await PageShow.initSetingP2P();
+                  // 回到首页
+                  await PageShow.showIndex();
+                }
+              }, 200);
             } else if (type != 2) {
               if (Store.network.calltype == 0) {
                 // 挂断
@@ -1802,6 +1820,7 @@ var OperationPackge = {
 
     // RTM 主叫: 创建呼叫邀请并发送 (callMode: 视频通话 0 语音通话 1)
     createLocalInvitationAndSend: async function (callMode) {
+      Store.JoinRTCChannel = true;
       // 加入实时通讯频道
       Store.ownUserId = await Store.rtcClient.join(
         Config.APPID,
@@ -1809,7 +1828,6 @@ var OperationPackge = {
         null,
         Store.ownUserId
       );
-      Store.JoinRTCChannel = true;
       // 创建呼叫邀请
       Store.localInvitation = Store.rtmClient.createLocalInvitation(
         Store.peerUserId
@@ -2025,6 +2043,7 @@ var OperationPackge = {
     },
     // RTM 被叫: 接受呼叫邀请成功
     RemoteInvitationAccepted: async function () {
+      Store.JoinRTCChannel = true;
       var invitationContent = JSON.parse(Store.remoteInvitation.response);
       // 接受邀请进入计时，如果频道一定时间内无人加入取消
       Store.callChannelPro = setTimeout(() => {
@@ -2038,7 +2057,7 @@ var OperationPackge = {
         null,
         Store.ownUserId
       );
-      Store.JoinRTCChannel = true;
+
       // 采集音视频
       await SdkPackge.RTC.getUserMedia();
       // 隐藏被呼叫页面
@@ -2261,6 +2280,7 @@ var OperationPackge = {
       Store.invitationUserIds = userOnlineStatus.oOline;
       // 标识为正在通话中
       Store.Calling = true;
+      Store.JoinRTCChannel = true;
       // 本地用户加入 RTM 频道
       await OperationPackge.multi.JoinRTMChannel();
       // 本地用户加入 RTC 实时通讯频道
@@ -2270,8 +2290,6 @@ var OperationPackge = {
         null,
         Store.ownUserId
       );
-      // 标识加入 RTC 频道
-      Store.JoinRTCChannel = true;
       // 提示用户不在线
       userOnlineStatus.oNotOline.length > 0 &&
         Utils.alertWhole("用户" + userOnlineStatus.oNotOline + "不在线");
@@ -2562,6 +2580,7 @@ var OperationPackge = {
     // RTM 被叫: 接受呼叫邀请
     RemoteInvitationAccepted: async function () {
       // console.log("被叫: 接受呼叫邀请");
+      Store.JoinRTCChannel = true;
       // 加入 RTC 实时通讯频道
       Store.ownUserId = await Store.rtcClient.join(
         Config.APPID,
@@ -2569,7 +2588,6 @@ var OperationPackge = {
         null,
         Store.ownUserId
       );
-      Store.JoinRTCChannel = true;
       // 更新用户状态及窗口显示 - 对方已接收
       await Utils.updateUserViewStatus(Store.remoteInvitation.callerId, 1);
       await OperationPackge.multi.LocalAudioVideoRender();
