@@ -4,7 +4,7 @@
 
 - 准备工作：请确保你已经完成 ARCall 项目指南中 的准备工作。
 - 真机
-- [运行 uniapp 视频插件前提步骤](https://github.com/anyRTC-UseCase/ARCall/tree/master/Call_uniapp/README)
+- [运行 uniapp 视频插件前提步骤](https://github.com/anyRTC-UseCase/ARCall/blob/master/Call_uniapp/README/%E8%BF%90%E8%A1%8Cuniapp%E8%A7%86%E9%A2%91%E6%8F%92%E4%BB%B6%E5%89%8D%E6%8F%90.md)
 
 ## 运行示例项目
 
